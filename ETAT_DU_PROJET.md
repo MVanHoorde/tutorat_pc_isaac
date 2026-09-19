@@ -75,4 +75,10 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 - **19/09/2026** — Mise en ligne de la maquette v2, puis de la v3.
 - **19/09/2026** — Ajout du script d'analyse et du générateur d'identifiants, du `.gitignore` et de ce fichier.
+- **19/09/2026** — Supabase activé :
+  - inscription libre fermée, tables créées, fonction `premiere-connexion` déployée ;
+  - 76 élèves et 2 enseignants importés.
+- **19/09/2026** — Parcours testé de bout en bout avec deux comptes de test sans nom (`PC-TEST1`, `PR-TEST1`, classe « TEST »), à supprimer après les essais.
+  - Correction : le tableau enseignant restait vide, à cause d'un lien ambigu entre demandes et profils.
+  - Ajouts : liste « Mes demandes » côté élève, avec possibilité de retirer une demande ; masquage des parties encore fictives quand on est connecté.
 - **19/09/2026** — Choix de Supabase (Paris). Ajout des rôles élève et enseignant, de la structure de la base, de la fonction de première connexion, du script d'import et du chargement de la correspondance sur l'appareil.

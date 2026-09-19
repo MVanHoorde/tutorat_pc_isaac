@@ -311,6 +311,14 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 
 /* rôles */
 body:not(.role-prof) .tab.prof{display:none}
+/* Connecté : on masque les parties encore fictives, on montre ce qui est branché. */
+body.en-ligne .fictif, body.en-ligne .raie{display:none}
+body:not(.en-ligne) .en-ligne-seul, body:not(.en-ligne) .bientot-carte{display:none}
+body:not(.role-eleve) .eleve-seul{display:none}
+.bientot-carte{border-style:dashed;box-shadow:none;background:var(--soft);margin-bottom:22px}
+.mesdem{display:flex;gap:12px;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);padding:10px 0;font-size:14.5px}
+.mesdem:first-child{border-top:0}
+.mesdem small{display:block;color:var(--muted);font-size:12.5px}
 .rolebar{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 14px;margin:24px 0 -12px;
   font-size:14px;line-height:1.45;background:#EEF1FF;border:1px solid #CBD3F5;color:#2B3A80}
 .rolebar b{font-weight:600}
@@ -324,7 +332,7 @@ body:not(.role-prof) .tab.prof{display:none}
 </head>
 <body>
 
-<div class="demo">
+<div class="demo" id="bandeauDemo">
   <strong>Maquette de démonstration.</strong> Tous les noms, demandes et chiffres sont inventés —
   aucun élève réel n'apparaît ici et rien n'est enregistré.
 </div>
@@ -444,6 +452,11 @@ body:not(.role-prof) .tab.prof{display:none}
         <p>On peut être aidé par un camarade de sa classe, dans la limite de deux séances par binôme et par période.</p>
       </details>
     </div>
+
+    <div class="card en-ligne-seul eleve-seul" style="margin-top:22px">
+      <span class="f">Mes demandes</span>
+      <div id="mesDemandes"><p class="note" style="margin:0">Chargement…</p></div>
+    </div>
   </div>
 </section>
 
@@ -487,7 +500,10 @@ body:not(.role-prof) .tab.prof{display:none}
   <h2>Calendrier des rencontres</h2>
   <p class="lede">Mis à jour à partir des demandes et des disponibilités des tuteurs. Clique sur une case pour voir le détail.</p>
 
-  <div class="card">
+  <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
+    <p class="note" style="margin:0">Le calendrier sera calculé à partir des vraies demandes et disponibilités à l'étape suivante.
+    En attendant, indique tes moments libres dans « Demander de l'aide » ou « Proposer son aide ».</p></div>
+  <div class="card fictif">
     <div class="calhead">
       <span class="sem" id="semLabel"></span>
       <button class="mini ghost" id="semPrev" aria-label="Semaine précédente">←</button>
@@ -516,7 +532,9 @@ body:not(.role-prof) .tab.prof{display:none}
     <h2>Bilan de séance</h2>
     <p class="lede">Quelques cases, puis 60 à 90 secondes de voix ou cinq lignes écrites. C'est cette trace qui compte pour le bonus.</p>
 
-    <div class="card">
+    <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
+      <p class="note" style="margin:0">Le bilan s'ouvrira ici après une séance validée par ton professeur.</p></div>
+    <div class="card fictif">
       <div class="seance">
         <div class="av" aria-hidden="true">MR</div>
         <p><b>Jeudi 12 mars, 15 h — CDI 01</b><br>Titrage colorimétrique · première spécialité</p>
@@ -592,6 +610,15 @@ body:not(.role-prof) .tab.prof{display:none}
 
 <!-- ================= PROF ================= -->
 <section class="view" id="v-prof">
+  <div class="en-ligne-seul">
+    <h2>Tableau de bord</h2>
+    <p class="lede">Les demandes déposées par les élèves, en temps réel. Chargez votre correspondance pour voir les noms.</p>
+    <div class="card bientot-carte"><span class="f">Binômes et retours des élèves — bientôt disponible</span>
+      <p class="note" style="margin:0">La validation des binômes et la synthèse des retours seront branchées à l'étape suivante.
+      Pour l'instant, vous voyez les demandes et vous pouvez les rapprocher des tuteurs disponibles.</p></div>
+  </div>
+
+  <div class="fictif">
   <h2>Jeudi 12 mars — quatre binômes à arbitrer</h2>
   <p class="lede">Rien ne se met en relation sans vous. La validation allume la raie du chapitre dans le spectre, en haut de page.</p>
 
@@ -645,6 +672,7 @@ body:not(.role-prof) .tab.prof{display:none}
   </table>
   </div>
   <p style="margin-top:12px"><button class="mini ghost" id="voirFeedback">Voir le pop-up côté élève</button></p>
+  </div>
 
   <div class="card" id="corresp" style="margin-top:34px">
     <span class="f">Correspondance identifiants ↔ noms</span>
@@ -688,7 +716,9 @@ body:not(.role-prof) .tab.prof{display:none}
     <p class="lede">Compteurs remplis automatiquement. Vous ajoutez une mention, vous signez, vous exportez.</p>
   </div>
 
-  <div class="sheet" id="attestation">
+  <div class="card bientot-carte center" style="max-width:720px"><span class="f">Bientôt disponible</span>
+    <p class="note" style="margin:0">Les attestations seront remplies automatiquement à partir des séances et des bilans.</p></div>
+  <div class="sheet fictif" id="attestation">
     <div class="spectrumline">
       <span style="background:var(--premiere)"></span>
       <span style="background:var(--terminale)"></span>
@@ -1006,6 +1036,10 @@ function appliquerRole(r){
   role=r;
   document.body.classList.remove('role-eleve','role-prof','role-visiteur');
   document.body.classList.add('role-'+r);
+  document.body.classList.toggle('en-ligne',enLigne());
+  document.getElementById('bandeauDemo').innerHTML=enLigne()
+    ? '<strong>Version de test.</strong> Les demandes sont réellement enregistrées. Les parties « bientôt disponible » ne sont pas encore branchées.'
+    : '<strong>Maquette de démonstration.</strong> Tous les noms, demandes et chiffres sont inventés — aucun élève réel n\'apparaît ici et rien n\'est enregistré.';
   document.querySelectorAll('#envoiDemande,#envoiBilan,#recbtn').forEach(b=>b.disabled=!peutAgir());
   afficherDemandes();
   const ident=esc(identifiantDeSession(session));
@@ -1013,8 +1047,7 @@ function appliquerRole(r){
     rolebar.className='rolebar';
     rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les onglets élèves montrent exactement ce que voient les élèves, '+
       'mais vous ne pouvez ni déposer une demande, ni vous positionner, ni prendre un rendez-vous. '+
-      '<span class="hint">Déjà branchés : demandes, propositions d\'aide, disponibilités, tableau des dépôts. '+
-      'Encore fictifs : binômes, calendrier, bilans, retours, attestation.</span></span>';
+      '<span class="hint">Les parties pas encore branchées (binômes, calendrier, bilans, retours, attestation) sont marquées « bientôt disponible ».</span></span>';
     whoBtn.innerHTML='Enseignant · <span class="id">'+ident+'</span> · se déconnecter';
   } else if(r==='eleve'){
     rolebar.className='rolebar'; rolebar.innerHTML='';
@@ -1154,6 +1187,7 @@ btnDemande.addEventListener('click',async()=>{
   if(error){ alert("La demande n'a pas pu être envoyée : "+error.message); return; }
   confirmer(btnDemande,'Demande envoyée à ton professeur ✓');
   txtA.value=''; majCompteur();
+  chargerMesDemandes();
 });
 document.getElementById('envoiBilan').addEventListener('click',e=>confirmer(e.currentTarget,'Bilan envoyé à M. Van Hoorde ✓'));
 
@@ -1419,6 +1453,26 @@ async function chargerDonneesReelles(){
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
   afficherDemandes();
   if(role==='prof') await chargerDepots();
+  if(role==='eleve') await chargerMesDemandes();
+}
+async function chargerMesDemandes(){
+  const zone=document.getElementById('mesDemandes');
+  const {data,error}=await sb.from('demandes').select('id,chapitre,statut,urgent,cree_le')
+    .eq('auteur',session.user.id).order('cree_le',{ascending:false});
+  if(error){ zone.innerHTML='<p class="note" style="margin:0">Erreur : '+esc(error.message)+'</p>'; return; }
+  if(!data.length){ zone.innerHTML='<p class="note" style="margin:0">Tu n\'as encore envoyé aucune demande.</p>'; return; }
+  zone.innerHTML=data.map(d=>{
+    const st=LIB_STATUT[d.statut]||['',d.statut];
+    return '<div class="mesdem"><div>'+esc(d.chapitre)+'<small>envoyée le '+dateCourte(d.cree_le)+(d.urgent?' · pressante':'')+'</small></div>'+
+      '<span><span class="badge '+st[0]+'">'+esc(st[1])+'</span> '+
+      (d.statut==='ouverte'||d.statut==='positionnee'?'<button class="mini ghost retirer" data-id="'+d.id+'">Retirer</button>':'')+'</span></div>';
+  }).join('');
+  zone.querySelectorAll('.retirer').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('Retirer cette demande ?')) return;
+    const {error}=await sb.from('demandes').delete().eq('id',+b.dataset.id);
+    if(error) alert("Impossible de retirer la demande : "+error.message);
+    chargerMesDemandes();
+  }));
 }
 let minuteurDispo=null;
 slotsTuteur.addEventListener('change',()=>{
@@ -1431,7 +1485,8 @@ slotsTuteur.addEventListener('change',()=>{
 });
 async function chargerDepots(){
   const {data,error}=await sb.from('demandes')
-    .select('id,niveau,chapitre,besoin,duree,urgent,date_eval,statut,cree_le,profils(identifiant,classe)')
+    // « !demandes_auteur_fkey » : l'auteur, et non les tuteurs positionnés (deux liens possibles vers profils).
+    .select('id,niveau,chapitre,besoin,duree,urgent,date_eval,statut,cree_le,profils!demandes_auteur_fkey(identifiant,classe)')
     .order('cree_le',{ascending:false});
   if(error){ tabDepots.innerHTML='<tr><td colspan="6">Erreur : '+esc(error.message)+'</td></tr>'; return; }
   if(!data.length){ tabDepots.innerHTML='<tr><td colspan="6" class="note">Aucune demande pour l\'instant.</td></tr>'; return; }
