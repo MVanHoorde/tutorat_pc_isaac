@@ -62,7 +62,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Créer les comptes enseignants avec `preparer_supabase.py --enseignant`.
 - [ ] Brancher la suite : validation des binômes, calendrier réel, bilans (texte puis audio dans le stockage Supabase), retours, attestation.
 - [ ] Effacement automatique des textes quinze jours après la séance (tâche planifiée dans Supabase).
-- [ ] Chapitres dans l'ordre des progressions réelles : Mme Castel pour la première, M. Van Hoorde pour la terminale (listes à fournir).
+- [x] Chapitres de terminale : progression de M. Van Hoorde, 25 chapitres de T.1 à 4.6 (19/09/2026).
+- [ ] Chapitres de première : progression de Mme Castel (liste à fournir).
 - [ ] Classes à afficher : « Première spé — Mme Castel » et « Terminale spé — M. Van Hoorde », sans numéro de groupe.
 - [ ] « Pressant » : exiger une évaluation à plus de trois jours, sans révision de dernière minute (demande de Mme Castel, à préciser).
 - [ ] Validation des binômes : décider comment les deux élèves savent avec qui ils ont rendez-vous, puisque les noms ne sont pas en ligne.

@@ -395,9 +395,9 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <p class="lede">Ta demande arrive chez ton professeur. Elle n'est proposée aux tuteurs que sans ton nom.</p>
 
     <div class="card">
-      <div class="bandeau"><span aria-hidden="true">✎</span><span><b>Liste des chapitres à valider par l'équipe.</b>
-        Elle reprend les programmes officiels de spécialité (BO spécial n° 1 du 22 janvier 2019 pour la première,
-        n° 8 du 25 juillet 2019 pour la terminale). Les collègues peuvent la découper ou la renommer selon leur progression.</span></div>
+      <div class="bandeau"><span aria-hidden="true">✎</span><span><b>Chapitres en cours de mise à jour.</b>
+        Terminale : progression de M. Van Hoorde. Première : programme officiel (BO spécial n° 1 du 22 janvier 2019),
+        en attendant la progression de Mme Castel.</span></div>
 
       <div class="step">
         <span class="f">Ma classe</span>
@@ -922,31 +922,38 @@ const CHAPITRES = {
       "La lumière : images et couleurs",
       "La lumière : modèles ondulatoire et particulaire"]]
   ],
+  // Terminale spé : progression de M. Van Hoorde (2026-2027)
   0: [
-    ["Constitution et transformations de la matière", [
-      "Transformations acide-base",
-      "Analyser un système par des méthodes physiques",
-      "Analyser un système par des méthodes chimiques (titrages)",
-      "Cinétique chimique",
-      "Transformations nucléaires",
-      "Sens d'évolution spontanée d'un système (piles)",
-      "Force des acides et des bases",
-      "Forcer le sens d'évolution (électrolyse)",
-      "Stratégies en synthèse organique"]],
-    ["Mouvement et interactions", [
-      "Décrire un mouvement",
-      "Deuxième loi de Newton",
-      "Mouvement dans un champ uniforme",
-      "Mouvement dans un champ de gravitation",
-      "Écoulement d'un fluide"]],
-    ["L'énergie : conversions et transferts", [
-      "Modèle du gaz parfait",
-      "Premier principe de la thermodynamique"]],
-    ["Ondes et signaux", [
-      "Phénomènes ondulatoires (diffraction, interférences, Doppler)",
-      "Former des images : la lunette astronomique",
-      "Décrire la lumière par un flux de photons",
-      "Dynamique d'un système électrique (circuit RC)"]]
+    ["T - Compétences transversales (Incertitudes)", [
+      "T.1 - Incertitudes"]],
+    ["Thème 1 - Constitution et transformations de la matière", [
+      "1.1 - Équilibres chimiques",
+      "1.2 - Transformations acide-base (II)",
+      "1.3 - Analyser un système chimique par des méthodes physiques",
+      "1.4 - Méthodes d'analyse chimique, les titrages",
+      "1.5 - Cinétique chimique",
+      "1.6 - Piles et électrolyse",
+      "1.7 - Transformations nucléaires",
+      "1.8 - Structure et propriétés des molécules organiques",
+      "1.9 - Synthèse organique et écoresponsabilité"]],
+    ["Thème 2 - Mouvement et interactions", [
+      "2.1 - Décrire un mouvement",
+      "2.2 - Forces et deuxième loi de Newton",
+      "2.3 - Mouvement dans un champ uniforme",
+      "2.4 - Gravitation et satellites",
+      "2.5 - Écoulement d'un fluide"]],
+    ["Thème 3 - L'énergie : conversions et transferts", [
+      "3.1 - Gaz parfaits et modèle microscopique",
+      "3.2 - Bilan énergétique d'un système",
+      "3.3 - Transferts thermiques",
+      "3.4 - Modélisation de l'évolution thermique"]],
+    ["Thème 4 - Ondes et signaux", [
+      "4.1 - Propriétés des ondes sonores",
+      "4.2 - Diffraction et interférences",
+      "4.3 - Effet Doppler",
+      "4.4 - Optique géométrique et formation d'images",
+      "4.5 - Interactions lumière/matière",
+      "4.6 - Dynamique d'un système électrique"]]
   ]
 };
 const GROUPES = {1:["1re spé 1","1re spé 2","1re spé 3"], 0:["Tle spé 1","Tle spé 2"]};
@@ -1240,13 +1247,13 @@ document.getElementById('envoiBilan').addEventListener('click',e=>confirmer(e.cu
 const DEMO_DEMANDES=[
   {id:214,n:1,chap:"Titrage colorimétrique",nat:"Le cours · La méthode",besoin:"Ponctuel",duree:"Une heure",urgent:"DS le 16/03",
    q:"Ne comprend pas ce qui se passe à l'équivalence ni le changement de couleur ; bloque sur la quantité de réactif titré.",slots:["s-0","s-1","s-3","r1-1"]},
-  {id:219,n:0,chap:"Mouvement dans un champ uniforme",nat:"Un exercice",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"contrôle le 13/03",
+  {id:219,n:0,chap:"2.3 - Mouvement dans un champ uniforme",nat:"Un exercice",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"contrôle le 13/03",
    q:"N'arrive pas à projeter sur les deux axes avant d'intégrer.",slots:["r1-2","r2-3"]},
   {id:217,n:1,chap:"Aspects énergétiques des phénomènes mécaniques",nat:"Un exercice · La méthode",besoin:"Sur la durée",duree:"Une heure",urgent:"",
    q:"Bloque sur les exercices avec frottements : ne sait pas quoi poser au départ.",slots:["s-1","s-3"]},
   {id:221,n:1,chap:"Ondes mécaniques",nat:"Le cours",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"",
    q:"Confond la période et la longueur d'onde sur les graphiques.",slots:["r1-0","r1-3","r2-4"]},
-  {id:223,n:0,chap:"Cinétique chimique",nat:"Le TP",besoin:"Sur la durée",duree:"Une heure",urgent:"",
+  {id:223,n:0,chap:"1.5 - Cinétique chimique",nat:"Le TP",besoin:"Sur la durée",duree:"Une heure",urgent:"",
    q:"Ne sait pas exploiter la courbe pour trouver le temps de demi-réaction.",slots:["s-2","s-4"]},
   {id:211,n:1,chap:"Mouvement d'un système",nat:"Un exercice",besoin:"Ponctuel",duree:"Une heure",urgent:"",
    q:"",slots:["s-0"],pris:true}
