@@ -223,7 +223,11 @@ def ecrire_registre(chemin, lignes):
         ws.column_dimensions[col].width = largeur
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
-    wb.save(chemin)
+    try:
+        wb.save(chemin)
+    except PermissionError:
+        sys.exit(f"\n  ⚠  Impossible d'écrire {chemin.name} : le fichier est ouvert (Excel, aperçu OneDrive…).\n"
+                 f"     Fermez-le puis relancez la même commande. Rien n'a été créé.\n")
 
 
 CSS_COUPON = """

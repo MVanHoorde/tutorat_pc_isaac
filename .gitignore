@@ -4,7 +4,11 @@
 *.xls
 *.csv
 *.json
+import_supabase_*.sql
 sortie_resonance/
 
 # Anciennes versions de la maquette
 A0*-resonance-*.html
+
+# Python
+__pycache__/

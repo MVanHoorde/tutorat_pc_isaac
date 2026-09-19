@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Ajouté à l'écran d'accueil (iPad) : s'ouvre comme une app, avec sa propre mémoire. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Résonance">
 <title>Résonance — maquette v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -305,6 +309,16 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 .merci{text-align:center;padding:20px 0 8px}
 .merci b{display:block;font-family:var(--disp);font-size:22px;margin-bottom:6px}
 
+/* rôles */
+body:not(.role-prof) .tab.prof{display:none}
+.rolebar{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 14px;margin:24px 0 -12px;
+  font-size:14px;line-height:1.45;background:#EEF1FF;border:1px solid #CBD3F5;color:#2B3A80}
+.rolebar b{font-weight:600}
+.rolebar.visiteur{background:#FDF0D8;border-color:#EBD3A0;color:#6B4705}
+.cta:disabled,.mini:disabled,.recbtn:disabled{background:#B7BECB;border-color:#B7BECB;color:#fff;cursor:not-allowed}
+.mini.ghost:disabled{background:#fff;color:#9AA3B2;border-color:var(--rule)}
+.role-seg{margin:0 0 20px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -347,6 +361,8 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 </nav>
 
 <main class="wrap">
+
+<div class="rolebar" id="rolebar" hidden></div>
 
 <!-- ================= DEMANDE ================= -->
 <section class="view on" id="v-demande">
@@ -630,11 +646,23 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
   </div>
   <p style="margin-top:12px"><button class="mini ghost" id="voirFeedback">Voir le pop-up côté élève</button></p>
 
+  <div class="card" id="corresp" style="margin-top:34px">
+    <span class="f">Correspondance identifiants ↔ noms</span>
+    <p class="note" id="correspEtat" style="margin:0 0 12px">Aucune correspondance chargée sur cet appareil : les élèves apparaissent par leur identifiant.</p>
+    <div class="barre" style="margin-top:0">
+      <label class="mini" style="display:inline-block">Charger mon fichier .xlsx
+        <input type="file" id="correspFichier" accept=".xlsx" hidden></label>
+      <button class="mini ghost" id="correspOublier" hidden>Oublier sur cet appareil</button>
+    </div>
+    <p class="note">Le fichier est lu sur cet appareil et n'est jamais envoyé sur Internet.
+    Sur iPad, chargez-le depuis l'icône Résonance de l'écran d'accueil (et non depuis Safari).</p>
+  </div>
+
   <h3>Tout ce qui a été déposé</h3>
   <div class="tscroll">
   <table class="t">
     <thead><tr><th>Élève</th><th>Classe</th><th>Chapitre</th><th>Type</th><th>Besoin</th><th>Statut</th></tr></thead>
-    <tbody>
+    <tbody id="tabDepots">
       <tr><td>Manon Rivière</td><td>1re spé 2</td><td>Titrage colorimétrique</td><td>Demande</td><td>ponctuel · 1 h · <b style="color:#8A5D08;font-weight:600">pressant</b></td><td><span class="badge live">binôme proposé</span></td></tr>
       <tr><td>Adrien Costa</td><td>Tle spé 1</td><td>Titrages, acides-bases</td><td>Offre</td><td>lun., mar., jeu. 15 h</td><td><span class="badge live">positionné</span></td></tr>
       <tr><td>Sofia Nguyen</td><td>1re spé 2</td><td>Énergie mécanique</td><td>Demande</td><td>sur la durée · 1 h</td><td><span class="badge">prescrit</span></td></tr>
@@ -750,13 +778,20 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
     <h2 id="loginTitre">Résonance</h2>
     <p class="sub">Tutorat en physique-chimie — CDI 01</p>
 
-    <label class="f" for="idf">Identifiant</label>
-    <input id="idf" type="text" value="PC-MYWM4" style="font-family:var(--mono);margin-bottom:14px" autocomplete="off">
-    <label class="f" for="mdp">Mot de passe</label>
-    <input id="mdp" type="password" value="Neige!32" style="margin-bottom:18px" autocomplete="off">
+    <div class="seg role-seg" role="group" aria-label="Je suis">
+      <button type="button" id="roleEleve" aria-pressed="true">Je suis élève</button>
+      <button type="button" id="roleProf" aria-pressed="false">Je suis enseignant</button>
+    </div>
 
-    <button class="cta" value="login">Se connecter</button>
-    <p class="note" style="text-align:center;margin-top:8px">Identifiant et mot de passe sont sur le coupon remis par ton professeur.</p>
+    <label class="f" for="idf">Identifiant</label>
+    <input id="idf" type="text" placeholder="PC-XXXXX" style="font-family:var(--mono);margin-bottom:14px;text-transform:uppercase"
+      autocomplete="username" autocapitalize="characters" spellcheck="false">
+    <label class="f" for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" placeholder="Mot-Mot-99" style="margin-bottom:18px" autocomplete="current-password">
+
+    <p class="note" id="loginErreur" role="alert" style="color:#B3261E;margin:-6px 0 12px" hidden></p>
+    <button class="cta" value="login" id="btnLogin">Se connecter</button>
+    <p class="note" style="text-align:center;margin-top:8px" id="loginAide">Identifiant et mot de passe sont sur le coupon remis par ton professeur.</p>
 
     <div class="sep">ou</div>
     <button class="browse" value="browse">Parcourir sans se connecter
@@ -799,7 +834,19 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
   </form>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <script>
+/* ---------- Supabase ---------- */
+// Clé « anon » : publique par conception, les droits réels sont fixés par les règles de la base (supabase/schema.sql).
+const SUPABASE_URL="https://mnqcmjmypkleptbmqtws.supabase.co";
+const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ucWNtam15cGtsZXB0Ym1xdHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3OTg2MzgsImV4cCI6MjEwNTM3NDYzOH0.6D3QDDW4DYm_xErBwCom6xdKeMhOUf1TbUDZPN-Q0bc";
+const DOMAINE_COMPTES="resonance.invalid"; // identique à DOMAINE dans la fonction premiere-connexion
+const sb=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON):null;
+let session=null; // session Supabase réelle ; null = visiteur (données d'exemple)
+const enLigne=()=>!!session;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 /* ---------- programmes (BO 2019) ---------- */
 const CHAPITRES = {
   1: [
@@ -907,21 +954,97 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
 /* ---------- pop-up connexion ---------- */
 const dlgLogin=document.getElementById('dlgLogin'), dlgFb=document.getElementById('dlgFeedback');
 const whoBtn=document.getElementById('whoBtn');
-let connecte=false;
-dlgLogin.addEventListener('close',()=>{
-  if(dlgLogin.returnValue==='login'){
-    connecte=true;
-    whoBtn.innerHTML='<span class="id">'+document.getElementById('idf').value+'</span> · se déconnecter';
-    setTimeout(()=>dlgFb.showModal(),350);
+const rolebar=document.getElementById('rolebar');
+const roleEleve=document.getElementById('roleEleve'), roleProf=document.getElementById('roleProf');
+const idf=document.getElementById('idf'), mdp=document.getElementById('mdp');
+/* Les identifiants PR- sont ceux des enseignants, PC- ceux des élèves. Le rôle réel vient du serveur. */
+const AIDE={eleve:{ph:"PC-XXXXX",txt:"Identifiant et mot de passe sont sur le coupon remis par ton professeur."},
+            prof:{ph:"PR-XXXXX",txt:"Compte enseignant remis par l'administrateur du dispositif."}};
+let role='visiteur';
+function choisirLogin(r){
+  roleEleve.setAttribute('aria-pressed',r==='eleve'); roleProf.setAttribute('aria-pressed',r==='prof');
+  idf.placeholder=AIDE[r].ph;
+  document.getElementById('loginAide').textContent=AIDE[r].txt;
+}
+const loginErreur=document.getElementById('loginErreur'), btnLogin=document.getElementById('btnLogin');
+async function seConnecter(identifiant, motDePasse){
+  if(!sb) throw new Error("Connexion au serveur impossible (vérifiez Internet).");
+  const email=identifiant.toLowerCase()+'@'+DOMAINE_COMPTES;
+  let r=await sb.auth.signInWithPassword({email,password:motDePasse});
+  if(r.error){
+    // Première connexion : le compte n'existe encore que dans comptes_import.
+    const f=await sb.functions.invoke('premiere-connexion',{body:{identifiant,mot_de_passe:motDePasse}});
+    if(f.error || !f.data || !f.data.ok) throw new Error("Identifiant ou mot de passe incorrect.");
+    r=await sb.auth.signInWithPassword({email,password:motDePasse});
+    if(r.error) throw new Error("Compte créé, mais la connexion a échoué : réessaie.");
+  }
+  return r.data.session;
+}
+const roleDeSession=s=>(s && s.user.app_metadata && s.user.app_metadata.role)||'visiteur';
+const identifiantDeSession=s=>(s && s.user.app_metadata && s.user.app_metadata.identifiant)||'';
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+  if(!e.submitter || e.submitter.value!=='login') return;
+  e.preventDefault();
+  const identifiant=idf.value.trim().toUpperCase(), motDePasse=mdp.value;
+  loginErreur.hidden=true;
+  if(!/^P[CR]-[A-Z0-9]{5}$/.test(identifiant)){ loginErreur.textContent="L'identifiant ressemble à PC-XXXXX (5 caractères après le tiret)."; loginErreur.hidden=false; return; }
+  btnLogin.disabled=true; btnLogin.textContent='Connexion…';
+  try{
+    session=await seConnecter(identifiant,motDePasse);
+    mdp.value='';
+    dlgLogin.close('login');
+  }catch(err){
+    loginErreur.textContent=err.message; loginErreur.hidden=false;
+  }finally{ btnLogin.disabled=false; btnLogin.textContent='Se connecter'; }
+});
+roleEleve.addEventListener('click',()=>choisirLogin('eleve'));
+roleProf.addEventListener('click',()=>choisirLogin('prof'));
+
+/* Seul un élève connecté peut agir ; l'enseignant et le visiteur voient tout sans pouvoir réserver. */
+const peutAgir=()=>role==='eleve';
+function appliquerRole(r){
+  role=r;
+  document.body.classList.remove('role-eleve','role-prof','role-visiteur');
+  document.body.classList.add('role-'+r);
+  document.querySelectorAll('#envoiDemande,#envoiBilan,#recbtn').forEach(b=>b.disabled=!peutAgir());
+  afficherDemandes();
+  const ident=esc(identifiantDeSession(session));
+  if(r==='prof'){
+    rolebar.className='rolebar';
+    rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les onglets élèves montrent exactement ce que voient les élèves, '+
+      'mais vous ne pouvez ni déposer une demande, ni vous positionner, ni prendre un rendez-vous. '+
+      '<span class="hint">Déjà branchés : demandes, propositions d\'aide, disponibilités, tableau des dépôts. '+
+      'Encore fictifs : binômes, calendrier, bilans, retours, attestation.</span></span>';
+    whoBtn.innerHTML='Enseignant · <span class="id">'+ident+'</span> · se déconnecter';
+  } else if(r==='eleve'){
+    rolebar.className='rolebar'; rolebar.innerHTML='';
+    whoBtn.innerHTML='<span class="id">'+ident+'</span> · se déconnecter';
   } else {
+    rolebar.className='rolebar visiteur';
+    rolebar.innerHTML='<span aria-hidden="true">ⓘ</span><span><b>Mode découverte.</b> Vous parcourez le site sans compte : '+
+      'rien ne peut être envoyé. <a href="#" id="lienConnexion">Se connecter</a></span>';
+    rolebar.querySelector('#lienConnexion').addEventListener('click',e=>{e.preventDefault();ouvrirConnexion();});
     whoBtn.textContent='Visiteur · se connecter';
   }
+  rolebar.hidden=!rolebar.innerHTML;
+  const active=document.querySelector('.tab[aria-selected="true"]');
+  if(r==='prof') ouvrirVue('prof');
+  else if(active && active.classList.contains('prof')) ouvrirVue('demande');
+}
+function ouvrirConnexion(){ dlgLogin.returnValue=''; loginErreur.hidden=true; dlgLogin.showModal(); }
+dlgLogin.addEventListener('close',()=>{
+  if(dlgLogin.returnValue==='login' && session) entrer();
+  else if(!session) appliquerRole('visiteur');
 });
-whoBtn.addEventListener('click',()=>{
-  if(connecte){ connecte=false; whoBtn.textContent='Se connecter'; }
-  dlgLogin.returnValue=''; dlgLogin.showModal();
+whoBtn.addEventListener('click',async()=>{
+  if(session){ await sb.auth.signOut(); session=null; restaurerDemo(); appliquerRole('visiteur'); }
+  ouvrirConnexion();
 });
-dlgLogin.showModal();
+/* Après connexion (ou session retrouvée) : on quitte les données d'exemple pour les vraies. */
+async function entrer(){
+  appliquerRole(roleDeSession(session));
+  await chargerDonneesReelles();
+}
 
 /* ---------- pop-up retour ---------- */
 const fbCorps=document.getElementById('fbCorps'), fbHTML=fbCorps.innerHTML;
@@ -1005,11 +1128,37 @@ function confirmer(btn, texte){
   btn.textContent=texte; btn.classList.add('sent');
   setTimeout(()=>{ btn.textContent=avant; btn.classList.remove('sent'); },2600);
 }
-document.getElementById('envoiDemande').addEventListener('click',e=>confirmer(e.currentTarget,'Demande envoyée à ton professeur ✓'));
+const btnDemande=document.getElementById('envoiDemande');
+function lireDemande(){
+  const v=document.getElementById('v-demande');
+  return {
+    niveau: nivP.getAttribute('aria-pressed')==='true'?1:0,
+    chapitre: selChap.value,
+    natures: [...v.querySelectorAll('.chips .chip[aria-pressed="true"]')].map(c=>c.textContent.trim()),
+    besoin: v.querySelector('input[name="besoin"]:checked').value,
+    duree: v.querySelector('input[name="duree"]:checked').value,
+    urgent: document.getElementById('urgentBox').checked,
+    date_eval: document.getElementById('urgentBox').checked ? (document.getElementById('dateEval').value||null) : null,
+    texte: txtA.value.trim().slice(0,400),
+    creneaux: [...document.querySelectorAll('#slotsDemande input:checked')].map(i=>i.value)
+  };
+}
+btnDemande.addEventListener('click',async()=>{
+  if(!enLigne()){ confirmer(btnDemande,'Demande envoyée à ton professeur ✓'); return; }
+  const d=lireDemande();
+  if(!d.creneaux.length){ alert("Coche au moins un moment où tu peux venir."); return; }
+  if(!d.texte){ alert("Décris en quelques mots le point précis qui te bloque."); return; }
+  btnDemande.disabled=true;
+  const {error}=await sb.from('demandes').insert(d);
+  btnDemande.disabled=false;
+  if(error){ alert("La demande n'a pas pu être envoyée : "+error.message); return; }
+  confirmer(btnDemande,'Demande envoyée à ton professeur ✓');
+  txtA.value=''; majCompteur();
+});
 document.getElementById('envoiBilan').addEventListener('click',e=>confirmer(e.currentTarget,'Bilan envoyé à M. Van Hoorde ✓'));
 
 /* ---------- demandes vues par le tuteur ---------- */
-const DEMANDES=[
+const DEMO_DEMANDES=[
   {id:214,n:1,chap:"Titrage colorimétrique",nat:"Le cours · La méthode",besoin:"Ponctuel",duree:"Une heure",urgent:"DS le 16/03",
    q:"Ne comprend pas ce qui se passe à l'équivalence ni le changement de couleur ; bloque sur la quantité de réactif titré.",slots:["s-0","s-1","s-3","r1-1"]},
   {id:219,n:0,chap:"Mouvement dans un champ uniforme",nat:"Un exercice",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"contrôle le 13/03",
@@ -1023,6 +1172,7 @@ const DEMANDES=[
   {id:211,n:1,chap:"Mouvement d'un système",nat:"Un exercice",besoin:"Ponctuel",duree:"Une heure",urgent:"",
    q:"",slots:["s-0"],pris:true}
 ];
+let DEMANDES=DEMO_DEMANDES.map(d=>({...d}));
 const liste=document.getElementById('listeDemandes');
 let filtre='tous';
 function afficherDemandes(){
@@ -1031,25 +1181,32 @@ function afficherDemandes(){
   DEMANDES.filter(d=>filtre==='tous'||(filtre==='urgent'?d.urgent:filtre==='dispo'?d.slots.some(s=>mc.includes(s)):String(d.n)===filtre))
   .forEach(d=>{
     const el=document.createElement('article');
-    el.className='dem'+(d.n===0?' tle':'')+(d.pris?' pris':'');
+    const ferme=d.pris||d.moi;
+    el.className='dem'+(d.n===0?' tle':'')+(ferme?' pris':'');
     el.innerHTML='<div class="h"><span class="badge p'+d.n+'">'+(d.n?'Première spé':'Terminale spé')+'</span>'+
-      (d.urgent?'<span class="badge wait">pressant · '+d.urgent+'</span>':'')+
-      '<span class="badge">'+d.besoin+' · '+d.duree.toLowerCase()+'</span><span class="anon">n° '+d.id+'</span></div>'+
-      '<p class="c">'+d.chap+'</p>'+
-      '<p class="q">'+(d.pris?"Un tuteur s'est déjà positionné.":'<b style="font-weight:600;color:var(--ink)">'+d.nat+'.</b> '+d.q)+'</p>'+
-      (d.pris?'':'<div class="horaires" hidden></div><div class="acts"><button class="mini ghost voir">Voir les horaires</button>'+
+      (d.urgent?'<span class="badge wait">pressant · '+esc(d.urgent)+'</span>':'')+
+      '<span class="badge">'+esc(d.besoin)+' · '+esc(d.duree.toLowerCase())+'</span><span class="anon">n° '+esc(d.id)+'</span></div>'+
+      '<p class="c">'+esc(d.chap)+'</p>'+
+      '<p class="q">'+(d.moi?"Tu t'es positionné. En attente de validation par ton professeur.":d.pris?"Un tuteur s'est déjà positionné.":
+        (d.nat?'<b style="font-weight:600;color:var(--ink)">'+esc(d.nat)+'.</b> ':'')+esc(d.q))+'</p>'+
+      (ferme?'':'<div class="horaires" hidden></div><div class="acts"><button class="mini ghost voir">Voir les horaires</button>'+
       '<button class="mini offre">Je propose mon aide</button></div>');
-    if(!d.pris){
+    if(!ferme){
       const hor=el.querySelector('.horaires'), voir=el.querySelector('.voir');
       voir.addEventListener('click',()=>{
         hor.hidden=!hor.hidden;
         if(!hor.hidden) hor.innerHTML=grilleLecture(d.slots,d.n===0,mesCreneaux());
         voir.textContent=hor.hidden?'Voir les horaires':'Masquer les horaires';
       });
-      el.querySelector('.offre').addEventListener('click',()=>{
-        d.pris=true; afficherDemandes();
-        const carte=[...liste.children].find(c=>c.querySelector('.anon').textContent==='n° '+d.id);
-        if(carte) carte.querySelector('.q').textContent="Tu t'es positionné. En attente de validation par ton professeur.";
+      el.querySelector('.offre').disabled=!peutAgir();
+      const btnOffre=el.querySelector('.offre');
+      btnOffre.addEventListener('click',async()=>{
+        if(enLigne()){
+          btnOffre.disabled=true;
+          const {error}=await sb.from('positionnements').insert({demande_id:d.id});
+          if(error){ alert("Impossible de se positionner : "+error.message); btnOffre.disabled=false; return; }
+        }
+        d.moi=true; afficherDemandes();
       });
     }
     liste.appendChild(el);
@@ -1190,6 +1347,115 @@ document.getElementById('btnPdf').addEventListener('click',()=>{
   etat.style.color = vide ? '#8A5D08' : 'var(--vert)';
   etat.hidden=false;
 });
+
+/* ---------- correspondance identifiants ↔ noms (reste sur l'appareil) ---------- */
+const CLE_CORRESP='resonance-correspondance';
+let corresp=null;
+function lireCorresp(){
+  try{ corresp=JSON.parse(localStorage.getItem(CLE_CORRESP)); }catch(e){ corresp=null; }
+  majCorrespEtat();
+}
+function nomAffiche(id){
+  const n=corresp && corresp.eleves[id];
+  return n ? esc(n)+' <span class="anon" style="margin:0">'+esc(id)+'</span>'
+           : '<span style="font-family:var(--mono)">'+esc(id||'?')+'</span>';
+}
+function majCorrespEtat(){
+  const etat=document.getElementById('correspEtat');
+  document.getElementById('correspOublier').hidden=!corresp;
+  etat.textContent=corresp
+    ? 'Chargée : '+corresp.fichier+' — '+Object.keys(corresp.eleves).length+' personnes — le '+corresp.charge_le+'. Rechargez-la si le fichier a changé.'
+    : 'Aucune correspondance chargée sur cet appareil : les élèves apparaissent par leur identifiant.';
+}
+document.getElementById('correspFichier').addEventListener('change',async e=>{
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  if(!window.XLSX){ alert("Le lecteur de fichiers Excel n'est pas chargé : vérifiez la connexion Internet."); return; }
+  try{
+    const wb=XLSX.read(await f.arrayBuffer());
+    const eleves={};
+    XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]).forEach(l=>{
+      if(l['Identifiant']) eleves[String(l['Identifiant']).trim()]=((l['Prénom']||'')+' '+(l['Nom']||'')).trim();
+    });
+    if(!Object.keys(eleves).length) throw new Error("aucune colonne « Identifiant » trouvée");
+    corresp={fichier:f.name, charge_le:new Date().toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}), eleves};
+    try{ localStorage.setItem(CLE_CORRESP,JSON.stringify(corresp)); }
+    catch(err){ alert("Chargée pour cette visite seulement : ce navigateur refuse de la conserver (navigation privée ?)."); }
+    majCorrespEtat();
+    if(enLigne() && role==='prof') chargerDepots();
+  }catch(err){ alert("Fichier illisible : "+err.message); }
+});
+document.getElementById('correspOublier').addEventListener('click',()=>{
+  try{ localStorage.removeItem(CLE_CORRESP); }catch(e){}
+  corresp=null; majCorrespEtat();
+  if(enLigne() && role==='prof') chargerDepots();
+});
+
+/* ---------- données réelles (Supabase) ---------- */
+const tabDepots=document.getElementById('tabDepots'), DEMO_DEPOTS=tabDepots.innerHTML, DEMO_DISPOS=mesCreneaux();
+const LIB_BESOIN={ponctuel:'Ponctuel',duree:'Sur la durée'}, LIB_DUREE={min:'Quelques minutes',heure:'Une heure'};
+const LIB_STATUT={ouverte:['wait','sans tuteur'],positionnee:['live','tuteur positionné'],binome:['vert','binôme validé'],close:['','close']};
+const dateCourte=s=>s?new Date(s).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'';
+
+function restaurerDemo(){
+  DEMANDES=DEMO_DEMANDES.map(d=>({...d}));
+  tabDepots.innerHTML=DEMO_DEPOTS;
+  slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=DEMO_DISPOS.includes(i.value));
+  afficherDemandes();
+}
+async function chargerDonneesReelles(){
+  txtA.value=''; majCompteur();
+  document.querySelectorAll('#v-demande .chips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+  document.querySelectorAll('#slotsDemande input').forEach(i=>i.checked=false);
+
+  const {data:ouvertes,error}=await sb.rpc('demandes_ouvertes');
+  DEMANDES=(error?[]:ouvertes).map(d=>({
+    id:d.id, n:d.niveau, chap:d.chapitre, nat:(d.natures||[]).join(' · '),
+    besoin:LIB_BESOIN[d.besoin]||d.besoin, duree:LIB_DUREE[d.duree]||d.duree,
+    urgent:d.urgent?(d.date_eval?'éval. le '+dateCourte(d.date_eval):'oui'):'',
+    q:d.texte||'', slots:d.creneaux||[], moi:d.deja_positionne}));
+
+  const {data:dispo}=await sb.from('disponibilites').select('creneaux').eq('eleve',session.user.id).maybeSingle();
+  slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
+  afficherDemandes();
+  if(role==='prof') await chargerDepots();
+}
+let minuteurDispo=null;
+slotsTuteur.addEventListener('change',()=>{
+  if(!enLigne() || role!=='eleve') return;
+  clearTimeout(minuteurDispo);
+  minuteurDispo=setTimeout(async()=>{
+    const {error}=await sb.from('disponibilites').upsert({eleve:session.user.id, creneaux:mesCreneaux(), maj_le:new Date().toISOString()});
+    if(error) alert("Disponibilités non enregistrées : "+error.message);
+  },600);
+});
+async function chargerDepots(){
+  const {data,error}=await sb.from('demandes')
+    .select('id,niveau,chapitre,besoin,duree,urgent,date_eval,statut,cree_le,profils(identifiant,classe)')
+    .order('cree_le',{ascending:false});
+  if(error){ tabDepots.innerHTML='<tr><td colspan="6">Erreur : '+esc(error.message)+'</td></tr>'; return; }
+  if(!data.length){ tabDepots.innerHTML='<tr><td colspan="6" class="note">Aucune demande pour l\'instant.</td></tr>'; return; }
+  tabDepots.innerHTML=data.map(d=>{
+    const p=d.profils||{}, st=LIB_STATUT[d.statut]||['',d.statut];
+    const besoin=esc(((LIB_BESOIN[d.besoin]||'')+' · '+(LIB_DUREE[d.duree]||'')).toLowerCase())+
+      (d.urgent?' · <b style="color:#8A5D08;font-weight:600">pressant'+(d.date_eval?' ('+dateCourte(d.date_eval)+')':'')+'</b>':'');
+    return '<tr><td>'+nomAffiche(p.identifiant)+'</td><td>'+esc(p.classe)+'</td><td>'+esc(d.chapitre)+'</td><td>Demande</td><td>'+
+      besoin+'</td><td><span class="badge '+st[0]+'">'+esc(st[1])+'</span></td></tr>';
+  }).join('');
+}
+
+/* ---------- démarrage ---------- */
+choisirLogin('eleve');
+lireCorresp();
+(async()=>{
+  if(sb){
+    sb.auth.onAuthStateChange((_evt,s)=>{ session=s; });
+    const {data}=await sb.auth.getSession();
+    if(data.session){ session=data.session; await entrer(); return; }
+  }
+  appliquerRole('visiteur');
+  dlgLogin.showModal();
+})();
 </script>
 </body>
 </html>
