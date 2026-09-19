@@ -1,0 +1,10 @@
+# Données d'élèves : ne jamais publier (le dépôt est public)
+*.pdf
+*.xlsx
+*.xls
+*.csv
+*.json
+sortie_resonance/
+
+# Anciennes versions de la maquette
+A0*-resonance-*.html
