@@ -20,6 +20,7 @@
   --mono:"IBM Plex Mono",ui-monospace,monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
@@ -312,8 +313,23 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 /* rôles */
 body:not(.role-prof) .tab.prof{display:none}
 /* Connecté : on masque les parties encore fictives, on montre ce qui est branché. */
-body.en-ligne .fictif, body.en-ligne .raie{display:none}
-body:not(.en-ligne) .en-ligne-seul, body:not(.en-ligne) .bientot-carte{display:none}
+/* Connecté : les parties pas encore branchées restent visibles, étiquetées « Exemple ». */
+body.en-ligne .fictif{position:relative;outline:2px dashed #CBD3F5;outline-offset:6px;border-radius:4px}
+body.en-ligne .fictif::before{content:attr(data-exemple);position:absolute;top:-17px;right:8px;z-index:2;
+  background:#2B3A80;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:10px}
+body.en-ligne .fictif button, body.en-ligne .fictif input, body.en-ligne .fictif textarea{pointer-events:none}
+body:not(.en-ligne) .en-ligne-seul, .bientot-carte{display:none}
+.appar{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--premiere);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px}
+.appar.tle{border-left-color:var(--terminale)}
+.appar .t1{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px;font-size:15px}
+.appar .t1 b{font-weight:600}
+.appar .ligne{font-size:13.5px;color:var(--muted);margin:6px 0 0}
+.appar .ligne b{color:var(--ink);font-weight:600}
+.cren{display:inline-block;font-size:12px;padding:1px 7px;border-radius:10px;background:#E7EAEF;color:var(--ink);margin:2px 3px 2px 0}
+.cren.commun{background:#E2F3EA;color:#1E6E48;font-weight:600}
+.tut{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:4px 0}
+.choixcren{margin:0 0 12px;padding:12px 14px;background:var(--soft);border-radius:10px}
+.choixcren .f{font-size:13.5px}
 body:not(.role-eleve) .eleve-seul{display:none}
 .bientot-carte{border-style:dashed;box-shadow:none;background:var(--soft);margin-bottom:22px}
 .mesdem{display:flex;gap:12px;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);padding:10px 0;font-size:14.5px}
@@ -503,7 +519,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
   <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
     <p class="note" style="margin:0">Le calendrier sera calculé à partir des vraies demandes et disponibilités à l'étape suivante.
     En attendant, indique tes moments libres dans « Demander de l'aide » ou « Proposer son aide ».</p></div>
-  <div class="card fictif">
+  <div class="card fictif" data-exemple="Exemple — calendrier réel bientôt disponible">
     <div class="calhead">
       <span class="sem" id="semLabel"></span>
       <button class="mini ghost" id="semPrev" aria-label="Semaine précédente">←</button>
@@ -534,7 +550,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
 
     <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
       <p class="note" style="margin:0">Le bilan s'ouvrira ici après une séance validée par ton professeur.</p></div>
-    <div class="card fictif">
+    <div class="card fictif" data-exemple="Exemple — s'ouvrira après une séance validée">
       <div class="seance">
         <div class="av" aria-hidden="true">MR</div>
         <p><b>Jeudi 12 mars, 15 h — CDI 01</b><br>Titrage colorimétrique · première spécialité</p>
@@ -611,14 +627,20 @@ body:not(.role-eleve) .eleve-seul{display:none}
 <!-- ================= PROF ================= -->
 <section class="view" id="v-prof">
   <div class="en-ligne-seul">
-    <h2>Tableau de bord</h2>
-    <p class="lede">Les demandes déposées par les élèves, en temps réel. Chargez votre correspondance pour voir les noms.</p>
-    <div class="card bientot-carte"><span class="f">Binômes et retours des élèves — bientôt disponible</span>
-      <p class="note" style="margin:0">La validation des binômes et la synthèse des retours seront branchées à l'étape suivante.
-      Pour l'instant, vous voyez les demandes et vous pouvez les rapprocher des tuteurs disponibles.</p></div>
+    <div class="calhead" style="margin-bottom:6px">
+      <h2 class="sem" style="margin:0">Demandes à apparier</h2>
+      <button class="mini ghost" id="actualiser">Actualiser</button>
+    </div>
+    <p class="lede">Pour chaque demande ouverte : les tuteurs qui se sont positionnés, et ceux qui sont disponibles sur les
+    mêmes créneaux. Les créneaux en vert sont communs à l'élève et au tuteur.</p>
+    <div id="appariements"><p class="note">Chargement…</p></div>
+
+    <h3>Disponibilités déclarées par les tuteurs</h3>
+    <div id="dispoTuteurs"><p class="note">Chargement…</p></div>
+    <div style="height:44px"></div>
   </div>
 
-  <div class="fictif">
+  <div class="fictif" data-exemple="Exemple — validation des binômes et retours bientôt disponibles">
   <h2>Jeudi 12 mars — quatre binômes à arbitrer</h2>
   <p class="lede">Rien ne se met en relation sans vous. La validation allume la raie du chapitre dans le spectre, en haut de page.</p>
 
@@ -718,7 +740,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
 
   <div class="card bientot-carte center" style="max-width:720px"><span class="f">Bientôt disponible</span>
     <p class="note" style="margin:0">Les attestations seront remplies automatiquement à partir des séances et des bilans.</p></div>
-  <div class="sheet fictif" id="attestation">
+  <div class="sheet fictif" id="attestation" data-exemple="Exemple — attestations bientôt disponibles">
     <div class="spectrumline">
       <span style="background:var(--premiere)"></span>
       <span style="background:var(--terminale)"></span>
@@ -958,18 +980,36 @@ const raies = [
   {n:0,x:96,  h:28,t:"Tle — Circuit RC",d:"1 demande · 1 tuteur"}
 ];
 const spec=document.getElementById('spectrum'), tip=document.getElementById('tip');
-raies.forEach((r,i)=>{
-  const b=document.createElement('button');
-  b.className='raie n'+r.n; b.dataset.i=i;
-  b.style.left=r.x+'%'; b.style.height=r.h+'px';
-  b.setAttribute('aria-label', r.t+' — '+r.d);
-  const show=()=>{tip.innerHTML='<b>'+r.t+'</b><br>'+r.d;tip.style.left=Math.min(Math.max(r.x,12),88)+'%';tip.classList.add('on');};
-  const hide=()=>tip.classList.remove('on');
-  b.addEventListener('mouseenter',show); b.addEventListener('focus',show);
-  b.addEventListener('mouseleave',hide); b.addEventListener('blur',hide);
-  spec.appendChild(b);
-});
-const raieEls=[...document.querySelectorAll('.raie')];
+let raieEls=[];
+function construireSpectre(liste){
+  spec.querySelectorAll('.raie').forEach(b=>b.remove());
+  liste.forEach((r,i)=>{
+    const b=document.createElement('button');
+    b.className='raie n'+r.n+(r.paire?' paired':''); b.dataset.i=i;
+    b.style.left=r.x+'%'; b.style.height=r.h+'px';
+    b.setAttribute('aria-label', r.t+' — '+r.d);
+    const show=()=>{tip.innerHTML='<b>'+esc(r.t)+'</b><br>'+esc(r.d);tip.style.left=Math.min(Math.max(r.x,12),88)+'%';tip.classList.add('on');};
+    const hide=()=>tip.classList.remove('on');
+    b.addEventListener('mouseenter',show); b.addEventListener('focus',show);
+    b.addEventListener('mouseleave',hide); b.addEventListener('blur',hide);
+    spec.appendChild(b);
+  });
+  raieEls=[...spec.querySelectorAll('.raie')];
+}
+/* Spectre réel : une raie par chapitre du programme, hauteur selon le nombre de demandes ouvertes. */
+function spectreReel(demandes){
+  const liste=[];
+  [[1,3,48],[0,53,97]].forEach(([n,x0,x1])=>{
+    const chs=CHAPITRES[n].flatMap(([,c])=>c);
+    chs.forEach((c,i)=>{
+      const nb=demandes.filter(d=>d.n===n && d.chap===c).length;
+      liste.push({n, x:x0+(x1-x0)*i/(chs.length-1), h:8+Math.min(nb,5)*12, paire:false,
+        t:(n?'1re — ':'Tle — ')+c, d:nb?nb+' demande'+(nb>1?'s':'')+' ouverte'+(nb>1?'s':''):'aucune demande ouverte'});
+    });
+  });
+  construireSpectre(liste);
+}
+construireSpectre(raies);
 
 /* ---------- navigation ---------- */
 function ouvrirVue(nom){
@@ -1123,6 +1163,11 @@ function grilleLecture(slots, tle, mesCreneaux){
   });
   return h+'</tbody></table><p class="note" style="margin-top:6px">Case colorée : moment demandé. Contour rose : tu es aussi disponible.</p>';
 }
+/* « s-3 » → « Jeu. · séance 15 h – 16 h » */
+function libCreneau(k){
+  const [l,j]=String(k).split('-'), L=LIGNES.find(x=>x.k===l);
+  return (JOURS[+j]||'?')+'. · '+(L?L.l.replace(/^Récré/,'récré').replace(/^Séance/,'séance'):k);
+}
 grille(document.getElementById('slotsDemande'),'dispoDemande',["s-0","s-1","s-3","r1-1"]);
 const slotsTuteur=document.getElementById('slotsTuteur');
 grille(slotsTuteur,'dispoTuteur',["s-0","s-1","s-3","r1-2","r2-3"]);
@@ -1223,7 +1268,11 @@ function afficherDemandes(){
       '<p class="c">'+esc(d.chap)+'</p>'+
       '<p class="q">'+(d.moi?"Tu t'es positionné. En attente de validation par ton professeur.":d.pris?"Un tuteur s'est déjà positionné.":
         (d.nat?'<b style="font-weight:600;color:var(--ink)">'+esc(d.nat)+'.</b> ':'')+esc(d.q))+'</p>'+
-      (ferme?'':'<div class="horaires" hidden></div><div class="acts"><button class="mini ghost voir">Voir les horaires</button>'+
+      (ferme?'':'<div class="horaires" hidden></div>'+
+      '<div class="choixcren" hidden><span class="f">Sur quels créneaux peux-tu venir ?</span>'+
+        d.slots.map(k=>'<label class="coche"><input type="checkbox" value="'+esc(k)+'"'+(mc.includes(k)?' checked':'')+'> '+esc(libCreneau(k))+'</label>').join('')+
+        '<div class="acts"><button class="mini confirmer">Confirmer ma proposition</button><button class="mini ghost annuler">Annuler</button></div></div>'+
+      '<div class="acts principal"><button class="mini ghost voir">Voir les horaires</button>'+
       '<button class="mini offre">Je propose mon aide</button></div>');
     if(!ferme){
       const hor=el.querySelector('.horaires'), voir=el.querySelector('.voir');
@@ -1232,13 +1281,19 @@ function afficherDemandes(){
         if(!hor.hidden) hor.innerHTML=grilleLecture(d.slots,d.n===0,mesCreneaux());
         voir.textContent=hor.hidden?'Voir les horaires':'Masquer les horaires';
       });
-      el.querySelector('.offre').disabled=!peutAgir();
-      const btnOffre=el.querySelector('.offre');
-      btnOffre.addEventListener('click',async()=>{
+      const btnOffre=el.querySelector('.offre'), choix=el.querySelector('.choixcren'), principal=el.querySelector('.principal');
+      const btnConfirmer=el.querySelector('.confirmer');
+      btnOffre.disabled=!peutAgir();
+      const majConfirmer=()=>btnConfirmer.disabled=!choix.querySelector('input:checked');
+      choix.addEventListener('change',majConfirmer);
+      btnOffre.addEventListener('click',()=>{ choix.hidden=false; principal.hidden=true; majConfirmer(); });
+      el.querySelector('.annuler').addEventListener('click',()=>{ choix.hidden=true; principal.hidden=false; });
+      btnConfirmer.addEventListener('click',async()=>{
+        const creneaux=[...choix.querySelectorAll('input:checked')].map(i=>i.value);
         if(enLigne()){
-          btnOffre.disabled=true;
-          const {error}=await sb.from('positionnements').insert({demande_id:d.id});
-          if(error){ alert("Impossible de se positionner : "+error.message); btnOffre.disabled=false; return; }
+          btnConfirmer.disabled=true;
+          const {error}=await sb.from('positionnements').insert({demande_id:d.id, creneaux});
+          if(error){ alert("Impossible de se positionner : "+error.message); btnConfirmer.disabled=false; return; }
         }
         d.moi=true; afficherDemandes();
       });
@@ -1416,13 +1471,13 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
     try{ localStorage.setItem(CLE_CORRESP,JSON.stringify(corresp)); }
     catch(err){ alert("Chargée pour cette visite seulement : ce navigateur refuse de la conserver (navigation privée ?)."); }
     majCorrespEtat();
-    if(enLigne() && role==='prof') chargerDepots();
+    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); }
   }catch(err){ alert("Fichier illisible : "+err.message); }
 });
 document.getElementById('correspOublier').addEventListener('click',()=>{
   try{ localStorage.removeItem(CLE_CORRESP); }catch(e){}
   corresp=null; majCorrespEtat();
-  if(enLigne() && role==='prof') chargerDepots();
+  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); }
 });
 
 /* ---------- données réelles (Supabase) ---------- */
@@ -1436,6 +1491,7 @@ function restaurerDemo(){
   tabDepots.innerHTML=DEMO_DEPOTS;
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=DEMO_DISPOS.includes(i.value));
   afficherDemandes();
+  construireSpectre(raies);
 }
 async function chargerDonneesReelles(){
   txtA.value=''; majCompteur();
@@ -1452,9 +1508,57 @@ async function chargerDonneesReelles(){
   const {data:dispo}=await sb.from('disponibilites').select('creneaux').eq('eleve',session.user.id).maybeSingle();
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
   afficherDemandes();
-  if(role==='prof') await chargerDepots();
+  spectreReel(DEMANDES);
+  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements()]);
   if(role==='eleve') await chargerMesDemandes();
 }
+
+/* ---------- appariement (enseignant) ---------- */
+const chipsCren=(liste,communs=[])=>(liste||[]).length
+  ? liste.map(k=>'<span class="cren'+(communs.includes(k)?' commun':'')+'">'+esc(libCreneau(k))+'</span>').join('')
+  : '<span class="hint">aucun</span>';
+const communs=(a,b)=>(a||[]).filter(k=>(b||[]).includes(k));
+async function chargerAppariements(){
+  const zone=document.getElementById('appariements'), zoneDispo=document.getElementById('dispoTuteurs');
+  const [rd,rp,rdis]=await Promise.all([
+    sb.from('demandes').select('id,niveau,chapitre,creneaux,urgent,date_eval,besoin,duree,statut,auteur,profils!demandes_auteur_fkey(identifiant,classe)')
+      .in('statut',['ouverte','positionnee']).order('urgent',{ascending:false}).order('cree_le'),
+    sb.from('positionnements').select('demande_id,creneaux,tuteur,profils(identifiant,classe)'),
+    sb.from('disponibilites').select('eleve,creneaux,maj_le,profils(identifiant,classe)')
+  ]);
+  const err=rd.error||rp.error||rdis.error;
+  if(err){ zone.innerHTML='<p class="note">Erreur : '+esc(err.message)+'</p>'; zoneDispo.innerHTML=''; return; }
+  const dispos=rdis.data.filter(x=>x.creneaux && x.creneaux.length);
+
+  zone.innerHTML=rd.data.length ? rd.data.map(d=>{
+    const auteur=d.profils||{};
+    const positionnes=rp.data.filter(p=>p.demande_id===d.id);
+    const idsPos=positionnes.map(p=>p.tuteur);
+    const autres=dispos.filter(x=>x.eleve!==d.auteur && !idsPos.includes(x.eleve) && communs(x.creneaux,d.creneaux).length);
+    const ligneTuteur=(profil,cr)=>'<div class="tut">'+nomAffiche(profil&&profil.identifiant)+
+      ' <span class="hint">'+esc(profil&&profil.classe||'')+'</span> '+chipsCren(communs(cr,d.creneaux),communs(cr,d.creneaux))+'</div>';
+    return '<div class="appar'+(d.niveau===0?' tle':'')+'">'+
+      '<p class="t1">'+nomAffiche(auteur.identifiant)+' <span class="hint">'+esc(auteur.classe||'')+'</span> · <b>'+esc(d.chapitre)+'</b>'+
+        (d.urgent?' <span class="badge wait">pressant'+(d.date_eval?' — éval. le '+dateCourte(d.date_eval):'')+'</span>':'')+
+        ' <span class="badge">'+esc(((LIB_BESOIN[d.besoin]||'')+' · '+(LIB_DUREE[d.duree]||'')).toLowerCase())+'</span></p>'+
+      '<p class="ligne"><b>Créneaux demandés :</b> '+chipsCren(d.creneaux)+'</p>'+
+      '<p class="ligne"><b>Tuteurs positionnés :</b></p>'+
+        (positionnes.length?positionnes.map(p=>ligneTuteur(p.profils,p.creneaux)).join(''):'<div class="tut hint">personne pour l\'instant</div>')+
+      '<p class="ligne"><b>Autres tuteurs disponibles sur ces créneaux :</b></p>'+
+        (autres.length?autres.map(x=>ligneTuteur(x.profils,x.creneaux)).join(''):'<div class="tut hint">aucun</div>')+
+    '</div>';
+  }).join('') : '<p class="note">Aucune demande ouverte pour l\'instant.</p>';
+
+  zoneDispo.innerHTML=dispos.length
+    ? '<div class="tscroll"><table class="t"><thead><tr><th>Tuteur</th><th>Classe</th><th>Créneaux</th><th>Mis à jour</th></tr></thead><tbody>'+
+      dispos.map(x=>'<tr><td>'+nomAffiche(x.profils&&x.profils.identifiant)+'</td><td>'+esc(x.profils&&x.profils.classe||'')+'</td><td>'+
+        chipsCren(x.creneaux)+'</td><td>'+dateCourte(x.maj_le)+'</td></tr>').join('')+'</tbody></table></div>'
+    : '<p class="note">Aucun élève n\'a encore déclaré de disponibilités de tuteur.</p>';
+}
+document.getElementById('actualiser').addEventListener('click',async e=>{
+  const b=e.currentTarget; b.disabled=true;
+  await chargerDonneesReelles(); b.disabled=false;
+});
 async function chargerMesDemandes(){
   const zone=document.getElementById('mesDemandes');
   const {data,error}=await sb.from('demandes').select('id,chapitre,statut,urgent,cree_le')

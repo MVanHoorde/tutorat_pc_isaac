@@ -90,6 +90,7 @@ create policy "dispo : prof voit tout" on public.disponibilites for select using
 create table if not exists public.positionnements (
   demande_id bigint not null references public.demandes on delete cascade,
   tuteur     uuid not null default auth.uid() references public.profils on delete cascade,
+  creneaux   text[] not null default '{}',  -- créneaux de la demande qui conviennent au tuteur (migration 002)
   cree_le    timestamptz not null default now(),
   primary key (demande_id, tuteur)
 );

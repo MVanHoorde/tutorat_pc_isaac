@@ -62,7 +62,11 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Créer les comptes enseignants avec `preparer_supabase.py --enseignant`.
 - [ ] Brancher la suite : validation des binômes, calendrier réel, bilans (texte puis audio dans le stockage Supabase), retours, attestation.
 - [ ] Effacement automatique des textes quinze jours après la séance (tâche planifiée dans Supabase).
-- [ ] Faire valider la liste des chapitres par les collègues.
+- [ ] Chapitres dans l'ordre des progressions réelles : Mme Castel pour la première, M. Van Hoorde pour la terminale (listes à fournir).
+- [ ] Classes à afficher : « Première spé — Mme Castel » et « Terminale spé — M. Van Hoorde », sans numéro de groupe.
+- [ ] « Pressant » : exiger une évaluation à plus de trois jours, sans révision de dernière minute (demande de Mme Castel, à préciser).
+- [ ] Validation des binômes : décider comment les deux élèves savent avec qui ils ont rendez-vous, puisque les noms ne sont pas en ligne.
+- [ ] Remettre une demande à « ouverte » quand tous les tuteurs se sont retirés.
 - [ ] Horaires :
   - la récré de 15 h 15 tombe pendant la séance de 15 h à 16 h : à vérifier ;
   - le CDI est-il ouvert le mercredi après-midi ?
@@ -75,6 +79,10 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 - **19/09/2026** — Mise en ligne de la maquette v2, puis de la v3.
 - **19/09/2026** — Ajout du script d'analyse et du générateur d'identifiants, du `.gitignore` et de ce fichier.
+- **19/09/2026** — Appariement. Testé de bout en bout ; migration `002` appliquée dans Supabase.
+  - Le tuteur coche les créneaux de la demande qui lui conviennent.
+  - L'enseignant voit, pour chaque demande, les tuteurs positionnés et les tuteurs disponibles sur les mêmes créneaux, ainsi que le tableau de toutes les disponibilités.
+  - Une fois connecté, les exemples restent visibles avec l'étiquette « Exemple », et le spectre affiche les vraies demandes.
 - **19/09/2026** — Supabase activé :
   - inscription libre fermée, tables créées, fonction `premiere-connexion` déployée ;
   - 76 élèves et 2 enseignants importés.
