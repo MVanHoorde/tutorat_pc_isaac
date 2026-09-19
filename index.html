@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Résonance — maquette v2</title>
+<title>Résonance — maquette v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EDF0F3; --ink:#151B2B; --muted:#5C6679; --sheet:#FFFFFF; --rule:#D6DCE4;
-  --deep:#131A2E; --premiere:#35C4C9; --terminale:#9B6BFF; --match:#FF5FA2; --vert:#2E9E6B;
+  --bg:#EDF0F3; --ink:#151B2B; --muted:#5C6679; --sheet:#FFFFFF; --rule:#D6DCE4; --soft:#F4F6F9;
+  --deep:#131A2E; --premiere:#35C4C9; --terminale:#9B6BFF; --match:#FF5FA2; --vert:#2E9E6B; --ambre:#C98A12;
   --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
   --disp:"Bricolage Grotesque","IBM Plex Sans",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
@@ -18,18 +18,18 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
 .demo{background:#FDF0D8;color:#6B4705;border-bottom:1px solid #EBD3A0;
-  padding:12px 20px;font-size:13.5px;line-height:1.5;text-align:center}
+  padding:10px 20px;font-size:13.5px;line-height:1.5;text-align:center}
 .demo strong{font-weight:600}
 
 /* hero */
-.hero{background:var(--deep);color:#fff;padding:26px 0 0}
+.hero{background:var(--deep);color:#fff;padding:22px 0 0}
 .hero .wrap{padding-bottom:0}
 .brandline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:-.02em;margin:0}
 .tag{color:#9AA6C0;font-size:14.5px;margin:0}
-.spectrum{position:relative;height:104px;margin:22px 0 0;background:linear-gradient(180deg,#0D1424,#1B2440);
+.spectrum{position:relative;height:96px;margin:18px 0 0;background:linear-gradient(180deg,#0D1424,#1B2440);
   border:1px solid #26304C;border-bottom:none;border-radius:4px 4px 0 0;overflow:hidden}
 .raie{position:absolute;bottom:26px;width:3px;border:0;padding:0;background:currentColor;cursor:pointer;
   box-shadow:0 0 10px currentColor;transition:height .35s ease,box-shadow .35s ease,transform .35s ease}
@@ -46,64 +46,162 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16p
   font-size:13px;line-height:1.35;border-radius:3px;white-space:nowrap;pointer-events:none;opacity:0;
   transition:opacity .15s;box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:5}
 .tip.on{opacity:1}
-.legend{display:flex;gap:20px;flex-wrap:wrap;padding:10px 0 16px;font-size:13.5px;color:#9AA6C0}
+.legend{display:flex;gap:20px;flex-wrap:wrap;padding:10px 0 14px;font-size:13.5px;color:#9AA6C0}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
 
 /* nav */
 nav{background:var(--deep);position:sticky;top:0;z-index:20;border-bottom:1px solid #26304C}
 nav .wrap{display:flex;gap:2px;padding-bottom:0;overflow-x:auto;align-items:center}
 .tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:#9AA6C0;
-  font-family:var(--sans);font-size:15px;font-weight:500;padding:13px 16px;cursor:pointer;white-space:nowrap}
+  font-family:var(--sans);font-size:15px;font-weight:500;padding:13px 14px;cursor:pointer;white-space:nowrap}
 .tab:hover{color:#fff}
 .tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--match)}
 .tab:focus-visible{outline:2px solid #fff;outline-offset:-4px}
-.tab.second{margin-left:auto;font-size:14px;color:#6E7B9C}
+.tab.second{font-size:14px;color:#6E7B9C}
 .tab.second::before{content:"⌄ ";}
+.tab.prof::after{content:"prof";font-size:10.5px;font-family:var(--mono);margin-left:6px;padding:1px 5px;
+  border:1px solid #3A4666;border-radius:3px;color:#8C98B4;vertical-align:1px}
+.who-btn{margin-left:auto;appearance:none;background:none;border:1px solid #3A4666;color:#C9D1E3;border-radius:16px;
+  font-family:var(--sans);font-size:13.5px;padding:6px 13px;cursor:pointer;white-space:nowrap;margin-right:2px}
+.who-btn:hover{border-color:#9AA6C0;color:#fff}
+.who-btn .id{font-family:var(--mono)}
 
 /* vues */
-.view{display:none;padding-top:38px}
+.view{display:none;padding-top:36px}
 .view.on{display:block}
-h2{font-family:var(--disp);font-weight:600;font-size:25px;letter-spacing:-.015em;margin:0 0 6px}
-.lede{color:var(--muted);max-width:62ch;margin:0 0 28px}
-.cols{display:grid;grid-template-columns:340px 1fr;gap:44px;align-items:start}
-@media(max-width:860px){.cols{grid-template-columns:1fr;gap:32px}}
-h3{font-family:var(--disp);font-weight:600;font-size:18px;margin:34px 0 4px}
+.center{max-width:720px;margin:0 auto}
+h2{font-family:var(--disp);font-weight:600;font-size:27px;letter-spacing:-.015em;margin:0 0 6px}
+.lede{color:var(--muted);max-width:62ch;margin:0 0 22px}
+h3{font-family:var(--disp);font-weight:600;font-size:18px;margin:34px 0 6px}
 p.libre{max-width:62ch}
+.card{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:26px 28px;
+  box-shadow:0 14px 36px rgba(21,27,43,.07)}
+@media(max-width:600px){.card{padding:20px 16px}}
+.step{margin:0 0 22px}
+.step:last-child{margin-bottom:0}
+.hint{font-size:12.5px;color:var(--muted);font-weight:400}
 
-/* téléphone */
-.phone{width:340px;max-width:100%;background:#fff;border:1px solid var(--rule);border-radius:26px;padding:14px;
-  box-shadow:0 18px 44px rgba(21,27,43,.13)}
-.screen{background:#F7F8FA;border-radius:16px;padding:18px 16px 20px;min-height:540px}
-.stitle{font-family:var(--disp);font-weight:600;font-size:19px;margin:0 0 3px}
-.ssub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
-.seg{display:flex;background:#E7EAEF;border-radius:8px;padding:3px;margin-bottom:20px}
+/* formulaires */
+.seg{display:flex;background:#E7EAEF;border-radius:8px;padding:3px}
 .seg button{flex:1;appearance:none;border:0;background:none;padding:8px 6px;border-radius:6px;
-  font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer}
+  font-family:var(--sans);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer}
 .seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-label.f{display:block;font-size:13px;font-weight:600;margin:0 0 7px;color:var(--ink)}
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:19px}
+label.f,.f{display:block;font-size:14px;font-weight:600;margin:0 0 8px;color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
 .chip{appearance:none;border:1px solid var(--rule);background:#fff;color:var(--ink);font-family:var(--sans);
-  font-size:13.5px;padding:7px 12px;border-radius:20px;cursor:pointer}
+  font-size:14px;padding:7px 13px;border-radius:20px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .chip:focus-visible,.seg button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-select,textarea,input[type=text],input[type=password]{width:100%;font-family:var(--sans);font-size:14.5px;
-  color:var(--ink);background:#fff;border:1px solid var(--rule);border-radius:6px;padding:10px 11px}
-textarea{resize:vertical;min-height:78px}
-.count{font-size:12px;color:var(--muted);text-align:right;margin:5px 0 18px}
-.cta{width:100%;appearance:none;border:0;border-radius:8px;background:var(--ink);color:#fff;font-family:var(--sans);
-  font-size:15px;font-weight:600;padding:13px;cursor:pointer}
+.choix{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.choix{grid-template-columns:1fr}}
+.choix label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;
+  padding:12px 13px;cursor:pointer;font-size:14px;line-height:1.4}
+.choix label:has(input:checked){border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 1px var(--ink)}
+.choix input{margin-top:3px;accent-color:var(--ink)}
+.choix b{display:block;font-weight:600}
+.choix span{color:var(--muted);font-size:13px}
+.coche{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;margin:0 0 9px;cursor:pointer}
+.coche input{margin-top:4px;accent-color:var(--ink);width:16px;height:16px;flex:none}
+.urgent{border:1px solid #EBD3A0;background:#FFF8EA;border-radius:10px;padding:12px 14px}
+.urgent .coche{margin:0}
+.urgent .sous{margin:10px 0 0 26px;display:none;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+.urgent.on .sous{display:flex}
+.urgent input[type=date]{width:auto}
+select,textarea,input[type=text],input[type=password],input[type=date]{width:100%;font-family:var(--sans);font-size:15px;
+  color:var(--ink);background:#fff;border:1px solid var(--rule);border-radius:7px;padding:10px 11px}
+select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+textarea{resize:vertical;min-height:130px;line-height:1.5}
+.count{font-size:12.5px;color:var(--muted);text-align:right;margin:5px 0 0}
+.cta{width:100%;appearance:none;border:0;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--sans);
+  font-size:16px;font-weight:600;padding:14px;cursor:pointer}
 .cta:hover{background:#26304C}
 .cta:focus-visible{outline:2px solid var(--match);outline-offset:2px}
-.note{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}
+.cta.sent{background:var(--vert)}
+.note{font-size:13px;color:var(--muted);margin:12px 0 0;line-height:1.5}
+.bandeau{display:flex;gap:10px;align-items:flex-start;background:#F1ECFF;border:1px solid #D9CCFF;color:#4B2E99;
+  border-radius:9px;padding:10px 13px;font-size:13px;line-height:1.45;margin:0 0 20px}
+.bandeau b{font-weight:600}
 
-/* demandes anonymes */
-.dem{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--premiere);padding:12px 13px;margin-bottom:9px}
-.dem .h{font-size:13px;color:var(--muted);margin:0 0 3px}
-.dem .c{font-size:14.5px;font-weight:600;margin:0 0 5px}
-.dem .q{font-size:13.5px;color:var(--muted);margin:0 0 10px;line-height:1.45}
-.dem .mini{width:100%}
-.dem.pris{border-left-color:var(--vert);opacity:.65}
-.anon{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+/* grille de créneaux */
+.slots{width:100%;border-collapse:separate;border-spacing:4px;font-size:13px;margin:0 -4px}
+.slots th{font-weight:600;color:var(--muted);font-size:12px;text-align:center;padding:0 0 2px}
+.slots th.l{text-align:left;font-weight:500;color:var(--ink);font-size:13px;white-space:nowrap;padding-right:6px}
+.slots th.l small{display:block;color:var(--muted);font-size:11.5px;font-weight:400}
+.slots td{padding:0}
+.slot{display:block;width:100%;height:34px;border:1px solid var(--rule);border-radius:6px;background:#fff;cursor:pointer;
+  position:relative}
+.slot input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
+.slot:has(input:checked){background:var(--ink);border-color:var(--ink)}
+.slot:has(input:checked)::after{content:"✓";color:#fff;position:absolute;inset:0;display:grid;place-items:center;font-size:14px}
+.slot:has(input:focus-visible){outline:2px solid var(--match);outline-offset:1px}
+.slots.ro .slot{cursor:default;height:26px}
+.slots.ro .slot.on{background:var(--premiere);border-color:var(--premiere)}
+.slots.ro.tle .slot.on{background:var(--terminale);border-color:var(--terminale)}
+.slots.ro .slot.moi{box-shadow:inset 0 0 0 2px var(--match)}
+
+/* info repliable */
+details.info{margin-top:14px;border-top:1px solid var(--rule);padding-top:12px}
+details.info summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;
+  font-size:14px;color:var(--muted);font-weight:500}
+details.info summary::-webkit-details-marker{display:none}
+details.info summary::before{content:"i";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+  border:1.5px solid currentColor;font-family:var(--mono);font-size:12px;font-weight:500}
+details.info summary:hover{color:var(--ink)}
+details.info[open] summary{color:var(--ink);margin-bottom:6px}
+details.info h4{font-size:14.5px;font-weight:600;margin:14px 0 2px}
+details.info p{font-size:14px;color:var(--muted);margin:0;max-width:66ch}
+
+/* demandes (tuteur) */
+.filtres{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.dem{background:#fff;border:1px solid var(--rule);border-top:4px solid var(--premiere);border-radius:10px;padding:16px 17px}
+.dem.tle{border-top-color:var(--terminale)}
+.dem .h{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+.dem .c{font-family:var(--disp);font-size:17.5px;font-weight:600;margin:0 0 5px;line-height:1.3}
+.dem .q{font-size:14px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.dem .acts{display:flex;gap:8px;flex-wrap:wrap}
+.dem .horaires{margin:0 0 14px}
+.dem.pris{opacity:.6}
+.anon{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-left:auto}
+.badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:3px;background:#E7EAEF;color:var(--muted);white-space:nowrap}
+.badge.wait{background:#FDF0D8;color:#8A5D08}
+.badge.live{background:#FFE6F0;color:#A81E5C}
+.badge.vert{background:#E2F3EA;color:#1E6E48}
+.badge.p1{background:#DDF6F7;color:#11777B}
+.badge.p0{background:#EEE6FF;color:#5B34C2}
+
+.mini{appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;font-family:var(--sans);
+  font-size:14px;font-weight:500;padding:8px 14px;border-radius:7px;cursor:pointer}
+.mini.ghost{background:#fff;color:var(--ink)}
+.mini:focus-visible{outline:2px solid var(--match);outline-offset:2px}
+
+/* calendrier */
+.calhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.calhead .sem{font-family:var(--disp);font-weight:600;font-size:18px;margin-right:auto}
+.calscroll{overflow-x:auto;margin:0 -4px}
+.cal{width:100%;min-width:620px;border-collapse:separate;border-spacing:6px}
+.cal th{font-size:13px;color:var(--muted);font-weight:600;text-align:left;padding:0 4px}
+.cal th.l{width:130px;color:var(--ink);font-weight:500;vertical-align:top;padding-top:10px}
+.cal th.l small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.cell{appearance:none;width:100%;min-height:74px;text-align:left;border:1px solid var(--rule);border-radius:8px;background:#fff;
+  font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 9px;cursor:pointer;color:var(--ink);vertical-align:top}
+.cell b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+.cell.vide{background:var(--soft);color:#9AA3B2;cursor:default}
+.cell.possible{border-color:#9ED8BE;background:#EFFAF4}
+.cell.manque{border-color:#EBD3A0;background:#FFF8EA}
+.cell.binome{border-color:var(--match);background:#FFF0F6}
+.cell[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.cell:focus-visible{outline:2px solid var(--match);outline-offset:2px}
+.callegend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 0 0}
+.callegend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid}
+.detail{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 10px 10px 0;
+  padding:14px 16px;margin-top:14px;font-size:14.5px}
+.detail h4{margin:0 0 6px;font-size:15px;font-weight:600}
+.detail ul{margin:0;padding-left:18px}
+.detail li{margin:2px 0}
 
 /* prof */
 .pair{background:var(--sheet);border:1px solid var(--rule);border-left:3px solid var(--match);padding:16px 18px;
@@ -112,26 +210,24 @@ textarea{resize:vertical;min-height:78px}
 .pair .who strong{font-weight:600}
 .pair .meta{font-size:13.5px;color:var(--muted);margin:0}
 .pair .meta em{font-style:normal;color:var(--ink)}
-.mini{appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;font-family:var(--sans);
-  font-size:14px;font-weight:500;padding:9px 15px;border-radius:6px;cursor:pointer}
-.mini.ghost{background:none;color:var(--ink)}
-.mini:focus-visible{outline:2px solid var(--match);outline-offset:2px}
 .pair.done{border-left-color:var(--vert);opacity:.72}
 .pair.done .mini{display:none}
 .ok{color:var(--vert);font-size:14px;font-weight:600;white-space:nowrap}
-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
-th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);padding:0 10px 8px 0;border-bottom:1px solid var(--rule)}
-td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
-.badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:3px;background:#E7EAEF;color:var(--muted)}
-.badge.wait{background:#FDF0D8;color:#8A5D08}
-.badge.live{background:#FFE6F0;color:#A81E5C}
-.badge.vert{background:#E2F3EA;color:#1E6E48}
+.tscroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+table.t th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);padding:0 10px 8px 0;border-bottom:1px solid var(--rule)}
+table.t td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF;vertical-align:top}
 .encadre{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--terminale);padding:16px 18px;margin:14px 0}
 .encadre p{margin:0 0 6px;max-width:64ch}
 .encadre p:last-child{margin-bottom:0}
+.encadre.ambre{border-left-color:var(--ambre)}
+.barres{display:flex;height:8px;border-radius:4px;overflow:hidden;width:120px;background:#E7EAEF;margin-top:5px}
+.barres span:nth-child(1){background:var(--vert)}
+.barres span:nth-child(2){background:#E3B33E}
+.barres span:nth-child(3){background:#D9534F}
 
 /* enregistrement */
-.rec{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:18px;text-align:center}
+.rec{background:var(--soft);border:1px solid var(--rule);border-radius:12px;padding:18px;text-align:center}
 .wave{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:56px;margin:6px 0 14px}
 .wave i{width:4px;background:var(--rule);border-radius:2px;height:8px;display:block}
 .rec.on .wave i{background:var(--match);animation:bounce .7s ease-in-out infinite alternate}
@@ -144,9 +240,15 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
   font-weight:600;padding:12px 22px;border-radius:24px;cursor:pointer;margin-top:6px}
 .recbtn.on{background:var(--ink)}
 .recbtn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.seance{display:flex;gap:12px;align-items:center;background:var(--soft);border-radius:10px;padding:12px 14px;margin:0 0 22px}
+.seance .av{width:38px;height:38px;border-radius:50%;background:var(--premiere);color:#fff;display:grid;place-items:center;
+  font-weight:600;flex:none}
+.seance p{margin:0;font-size:14px;color:var(--muted);line-height:1.4}
+.seance p b{color:var(--ink);font-weight:600;font-size:15px}
 
 /* attestation */
-.sheet{background:#fff;border:1px solid var(--rule);padding:44px 46px;max-width:720px;box-shadow:0 16px 40px rgba(21,27,43,.09)}
+.sheet{background:#fff;border:1px solid var(--rule);padding:44px 46px;max-width:720px;margin:0 auto;box-shadow:0 16px 40px rgba(21,27,43,.09)}
+@media(max-width:600px){.sheet{padding:26px 18px}}
 .sheet .ent{font-size:13px;color:var(--muted);margin:0 0 26px;line-height:1.5}
 .sheet h4{font-family:var(--disp);font-weight:600;font-size:22px;margin:0 0 22px;letter-spacing:-.01em}
 .sheet p{max-width:66ch}
@@ -157,11 +259,52 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
 .stat b{display:block;font-family:var(--disp);font-weight:800;font-size:32px;line-height:1.1}
 .stat span{font-size:13px;color:var(--muted)}
 .sigzone{margin-top:34px;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:end}
+@media(max-width:520px){.sigzone{grid-template-columns:1fr}}
 .padbox{border:1px dashed var(--rule);border-radius:4px;background:#FCFCFD}
 #pad{display:block;width:100%;height:110px;touch-action:none;cursor:crosshair}
 .sigmeta{font-size:13px;color:var(--muted);line-height:1.5}
-.barre{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-.foot{margin-top:44px;color:var(--muted);font-size:13.5px;max-width:62ch}
+.barre{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
+
+/* pied de page */
+footer{background:var(--deep);color:#C9D1E3;margin-top:40px;padding:34px 0 10px;font-size:14px}
+footer .wrap{padding-bottom:20px}
+.fcols{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+@media(max-width:760px){.fcols{grid-template-columns:1fr;gap:22px}}
+footer h5{font-family:var(--disp);font-weight:600;font-size:16px;color:#fff;margin:0 0 8px}
+footer p{margin:0 0 8px;line-height:1.5}
+footer .creneau{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #26304C;padding:6px 0}
+footer .creneau b{color:#fff;font-weight:500}
+footer .creneau span{color:#9AA6C0;text-align:right}
+footer .bas{border-top:1px solid #26304C;margin-top:26px;padding-top:14px;font-size:12.5px;color:#6E7B9C}
+
+/* pop-ups */
+dialog{border:0;border-radius:18px;padding:0;width:calc(100% - 32px);max-width:430px;color:var(--ink);
+  box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog.large{max-width:500px}
+dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
+.dlg{padding:28px 28px 24px}
+@media(max-width:480px){.dlg{padding:22px 18px 18px}}
+.dlg .top{display:flex;height:5px;margin:-28px -28px 24px}
+@media(max-width:480px){.dlg .top{margin:-22px -18px 20px}}
+.dlg .top span{flex:1}
+.dlg h2{font-size:26px;margin:0 0 2px}
+.dlg .sub{color:var(--muted);font-size:14.5px;margin:0 0 22px}
+.dlg .browse{display:block;width:100%;appearance:none;background:none;border:1px solid var(--rule);border-radius:9px;
+  font-family:var(--sans);font-size:15px;font-weight:500;color:var(--ink);padding:12px;margin-top:10px;cursor:pointer}
+.dlg .browse:hover{border-color:var(--ink)}
+.dlg .browse small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.dlg .sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:16px 0 0}
+.dlg .sep::before,.dlg .sep::after{content:"";flex:1;height:1px;background:var(--rule)}
+.q3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
+.q3 label{border:1px solid var(--rule);border-radius:10px;padding:12px 6px;text-align:center;font-size:13.5px;cursor:pointer;
+  line-height:1.3}
+.q3 label b{display:block;font-size:22px;line-height:1.1;margin-bottom:4px;font-family:var(--disp)}
+.q3 input{position:absolute;opacity:0;pointer-events:none}
+.q3 label:has(input:checked){border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 1px var(--ink)}
+.q3 label:has(input:focus-visible){outline:2px solid var(--match);outline-offset:2px}
+.merci{text-align:center;padding:20px 0 8px}
+.merci b{display:block;font-family:var(--disp);font-size:22px;margin-bottom:6px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -169,15 +312,14 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
 
 <div class="demo">
   <strong>Maquette de démonstration.</strong> Tous les noms, demandes et chiffres sont inventés —
-  aucun élève réel n'apparaît ici et rien n'est enregistré. Le dispositif n'est pas ouvert aux
-  élèves : cette page sert uniquement à montrer à quoi il ressemblerait.
+  aucun élève réel n'apparaît ici et rien n'est enregistré.
 </div>
 
 <header class="hero">
   <div class="wrap">
     <div class="brandline">
       <h1 class="brand">Résonance</h1>
-      <p class="tag">tutorat en physique-chimie — première et terminale spécialité — CDI 0</p>
+      <p class="tag">tutorat en physique-chimie — première et terminale spécialité — CDI 01</p>
     </div>
     <div class="spectrum" id="spectrum">
       <div class="baseline"></div>
@@ -194,200 +336,240 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
 
 <nav>
   <div class="wrap" role="tablist" aria-label="Vues de la maquette">
-    <button class="tab" role="tab" aria-selected="true" data-view="connexion">Connexion</button>
-    <button class="tab" role="tab" aria-selected="false" data-view="demande">Demander de l'aide</button>
+    <button class="tab" role="tab" aria-selected="true" data-view="demande">Demander de l'aide</button>
     <button class="tab" role="tab" aria-selected="false" data-view="offre">Proposer son aide</button>
-    <button class="tab" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="calendrier">Calendrier</button>
     <button class="tab" role="tab" aria-selected="false" data-view="bilan">Bilan de séance</button>
-    <button class="tab second" role="tab" aria-selected="false" data-view="attest">Fin de période</button>
+    <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
+    <button class="tab second prof" role="tab" aria-selected="false" data-view="attest">Fin de période</button>
+    <button class="who-btn" id="whoBtn">Se connecter</button>
   </div>
 </nav>
 
 <main class="wrap">
 
-<!-- ================= CONNEXION ================= -->
-<section class="view on" id="v-connexion">
-  <h2>On entre avec un identifiant, jamais avec son nom</h2>
-  <p class="lede">Chaque élève reçoit un identifiant tiré au hasard et un mot de passe, distribués sur
-  papier. Le serveur ne connaît que cet identifiant : la correspondance avec les noms reste sur les
-  machines des enseignants.</p>
+<!-- ================= DEMANDE ================= -->
+<section class="view on" id="v-demande">
+  <div class="center">
+    <h2>Demander de l'aide</h2>
+    <p class="lede">Ta demande arrive chez ton professeur. Elle n'est proposée aux tuteurs que sans ton nom.</p>
 
-  <div class="cols">
-    <div class="phone">
-      <div class="screen">
-        <p class="stitle">Résonance</p>
-        <p class="ssub">Tutorat en physique-chimie</p>
+    <div class="card">
+      <div class="bandeau"><span aria-hidden="true">✎</span><span><b>Liste des chapitres à valider par l'équipe.</b>
+        Elle reprend les programmes officiels de spécialité (BO spécial n° 1 du 22 janvier 2019 pour la première,
+        n° 8 du 25 juillet 2019 pour la terminale). Les collègues peuvent la découper ou la renommer selon leur progression.</span></div>
 
-        <label class="f" for="idf">Identifiant</label>
-        <input id="idf" type="text" value="PC-MYWM4" style="font-family:var(--mono);margin-bottom:16px">
-
-        <label class="f" for="mdp">Mot de passe</label>
-        <input id="mdp" type="password" value="Neige!32" style="margin-bottom:22px">
-
-        <button class="cta">Se connecter</button>
-
-        <div style="border-top:1px solid var(--rule);margin-top:24px;padding-top:16px">
-          <p class="note" style="margin:0">
-          <strong style="font-weight:600;color:var(--ink)">Ce qui est enregistré.</strong>
-          Ton identifiant, ta classe, les chapitres sur lesquels tu demandes ou proposes de l'aide,
-          et les séances auxquelles tu participes. Ton nom n'est pas enregistré en ligne.<br><br>
-          <strong style="font-weight:600;color:var(--ink)">Qui le voit.</strong>
-          Tes professeurs de physique-chimie. Les autres élèves ne voient jamais ton nom ni ta
-          demande tant qu'un binôme n'a pas été validé.<br><br>
-          <strong style="font-weight:600;color:var(--ink)">Combien de temps.</strong>
-          Le texte de tes demandes est effacé quinze jours après la séance. Le reste est supprimé
-          fin août. Tu peux demander l'effacement à tout moment à ton professeur.</p>
+      <div class="step">
+        <span class="f">Ma classe</span>
+        <div class="row2">
+          <div class="seg" role="group" aria-label="Niveau">
+            <button id="nivP" aria-pressed="true">Première spé</button>
+            <button id="nivT" aria-pressed="false">Terminale spé</button>
+          </div>
+          <select id="groupe" aria-label="Groupe"></select>
         </div>
       </div>
-    </div>
 
-    <div>
-      <h3 style="margin-top:0">Pourquoi pas de nom à la saisie</h3>
-      <p class="libre">Les listes viennent de l'export École Directe, les identifiants sont générés
-      hors ligne. Personne ne tape son nom, donc personne ne se trompe d'orthographe, et les
-      homonymes ne posent plus de problème. Surtout, il n'existe aucun endroit en ligne où le nom
-      d'un élève soit écrit.</p>
+      <div class="step">
+        <label class="f" for="chap">Sur quel chapitre</label>
+        <select id="chap"></select>
+      </div>
 
-      <h3>Ce que ça coûte</h3>
-      <p class="libre">Une distribution de coupons en début d'année, et une réimpression pour les
-      inscriptions tardives. C'est le prix de l'architecture, et il est bas.</p>
-
-      <h3>Les créneaux</h3>
-      <p class="libre">Tous les jours de 15 h à 16 h au CDI 0 : c'est le créneau qui compte, avec
-      inscription, binôme validé et bilan. Les récréations de 9 h 55 et de 15 h 15 restent en accès
-      libre, sans inscription et sans comptage — on y pose une question, on n'y fait pas une séance.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= DEMANDE ================= -->
-<section class="view" id="v-demande">
-  <h2>Déposer une demande</h2>
-  <p class="lede">Un chapitre choisi dans une liste, la nature du blocage, deux cents caractères.
-  Rien ne part vers un autre élève : la demande arrive chez le professeur, et n'apparaîtra ensuite
-  aux tuteurs que sans nom.</p>
-
-  <div class="cols">
-    <div class="phone">
-      <div class="screen">
-        <p class="stitle">Demander de l'aide</p>
-        <p class="ssub">Première spécialité — inscriptions ouvertes</p>
-
-        <label class="f" for="chapA">Sur quel chapitre</label>
-        <select id="chapA" style="margin-bottom:19px">
-          <option>1re — Forces et mouvement</option>
-          <option>1re — Énergie mécanique</option>
-          <option selected>1re — Titrage colorimétrique</option>
-          <option>1re — Oxydo-réduction</option>
-          <option>1re — Ondes et lumière</option>
-          <option>1re — Lentilles minces</option>
-        </select>
-
-        <label class="f">Où ça coince</label>
+      <div class="step">
+        <span class="f">Où ça coince <span class="hint">— plusieurs choix possibles</span></span>
         <div class="chips" role="group">
           <button class="chip" aria-pressed="true">Le cours</button>
           <button class="chip" aria-pressed="false">Un exercice</button>
           <button class="chip" aria-pressed="true">La méthode</button>
           <button class="chip" aria-pressed="false">Le TP</button>
+          <button class="chip" aria-pressed="false">Préparer une évaluation</button>
         </div>
-
-        <label class="f" for="txtA">Le point précis (deux cents caractères)</label>
-        <textarea id="txtA" maxlength="200">Je ne comprends pas ce qui se passe à l'équivalence, ni pourquoi on change de couleur juste à ce moment-là.</textarea>
-        <p class="count"><span id="cA">110</span>/200</p>
-
-        <label class="f" for="creneau">Quand je peux venir</label>
-        <select id="creneau" style="margin-bottom:22px">
-          <option selected>Lundi, mardi ou jeudi, 15 h</option>
-          <option>Tous les jours, 15 h</option>
-          <option>Vendredi seulement, 15 h</option>
-        </select>
-
-        <button class="cta">Envoyer ma demande</button>
-        <p class="note">Ta demande sera lue par ton professeur. Elle sera ensuite proposée aux
-        tuteurs sans ton nom ni ta classe exacte. Parle du chapitre, pas de toi.</p>
       </div>
-    </div>
 
-    <div>
-      <h3 style="margin-top:0">Deux voies d'entrée</h3>
-      <p class="libre">La demande spontanée, celle que tu vois ici. Et la demande prescrite : après
-      un devoir, vous envoyez quatre élèves nommément, avec le chapitre déjà rempli. C'est la
-      seconde qui fera vivre le dispositif — les élèves qui en ont le plus besoin ne s'inscrivent
-      pas d'eux-mêmes.</p>
+      <div class="step">
+        <span class="f">Mon besoin</span>
+        <div class="choix">
+          <label><input type="radio" name="besoin" value="ponctuel" checked><span><b>Ponctuel</b><span>Une question précise, une fois.</span></span></label>
+          <label><input type="radio" name="besoin" value="duree"><span><b>Sur la durée</b><span>Plusieurs séances sur ce chapitre.</span></span></label>
+          <label><input type="radio" name="duree" value="min" checked><span><b>Quelques minutes</b><span>Ça peut se régler pendant une récré.</span></span></label>
+          <label><input type="radio" name="duree" value="heure"><span><b>Une heure</b><span>Une vraie séance, de 15 h à 16 h.</span></span></label>
+        </div>
+      </div>
 
-      <h3>Ce que la limite de caractères protège</h3>
-      <p class="libre">Deux cents caractères et une question orientée sur le chapitre, c'est ce qui
-      évite de récolter des confidences qu'on n'a pas demandées et qu'on ne saurait pas conserver.
-      Le texte est effacé quinze jours après la séance.</p>
+      <div class="step">
+        <div class="urgent" id="urgent">
+          <label class="coche"><input type="checkbox" id="urgentBox"> <span><b style="font-weight:600">C'est pressant</b> — j'ai une évaluation bientôt</span></label>
+          <div class="sous"><label for="dateEval">Évaluation le</label><input type="date" id="dateEval" value="2027-03-16"></div>
+        </div>
+      </div>
 
-      <h3>Intra-classe</h3>
-      <p class="libre">Un élève de terminale peut demander de l'aide à un camarade de sa propre
-      classe. Deux séances par binôme et par période au maximum, sinon deux amis tourneront en
-      boucle pour le bonus.</p>
+      <div class="step">
+        <label class="f" for="txtA">Le point précis</label>
+        <textarea id="txtA" maxlength="400">Je ne comprends pas ce qui se passe à l'équivalence, ni pourquoi on change de couleur juste à ce moment-là. Dans l'exercice 12 du livre je n'arrive pas à trouver la quantité de matière de réactif titré.</textarea>
+        <p class="count"><span id="cA">0</span>/400</p>
+      </div>
+
+      <div class="step">
+        <span class="f">Quand je peux venir <span class="hint">— coche tous les moments possibles</span></span>
+        <div id="slotsDemande"></div>
+      </div>
+
+      <button class="cta" id="envoiDemande">Envoyer ma demande</button>
+      <p class="note">Parle du chapitre, pas de toi : ta demande sera montrée aux tuteurs sans ton nom ni ta classe exacte.</p>
+
+      <details class="info">
+        <summary>Comment ça marche</summary>
+        <h4>Deux voies d'entrée</h4>
+        <p>La demande spontanée, celle-ci. Et la demande prescrite : après un devoir, le professeur inscrit
+        directement des élèves, avec le chapitre déjà rempli.</p>
+        <h4>Pourquoi 400 caractères</h4>
+        <p>Assez pour décrire le blocage, pas assez pour se livrer. Le texte est effacé quinze jours après la séance.</p>
+        <h4>Dans sa propre classe</h4>
+        <p>On peut être aidé par un camarade de sa classe, dans la limite de deux séances par binôme et par période.</p>
+      </details>
     </div>
   </div>
 </section>
 
 <!-- ================= OFFRE ================= -->
 <section class="view" id="v-offre">
-  <h2>Le tuteur choisit une demande, pas une personne</h2>
-  <p class="lede">C'est le changement le plus important depuis la première maquette. Les demandes
-  s'affichent sans nom et sans classe précise. Le tuteur se positionne, vous validez, et les deux
-  identités n'apparaissent qu'à ce moment-là, aux deux élèves concernés.</p>
+  <div class="center" style="max-width:900px">
+    <h2>Proposer son aide</h2>
+    <p class="lede">Tu choisis une demande, pas une personne. Si ton professeur valide, vous recevez tous les deux
+    le nom de l'autre et l'horaire.</p>
 
-  <div class="cols">
-    <div class="phone">
-      <div class="screen">
-        <p class="stitle">Demandes en attente</p>
-        <p class="ssub">4 demandes · séance de jeudi 15 h</p>
-
-        <div class="dem">
-          <p class="h">Première spé · <span class="anon">demande 214</span></p>
-          <p class="c">Titrage colorimétrique</p>
-          <p class="q">Ne comprend pas ce qui se passe à l'équivalence ni le changement de couleur.</p>
-          <button class="mini offre">Je propose mon aide</button>
-        </div>
-
-        <div class="dem">
-          <p class="h">Première spé · <span class="anon">demande 217</span></p>
-          <p class="c">Énergie mécanique</p>
-          <p class="q">Bloque sur les exercices avec frottements : ne sait pas quoi poser au départ.</p>
-          <button class="mini offre">Je propose mon aide</button>
-        </div>
-
-        <div class="dem" style="border-left-color:var(--terminale)">
-          <p class="h">Terminale spé · <span class="anon">demande 219</span></p>
-          <p class="c">Mouvement dans un champ uniforme</p>
-          <p class="q">N'arrive pas à projeter sur les deux axes avant d'intégrer.</p>
-          <button class="mini offre">Je propose mon aide</button>
-        </div>
-
-        <div class="dem pris">
-          <p class="h">Première spé · <span class="anon">demande 211</span></p>
-          <p class="c">Forces et mouvement</p>
-          <p class="q">Un tuteur s'est déjà positionné.</p>
-        </div>
-
-        <p class="note">Tu ne vois ni le nom ni la classe exacte de l'élève. Si le professeur valide,
-        vous recevrez tous les deux le nom de l'autre et l'horaire, la veille de la séance.</p>
-      </div>
+    <div class="filtres" role="group" aria-label="Filtrer les demandes">
+      <button class="chip filtre" aria-pressed="true" data-f="tous">Toutes</button>
+      <button class="chip filtre" aria-pressed="false" data-f="1">Première</button>
+      <button class="chip filtre" aria-pressed="false" data-f="0">Terminale</button>
+      <button class="chip filtre" aria-pressed="false" data-f="urgent">Pressantes</button>
+      <button class="chip filtre" aria-pressed="false" data-f="dispo">Sur mes créneaux</button>
     </div>
 
-    <div>
-      <h3 style="margin-top:0">Pourquoi cette anonymisation</h3>
-      <p class="libre">Une liste nominative d'élèves en difficulté, consultable par des élèves, c'est
-      exactement ce qui blesse et ce qui décourage les plus fragiles de s'inscrire. Là, le tuteur
-      choisit un chapitre et une difficulté. Et on ne peut plus viser son copain pour se faire
-      attribuer les points.</p>
+    <div class="grid2" id="listeDemandes"></div>
 
-      <h3>Rien n'est demandé au tuteur</h3>
-      <p class="libre">Pas de profil, pas de présentation, pas de moyenne affichée. Il se déclare
-      disponible, il se positionne sur ce qu'il se sent capable d'expliquer. C'est vous qui
-      arbitrez si le tuteur tient la route sur ce chapitre-là.</p>
+    <div class="card" style="margin-top:22px">
+      <span class="f">Mes disponibilités de tuteur <span class="hint">— sert au calendrier et aux appariements du professeur</span></span>
+      <div id="slotsTuteur"></div>
+      <details class="info">
+        <summary>Comment ça marche</summary>
+        <h4>Pourquoi les demandes sont anonymes</h4>
+        <p>Une liste nominative d'élèves en difficulté, lue par d'autres élèves, blesse et décourage les plus fragiles
+        de s'inscrire. Ici, tu choisis un chapitre et une difficulté.</p>
+        <h4>Rien n'est demandé au tuteur</h4>
+        <p>Pas de profil, pas de moyenne affichée. Tu te positionnes sur ce que tu te sens capable d'expliquer ;
+        le professeur arbitre.</p>
+        <h4>Si personne ne se positionne</h4>
+        <p>Le professeur peut créer le binôme lui-même : se déclarer disponible sur un créneau vaut accord.</p>
+      </details>
+    </div>
+  </div>
+</section>
 
-      <h3>Et si personne ne se positionne</h3>
-      <p class="libre">Vous créez le binôme vous-même depuis le tableau de bord. Un élève inscrit
-      comme disponible peut être appelé sans s'être positionné : la disponibilité vaut accord.</p>
+<!-- ================= CALENDRIER ================= -->
+<section class="view" id="v-calendrier">
+  <h2>Calendrier des rencontres</h2>
+  <p class="lede">Mis à jour à partir des demandes et des disponibilités des tuteurs. Clique sur une case pour voir le détail.</p>
+
+  <div class="card">
+    <div class="calhead">
+      <span class="sem" id="semLabel"></span>
+      <button class="mini ghost" id="semPrev" aria-label="Semaine précédente">←</button>
+      <button class="mini ghost" id="semNext" aria-label="Semaine suivante">→</button>
+    </div>
+    <div class="calscroll"><table class="cal" id="cal"></table></div>
+    <div class="callegend">
+      <span><i style="background:#FFF0F6;border-color:var(--match)"></i>binôme validé</span>
+      <span><i style="background:#EFFAF4;border-color:#9ED8BE"></i>rencontre possible</span>
+      <span><i style="background:#FFF8EA;border-color:#EBD3A0"></i>demande sans tuteur</span>
+      <span><i style="background:var(--soft);border-color:var(--rule)"></i>rien pour l'instant</span>
+    </div>
+    <div class="detail" id="calDetail" hidden></div>
+    <details class="info">
+      <summary>Et dans le site final ?</summary>
+      <p>Le calendrier sera calculé automatiquement par le serveur à chaque nouvelle demande ou disponibilité.
+      Il pourra aussi être proposé en abonnement (lien .ics) dans l'agenda du téléphone ou dans celui des
+      professeurs. Les élèves n'y voient que des chapitres et des nombres, jamais de noms.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ================= BILAN ================= -->
+<section class="view" id="v-bilan">
+  <div class="center">
+    <h2>Bilan de séance</h2>
+    <p class="lede">Quelques cases, puis 60 à 90 secondes de voix ou cinq lignes écrites. C'est cette trace qui compte pour le bonus.</p>
+
+    <div class="card">
+      <div class="seance">
+        <div class="av" aria-hidden="true">MR</div>
+        <p><b>Jeudi 12 mars, 15 h — CDI 01</b><br>Titrage colorimétrique · première spécialité</p>
+      </div>
+
+      <div class="step">
+        <span class="f">Qui était présent</span>
+        <label class="coche"><input type="checkbox" checked> Manon Rivière (1re spé 2)</label>
+        <label class="coche"><input type="checkbox"> Inès Garnier (1re spé 2) <span class="hint">— ajoutée au binôme par le professeur</span></label>
+      </div>
+
+      <div class="step">
+        <span class="f">Durée réelle</span>
+        <div class="chips" role="group" data-single>
+          <button class="chip" aria-pressed="false">Moins de 15 min</button>
+          <button class="chip" aria-pressed="false">30 min</button>
+          <button class="chip" aria-pressed="true">Une heure</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="f">Comment ça s'est passé</span>
+        <div class="choix" style="grid-template-columns:repeat(3,1fr)">
+          <label><input type="radio" name="passe" checked><span><b>Bien</b><span>Elle a compris.</span></span></label>
+          <label><input type="radio" name="passe"><span><b>En partie</b><span>Il reste un point.</span></span></label>
+          <label><input type="radio" name="passe"><span><b>Difficile</b><span>Ça n'a pas pris.</span></span></label>
+        </div>
+      </div>
+
+      <div class="step">
+        <label class="coche"><input type="checkbox" checked> Elle a refait un exercice seule à la fin</label>
+        <label class="coche"><input type="checkbox"> Il faudrait une autre séance sur ce chapitre</label>
+        <label class="coche"><input type="checkbox"> J'ai bloqué sur un point : j'aimerais en parler au professeur</label>
+      </div>
+
+      <div class="step">
+        <span class="f">Ton explication</span>
+        <div class="seg" role="group" aria-label="Format du bilan" style="margin-bottom:14px">
+          <button id="segAudio" aria-pressed="true">Audio</button>
+          <button id="segTexte" aria-pressed="false">Écrit</button>
+        </div>
+        <div id="paneAudio">
+          <div class="rec" id="rec">
+            <div class="wave" id="wave"></div>
+            <div class="timer" id="timer">1:30</div>
+            <button class="recbtn" id="recbtn">Enregistrer</button>
+          </div>
+          <p class="note"><strong style="font-weight:600;color:var(--ink)">Ce qu'on attend :</strong>
+          le point expliqué, comment tu t'y es pris, et ce que tu as compris de sa difficulté.</p>
+        </div>
+        <div id="paneTexte" hidden>
+          <textarea id="bilanTxt" style="min-height:190px" aria-label="Ton bilan écrit">Elle croyait que le changement de couleur provoquait l'équivalence, alors que c'est l'inverse. On a refait le tableau d'avancement à trois moments : avant, à l'équivalence, après. Ensuite je lui ai fait dire ce qui restait en excès à chaque fois. À la fin elle a retrouvé seule pourquoi l'indicateur vire juste là.</textarea>
+          <p class="count">5 lignes minimum</p>
+        </div>
+      </div>
+
+      <button class="cta" id="envoiBilan">Envoyer mon bilan</button>
+
+      <details class="info">
+        <summary>Le barème et la présence</summary>
+        <h4>Sur 3 points de bonus</h4>
+        <p>La séance a eu lieu et le bilan est déposé. Le point traité est identifié précisément. La difficulté de
+        l'autre élève est nommée — c'est le critère le plus exigeant, et celui qui fait progresser le tuteur.</p>
+        <h4>La présence se prouve ailleurs</h4>
+        <p>Le registre visé au CDI fait foi. Le tutoré confirme la séance d'un appui et donne son ressenti,
+        sans jamais noter son tuteur.</p>
+        <h4>Ce que ça construit</h4>
+        <p>Une banque d'explications par les pairs, classée par chapitre, réutilisable en classe.</p>
+      </details>
     </div>
   </div>
 </section>
@@ -395,36 +577,34 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
 <!-- ================= PROF ================= -->
 <section class="view" id="v-prof">
   <h2>Jeudi 12 mars — quatre binômes à arbitrer</h2>
-  <p class="lede">Rien ne se met en relation sans vous. Les deux premiers viennent d'un tuteur qui
-  s'est positionné, les deux suivants sont à créer. La validation allume la raie du chapitre dans le
-  spectre, en haut de page.</p>
+  <p class="lede">Rien ne se met en relation sans vous. La validation allume la raie du chapitre dans le spectre, en haut de page.</p>
 
   <div id="pairs">
-    <div class="pair" data-raie="4">
-      <div>
-        <p class="who"><strong>Manon Rivière</strong> (1re spé 2) ← <strong>Adrien Costa</strong> (Tle spé 1)</p>
-        <p class="meta">Titrage colorimétrique · <em>positionné par le tuteur</em> · 15 h, CDI 0</p>
-      </div>
-      <button class="mini">Valider</button>
-    </div>
     <div class="pair" data-raie="2">
       <div>
-        <p class="who"><strong>Sofia Nguyen</strong> (1re spé 2) ← <strong>Hugo Lemaire</strong> (Tle spé 1)</p>
-        <p class="meta">Énergie mécanique · <em>demande prescrite après le DS n° 2</em> · 15 h, CDI 0</p>
+        <p class="who"><strong>Manon Rivière</strong> (1re spé 2) ← <strong>Adrien Costa</strong> (Tle spé 1)</p>
+        <p class="meta">Titrage colorimétrique · <em>positionné par le tuteur</em> · <span class="badge wait">pressant — DS le 16/03</span> · 15 h, CDI 01</p>
       </div>
       <button class="mini">Valider</button>
     </div>
-    <div class="pair" data-raie="8" style="border-left-color:var(--terminale)">
+    <div class="pair" data-raie="9">
+      <div>
+        <p class="who"><strong>Sofia Nguyen</strong> (1re spé 2) ← <strong>Hugo Lemaire</strong> (Tle spé 1)</p>
+        <p class="meta">Énergie mécanique · <em>demande prescrite après le DS n° 2</em> · sur la durée · 15 h, CDI 01</p>
+      </div>
+      <button class="mini">Valider</button>
+    </div>
+    <div class="pair" data-raie="18" style="border-left-color:var(--terminale)">
       <div>
         <p class="who"><strong>Yanis Delorme</strong> (Tle spé 1) ← <strong>Léa Bouchard</strong> (Tle spé 1)</p>
-        <p class="meta">Mouvement dans un champ · <em>intra-classe, 1re séance du binôme</em> · 15 h, CDI 0</p>
+        <p class="meta">Mouvement dans un champ uniforme · <em>intra-classe</em> · quelques minutes · récré de 9 h 55</p>
       </div>
       <button class="mini">Valider</button>
     </div>
-    <div class="pair" data-raie="0" style="border-left-color:var(--premiere)">
+    <div class="pair" data-raie="7" style="border-left-color:var(--premiere)">
       <div>
         <p class="who"><strong>Nolan Perrin</strong> (1re spé 3) ← <em style="font-style:normal;color:var(--muted)">aucun tuteur positionné</em></p>
-        <p class="meta">Forces et mouvement · <em>3 tuteurs déclarés disponibles sur ce chapitre</em></p>
+        <p class="meta">Mouvement d'un système · <em>3 tuteurs disponibles sur ses créneaux</em></p>
       </div>
       <button class="mini ghost">Choisir un tuteur</button>
     </div>
@@ -435,89 +615,50 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
     sont à leur deuxième séance ensemble cette période. Au-delà, le binôme ne sera plus proposé.</p>
   </div>
 
-  <h3>Tout ce qui a été déposé</h3>
-  <table>
-    <thead><tr><th>Élève</th><th>Classe</th><th>Chapitre</th><th>Type</th><th>Déposé</th><th>Statut</th></tr></thead>
+  <h3>Retours des élèves aidés</h3>
+  <p class="libre" style="color:var(--muted);margin:0">Recueillis par le pop-up qui s'affiche à la connexion après une séance. Le tuteur ne les voit pas.</p>
+  <div class="tscroll">
+  <table class="t">
+    <thead><tr><th>Tuteur</th><th>Séances</th><th>« Ça m'a aidé »</th><th>Ce qui ressort</th><th></th></tr></thead>
     <tbody>
-      <tr><td>Manon Rivière</td><td>1re spé 2</td><td>Titrage colorimétrique</td><td>Besoin</td><td>mar. 7 h 58</td><td><span class="badge live">binôme proposé</span></td></tr>
-      <tr><td>Adrien Costa</td><td>Tle spé 1</td><td>Titrages, acides-bases</td><td>Offre</td><td>sept. (permanente)</td><td><span class="badge live">positionné</span></td></tr>
-      <tr><td>Sofia Nguyen</td><td>1re spé 2</td><td>Énergie mécanique</td><td>Besoin</td><td>mar. 16 h 30</td><td><span class="badge">prescrit</span></td></tr>
-      <tr><td>Nolan Perrin</td><td>1re spé 3</td><td>Forces et mouvement</td><td>Besoin</td><td>lun. 12 h 05</td><td><span class="badge wait">sans tuteur</span></td></tr>
-      <tr><td>Élise Rambaud</td><td>Tle spé 2</td><td>Optique, ondes</td><td>Offre</td><td>oct. (permanente)</td><td><span class="badge wait">disponible</span></td></tr>
-      <tr><td>Théo Marchand</td><td>Tle spé 1</td><td>6 chapitres</td><td>Offre</td><td>sept. (permanente)</td><td><span class="badge vert">4 séances faites</span></td></tr>
+      <tr><td>Théo Marchand</td><td>14</td><td>12 oui · 2 en partie<div class="barres"><span style="flex:12"></span><span style="flex:2"></span></div></td><td>« Il explique avec des schémas »</td><td><span class="badge vert">rien à signaler</span></td></tr>
+      <tr><td>Adrien Costa</td><td>5</td><td>4 oui · 1 en partie<div class="barres"><span style="flex:4"></span><span style="flex:1"></span></div></td><td>—</td><td><span class="badge vert">rien à signaler</span></td></tr>
+      <tr><td>Hugo Lemaire</td><td>3</td><td>1 oui · 2 pas vraiment<div class="barres"><span style="flex:1"></span><span style="flex:0"></span><span style="flex:2"></span></div></td><td>« Il allait trop vite », « il a fait l'exercice à ma place »</td><td><span class="badge wait">à rencontrer</span></td></tr>
+      <tr><td>Léa Bouchard</td><td>1</td><td>en attente de retour</td><td>—</td><td><span class="badge">—</span></td></tr>
     </tbody>
   </table>
-
-  <h3>Ce que voit l'administrateur en plus</h3>
-  <p class="libre" style="color:var(--muted)">Le journal complet des dépôts et des retraits, les
-  textes libres avant effacement, les séances déclarées mais non confirmées par l'autre élève, et le
-  compteur d'attestation de chaque tuteur. Vos collègues de physique-chimie ont la même vue, chacun
-  ne pouvant afficher les noms que pour ses propres élèves.</p>
-</section>
-
-<!-- ================= BILAN ================= -->
-<section class="view" id="v-bilan">
-  <h2>Après la séance, le tuteur laisse une trace</h2>
-  <p class="lede">C'est cette trace qui est évaluée, pas la présence. Soixante à quatre-vingt-dix
-  secondes de voix, ou cinq lignes écrites, et le bonus sur la note d'investissement de la période
-  s'appuie dessus.</p>
-
-  <div class="cols">
-    <div class="phone">
-      <div class="screen">
-        <p class="stitle">Séance du jeudi 12 mars</p>
-        <p class="ssub">Manon Rivière — 1re spé 2 — titrage colorimétrique</p>
-
-        <div class="seg" role="group" aria-label="Format du bilan">
-          <button id="segAudio" aria-pressed="true">Audio</button>
-          <button id="segTexte" aria-pressed="false">Écrit</button>
-        </div>
-
-        <div id="paneAudio">
-          <div class="rec" id="rec">
-            <div class="wave" id="wave"></div>
-            <div class="timer" id="timer">1:30</div>
-            <button class="recbtn" id="recbtn">Enregistrer</button>
-          </div>
-          <p class="note" style="margin-top:16px"><strong style="font-weight:600;color:var(--ink)">Ce qu'on attend :</strong>
-          le point que tu as expliqué, la façon dont tu t'y es pris, et ce que tu as compris de sa
-          difficulté à elle. Parle comme si tu l'expliquais à quelqu'un d'autre.</p>
-        </div>
-
-        <div id="paneTexte" hidden>
-          <label class="f" for="bilanTxt">Ton bilan</label>
-          <textarea id="bilanTxt" style="min-height:200px">Elle croyait que le changement de couleur provoquait l'équivalence, alors que c'est l'inverse. On a refait le tableau d'avancement à trois moments : avant, à l'équivalence, après. Ensuite je lui ai fait dire ce qui restait en excès à chaque fois. À la fin elle a retrouvé seule pourquoi l'indicateur vire juste là.</textarea>
-          <p class="count">5 lignes minimum</p>
-          <button class="cta">Envoyer mon bilan</button>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <h3 style="margin-top:0">Le barème, sur 3 points de bonus</h3>
-      <p class="libre">La séance a eu lieu et le bilan est déposé. Le point traité est identifié
-      précisément. La difficulté de l'autre élève est nommée. Le troisième critère est le plus
-      difficile, et c'est celui qui fait progresser le tuteur.</p>
-
-      <h3>La présence se prouve ailleurs</h3>
-      <p class="libre">Vous ne serez pas au CDI à 15 h. Le registre visé par le collègue
-      documentaliste fait foi ; l'appli n'agrège que ce qui a été visé. Le tutoré confirme en un
-      appui que la séance a eu lieu, sans jamais noter son tuteur.</p>
-
-      <h3>Ce que ça construit sur l'année</h3>
-      <p class="libre">Une banque d'explications par les pairs, classée par chapitre, avec les mots
-      des élèves et leurs conceptions fausses. Aucun manuel ne vous donnera ça, et c'est réutilisable
-      en classe.</p>
-    </div>
   </div>
+  <p style="margin-top:12px"><button class="mini ghost" id="voirFeedback">Voir le pop-up côté élève</button></p>
+
+  <h3>Tout ce qui a été déposé</h3>
+  <div class="tscroll">
+  <table class="t">
+    <thead><tr><th>Élève</th><th>Classe</th><th>Chapitre</th><th>Type</th><th>Besoin</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td>Manon Rivière</td><td>1re spé 2</td><td>Titrage colorimétrique</td><td>Demande</td><td>ponctuel · 1 h · <b style="color:#8A5D08;font-weight:600">pressant</b></td><td><span class="badge live">binôme proposé</span></td></tr>
+      <tr><td>Adrien Costa</td><td>Tle spé 1</td><td>Titrages, acides-bases</td><td>Offre</td><td>lun., mar., jeu. 15 h</td><td><span class="badge live">positionné</span></td></tr>
+      <tr><td>Sofia Nguyen</td><td>1re spé 2</td><td>Énergie mécanique</td><td>Demande</td><td>sur la durée · 1 h</td><td><span class="badge">prescrit</span></td></tr>
+      <tr><td>Nolan Perrin</td><td>1re spé 3</td><td>Mouvement d'un système</td><td>Demande</td><td>ponctuel · récré</td><td><span class="badge wait">sans tuteur</span></td></tr>
+      <tr><td>Élise Rambaud</td><td>Tle spé 2</td><td>Ondes, lumière</td><td>Offre</td><td>récrés du mardi</td><td><span class="badge wait">disponible</span></td></tr>
+      <tr><td>Théo Marchand</td><td>Tle spé 1</td><td>6 chapitres</td><td>Offre</td><td>tous les jours 15 h</td><td><span class="badge vert">14 séances faites</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <details class="info">
+    <summary>Ce que voit l'administrateur en plus</summary>
+    <p>Le journal complet des dépôts et des retraits, les textes libres avant effacement, les séances déclarées
+    mais non confirmées par l'autre élève, et le compteur d'attestation de chaque tuteur. Les collègues de
+    physique-chimie ont la même vue, chacun ne pouvant afficher les noms que pour ses propres élèves.</p>
+  </details>
 </section>
 
 <!-- ================= ATTESTATION ================= -->
 <section class="view" id="v-attest">
-  <h2>Fin de période</h2>
-  <p class="lede">Rangé dans un menu secondaire : on y vient quatre ou cinq fois dans l'année. Les
-  compteurs sont remplis automatiquement, vous ajoutez une mention si vous le souhaitez, vous signez
-  et vous exportez.</p>
+  <div class="center" style="max-width:720px">
+    <h2>Fin de période</h2>
+    <p class="lede">Compteurs remplis automatiquement. Vous ajoutez une mention, vous signez, vous exportez.</p>
+  </div>
 
   <div class="sheet" id="attestation">
     <div class="spectrumline">
@@ -537,9 +678,10 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
       <div><b>6</b><span>chapitres couverts</span></div>
     </div>
 
-    <p style="margin-top:26px">Chapitres traités : forces et mouvement, énergie mécanique,
-    oxydo-réduction, titrage colorimétrique, ondes et lumière, lentilles minces. Niveau accompagné :
-    première spécialité. Régularité : présent sur 14 des 16 séances auxquelles il s'était engagé.</p>
+    <p style="margin-top:26px">Chapitres traités : composition d'un système initial, titrage colorimétrique,
+    mouvement d'un système, aspects énergétiques des phénomènes mécaniques, ondes mécaniques,
+    lumière : images et couleurs. Niveau accompagné : première spécialité. Régularité : présent sur
+    14 des 16 séances auxquelles il s'était engagé.</p>
 
     <p>Chaque séance a donné lieu à un bilan déposé par l'élève et validé par l'enseignant.</p>
 
@@ -561,39 +703,190 @@ td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF}
     </div>
   </div>
 
-  <p class="foot">La rubrique « Activités et centres d'intérêt » de Parcoursup est déclarative et
-  mentionne explicitement les missions de tutorat : c'est l'élève qui écrit, en 1 500 caractères.
-  L'attestation et une ligne dans votre appréciation lui donnent son poids. Et ses quatorze bilans
-  lui permettront d'écrire ce qu'il en a tiré sans rien inventer.</p>
+  <div class="center" style="max-width:720px">
+    <details class="info">
+      <summary>Et Parcoursup ?</summary>
+      <p>La rubrique « Activités et centres d'intérêt » est déclarative et mentionne explicitement le tutorat :
+      c'est l'élève qui écrit, en 1 500 caractères. L'attestation et une ligne dans l'appréciation lui donnent
+      son poids, et ses bilans lui permettent d'écrire ce qu'il en a tiré sans rien inventer.</p>
+    </details>
+  </div>
 </section>
 
 </main>
 
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <h5>Les créneaux</h5>
+        <div class="creneau"><b>Séance, tous les jours</b><span>15 h – 16 h, CDI 01<br>inscription et binôme validé</span></div>
+        <div class="creneau"><b>Récré du matin</b><span>9 h 55<br>accès libre, question rapide</span></div>
+        <div class="creneau"><b>Récré de l'après-midi</b><span>15 h 15<br>accès libre, question rapide</span></div>
+      </div>
+      <div>
+        <h5>Tes données</h5>
+        <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
+        propositions d'aide, tes séances. Jamais ton nom.</p>
+        <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
+        <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
+        tout le reste fin août. Effacement sur simple demande.</p>
+      </div>
+      <div>
+        <h5>Les règles</h5>
+        <p>Deux séances maximum par binôme et par période.</p>
+        <p>Le tuteur n'est jamais noté par l'élève aidé ; ton retour sert seulement aux professeurs.</p>
+        <p>Une question sur le dispositif : ton professeur de physique-chimie.</p>
+      </div>
+    </div>
+    <div class="bas">Résonance — lycée Isaac de l'Étoile, Poitiers — maquette v3</div>
+  </div>
+</footer>
+
+<!-- ================= POP-UP CONNEXION ================= -->
+<dialog id="dlgLogin" aria-labelledby="loginTitre">
+  <form method="dialog" class="dlg" id="loginForm">
+    <div class="top"><span style="background:var(--premiere)"></span><span style="background:var(--terminale)"></span><span style="background:var(--match)"></span></div>
+    <h2 id="loginTitre">Résonance</h2>
+    <p class="sub">Tutorat en physique-chimie — CDI 01</p>
+
+    <label class="f" for="idf">Identifiant</label>
+    <input id="idf" type="text" value="PC-MYWM4" style="font-family:var(--mono);margin-bottom:14px" autocomplete="off">
+    <label class="f" for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" value="Neige!32" style="margin-bottom:18px" autocomplete="off">
+
+    <button class="cta" value="login">Se connecter</button>
+    <p class="note" style="text-align:center;margin-top:8px">Identifiant et mot de passe sont sur le coupon remis par ton professeur.</p>
+
+    <div class="sep">ou</div>
+    <button class="browse" value="browse">Parcourir sans se connecter
+      <small>temporaire — pour découvrir le site pendant la phase de test</small></button>
+
+    <details class="info">
+      <summary>Pourquoi un identifiant et pas mon nom</summary>
+      <p>Ton nom n'est écrit nulle part en ligne : le serveur ne connaît que ton identifiant, la correspondance
+      reste sur les ordinateurs des professeurs.</p>
+    </details>
+  </form>
+</dialog>
+
+<!-- ================= POP-UP RETOUR ================= -->
+<dialog id="dlgFeedback" class="large" aria-labelledby="fbTitre">
+  <form method="dialog" class="dlg" id="fbForm">
+    <div class="top"><span style="background:var(--match)"></span></div>
+    <div id="fbCorps">
+      <h2 id="fbTitre" style="font-size:22px">Ta séance de jeudi</h2>
+      <p class="sub">Titrage colorimétrique, avec Adrien — jeudi 12 mars, 15 h</p>
+
+      <span class="f">Est-ce que ça t'a aidé ?</span>
+      <div class="q3">
+        <label><input type="radio" name="aide" value="oui"><b>Oui</b>j'ai compris</label>
+        <label><input type="radio" name="aide" value="partie"><b>En partie</b>il reste un point</label>
+        <label><input type="radio" name="aide" value="non"><b>Pas vraiment</b>je bloque encore</label>
+      </div>
+
+      <label class="coche"><input type="checkbox"> La séance a bien eu lieu</label>
+      <label class="coche"><input type="checkbox"> Je voudrais une autre séance sur ce chapitre</label>
+      <label class="coche" style="margin-bottom:14px"><input type="checkbox"> Je préférerais en parler à mon professeur</label>
+
+      <label class="f" for="fbTxt">Un mot pour ton professeur <span class="hint">— facultatif</span></label>
+      <textarea id="fbTxt" maxlength="200" style="min-height:70px"></textarea>
+
+      <p class="note" style="margin:10px 0 16px">Seuls tes professeurs lisent ce retour. Adrien ne le voit pas et n'est pas noté dessus.</p>
+      <button class="cta" value="send" id="fbEnvoyer">Envoyer</button>
+      <button class="browse" value="later" style="margin-top:8px">Plus tard</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
+/* ---------- programmes (BO 2019) ---------- */
+const CHAPITRES = {
+  1: [
+    ["Constitution et transformations de la matière", [
+      "Composition d'un système initial",
+      "Suivi et modélisation d'une transformation chimique",
+      "Titrage colorimétrique",
+      "De la structure des entités à la cohésion et à la solubilité",
+      "Structure des entités organiques",
+      "Synthèses d'espèces chimiques organiques",
+      "Conversion de l'énergie stockée dans la matière organique"]],
+    ["Mouvement et interactions", [
+      "Interactions fondamentales et notion de champ",
+      "Description d'un fluide au repos",
+      "Mouvement d'un système"]],
+    ["L'énergie : conversions et transferts", [
+      "Aspects énergétiques des phénomènes électriques",
+      "Aspects énergétiques des phénomènes mécaniques"]],
+    ["Ondes et signaux", [
+      "Ondes mécaniques",
+      "La lumière : images et couleurs",
+      "La lumière : modèles ondulatoire et particulaire"]]
+  ],
+  0: [
+    ["Constitution et transformations de la matière", [
+      "Transformations acide-base",
+      "Analyser un système par des méthodes physiques",
+      "Analyser un système par des méthodes chimiques (titrages)",
+      "Cinétique chimique",
+      "Transformations nucléaires",
+      "Sens d'évolution spontanée d'un système (piles)",
+      "Force des acides et des bases",
+      "Forcer le sens d'évolution (électrolyse)",
+      "Stratégies en synthèse organique"]],
+    ["Mouvement et interactions", [
+      "Décrire un mouvement",
+      "Deuxième loi de Newton",
+      "Mouvement dans un champ uniforme",
+      "Mouvement dans un champ de gravitation",
+      "Écoulement d'un fluide"]],
+    ["L'énergie : conversions et transferts", [
+      "Modèle du gaz parfait",
+      "Premier principe de la thermodynamique"]],
+    ["Ondes et signaux", [
+      "Phénomènes ondulatoires (diffraction, interférences, Doppler)",
+      "Former des images : la lunette astronomique",
+      "Décrire la lumière par un flux de photons",
+      "Dynamique d'un système électrique (circuit RC)"]]
+  ]
+};
+const GROUPES = {1:["1re spé 1","1re spé 2","1re spé 3"], 0:["Tle spé 1","Tle spé 2"]};
+
 /* ---------- spectre ---------- */
 const raies = [
-  {n:1, x:6,  h:44, t:"1re — Forces et mouvement", d:"2 demandes · 3 tuteurs"},
-  {n:1, x:12, h:26, t:"1re — Oxydo-réduction", d:"1 demande · 2 tuteurs"},
-  {n:1, x:18, h:54, t:"1re — Énergie mécanique", d:"3 demandes · 2 tuteurs"},
-  {n:1, x:24, h:30, t:"1re — Ondes et lumière", d:"1 demande · 2 tuteurs"},
-  {n:1, x:30, h:48, t:"1re — Titrage colorimétrique", d:"2 demandes · 3 tuteurs"},
-  {n:1, x:36, h:20, t:"1re — Lentilles minces", d:"0 demande · 2 tuteurs"},
-  {n:1, x:42, h:24, t:"1re — Ondes stationnaires", d:"1 demande · 1 tuteur"},
-  {n:0, x:56, h:28, t:"Tle — Cinétique et catalyse", d:"1 demande · 1 tuteur"},
-  {n:0, x:62, h:38, t:"Tle — Mouvement dans un champ", d:"2 demandes · 2 tuteurs"},
-  {n:0, x:68, h:18, t:"Tle — Interférences", d:"0 demande · 2 tuteurs"},
-  {n:0, x:74, h:32, t:"Tle — Acides et bases", d:"1 demande · 2 tuteurs"},
-  {n:0, x:80, h:22, t:"Tle — Radioactivité", d:"1 demande · 0 tuteur"},
-  {n:0, x:86, h:40, t:"Tle — Oscillateur mécanique", d:"1 demande · 2 tuteurs"},
-  {n:0, x:92, h:26, t:"Tle — Lunette astronomique", d:"1 demande · 1 tuteur"}
+  {n:1,x:4, h:30,t:"1re — Composition d'un système initial",d:"1 demande · 2 tuteurs"},
+  {n:1,x:8, h:22,t:"1re — Suivi d'une transformation chimique",d:"1 demande · 2 tuteurs"},
+  {n:1,x:12,h:50,t:"1re — Titrage colorimétrique",d:"2 demandes · 3 tuteurs"},
+  {n:1,x:16,h:26,t:"1re — Structure et cohésion",d:"1 demande · 1 tuteur"},
+  {n:1,x:20,h:18,t:"1re — Chimie organique",d:"0 demande · 2 tuteurs"},
+  {n:1,x:24,h:20,t:"1re — Interactions et champs",d:"0 demande · 2 tuteurs"},
+  {n:1,x:28,h:16,t:"1re — Fluide au repos",d:"0 demande · 1 tuteur"},
+  {n:1,x:32,h:44,t:"1re — Mouvement d'un système",d:"2 demandes · 3 tuteurs"},
+  {n:1,x:36,h:24,t:"1re — Énergie électrique",d:"1 demande · 1 tuteur"},
+  {n:1,x:40,h:54,t:"1re — Énergie mécanique",d:"3 demandes · 2 tuteurs"},
+  {n:1,x:44,h:34,t:"1re — Ondes mécaniques",d:"1 demande · 2 tuteurs"},
+  {n:1,x:48,h:28,t:"1re — Lumière",d:"1 demande · 2 tuteurs"},
+  {n:0,x:54,  h:32,t:"Tle — Acide-base",d:"1 demande · 2 tuteurs"},
+  {n:0,x:57.5,h:36,t:"Tle — Cinétique chimique",d:"2 demandes · 1 tuteur"},
+  {n:0,x:61,  h:22,t:"Tle — Transformations nucléaires",d:"1 demande · 0 tuteur"},
+  {n:0,x:64.5,h:20,t:"Tle — Piles et électrolyse",d:"0 demande · 1 tuteur"},
+  {n:0,x:68,  h:18,t:"Tle — Synthèse organique",d:"0 demande · 1 tuteur"},
+  {n:0,x:71.5,h:26,t:"Tle — Deuxième loi de Newton",d:"1 demande · 2 tuteurs"},
+  {n:0,x:75,  h:40,t:"Tle — Mouvement dans un champ uniforme",d:"2 demandes · 2 tuteurs"},
+  {n:0,x:78.5,h:24,t:"Tle — Champ de gravitation",d:"1 demande · 1 tuteur"},
+  {n:0,x:82,  h:14,t:"Tle — Écoulement d'un fluide",d:"0 demande · 1 tuteur"},
+  {n:0,x:85.5,h:30,t:"Tle — Thermodynamique",d:"1 demande · 1 tuteur"},
+  {n:0,x:89,  h:22,t:"Tle — Phénomènes ondulatoires",d:"1 demande · 2 tuteurs"},
+  {n:0,x:92.5,h:18,t:"Tle — Lunette et photons",d:"0 demande · 1 tuteur"},
+  {n:0,x:96,  h:28,t:"Tle — Circuit RC",d:"1 demande · 1 tuteur"}
 ];
-const spec = document.getElementById('spectrum'), tip = document.getElementById('tip');
+const spec=document.getElementById('spectrum'), tip=document.getElementById('tip');
 raies.forEach((r,i)=>{
   const b=document.createElement('button');
   b.className='raie n'+r.n; b.dataset.i=i;
   b.style.left=r.x+'%'; b.style.height=r.h+'px';
   b.setAttribute('aria-label', r.t+' — '+r.d);
-  const show=()=>{tip.innerHTML='<b>'+r.t+'</b><br>'+r.d;tip.style.left=r.x+'%';tip.classList.add('on');};
+  const show=()=>{tip.innerHTML='<b>'+r.t+'</b><br>'+r.d;tip.style.left=Math.min(Math.max(r.x,12),88)+'%';tip.classList.add('on');};
   const hide=()=>tip.classList.remove('on');
   b.addEventListener('mouseenter',show); b.addEventListener('focus',show);
   b.addEventListener('mouseleave',hide); b.addEventListener('blur',hide);
@@ -602,32 +895,226 @@ raies.forEach((r,i)=>{
 const raieEls=[...document.querySelectorAll('.raie')];
 
 /* ---------- navigation ---------- */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
-    t.setAttribute('aria-selected','true');
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
-    document.getElementById('v-'+t.dataset.view).classList.add('on');
-    window.scrollTo({top:0,behavior:'smooth'});
-    if(t.dataset.view==='attest') dimensionnerPad();
-  });
-});
+function ouvrirVue(nom){
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', x.dataset.view===nom?'true':'false'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id==='v-'+nom));
+  if(nom==='attest') dimensionnerPad();
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  ouvrirVue(t.dataset.view); window.scrollTo({top:0,behavior:'smooth'});
+}));
 
-/* ---------- formulaires ---------- */
-document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
-  c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true');
+/* ---------- pop-up connexion ---------- */
+const dlgLogin=document.getElementById('dlgLogin'), dlgFb=document.getElementById('dlgFeedback');
+const whoBtn=document.getElementById('whoBtn');
+let connecte=false;
+dlgLogin.addEventListener('close',()=>{
+  if(dlgLogin.returnValue==='login'){
+    connecte=true;
+    whoBtn.innerHTML='<span class="id">'+document.getElementById('idf').value+'</span> · se déconnecter';
+    setTimeout(()=>dlgFb.showModal(),350);
+  } else {
+    whoBtn.textContent='Visiteur · se connecter';
+  }
+});
+whoBtn.addEventListener('click',()=>{
+  if(connecte){ connecte=false; whoBtn.textContent='Se connecter'; }
+  dlgLogin.returnValue=''; dlgLogin.showModal();
+});
+dlgLogin.showModal();
+
+/* ---------- pop-up retour ---------- */
+const fbCorps=document.getElementById('fbCorps'), fbHTML=fbCorps.innerHTML;
+dlgFb.addEventListener('close',()=>{ setTimeout(()=>{ fbCorps.innerHTML=fbHTML; },200); });
+document.getElementById('fbForm').addEventListener('submit',e=>{
+  if(e.submitter && e.submitter.value==='send'){
+    e.preventDefault();
+    fbCorps.innerHTML='<div class="merci"><b>Merci !</b><p class="note" style="margin:0 0 18px">Ton retour est transmis à ton professeur.</p>'+
+      '<button class="cta" value="ok">Fermer</button></div>';
+  }
+});
+document.getElementById('voirFeedback').addEventListener('click',()=>dlgFb.showModal());
+
+/* ---------- grilles de créneaux ---------- */
+const JOURS=["Lun","Mar","Mer","Jeu","Ven"];
+const LIGNES=[
+  {k:"r1", l:"Récré 9 h 55", s:"quelques minutes"},
+  {k:"r2", l:"Récré 15 h 15", s:"quelques minutes"},
+  {k:"s",  l:"Séance 15 h – 16 h", s:"une heure"}
+];
+function grille(conteneur, nom, coches){
+  let h='<table class="slots"><thead><tr><th></th>'+JOURS.map(j=>'<th>'+j+'</th>').join('')+'</tr></thead><tbody>';
+  LIGNES.forEach(L=>{
+    h+='<tr><th class="l">'+L.l+'<small>'+L.s+'</small></th>';
+    JOURS.forEach((j,i)=>{
+      const k=L.k+'-'+i;
+      h+='<td><label class="slot"><input type="checkbox" name="'+nom+'" value="'+k+'"'+(coches.includes(k)?' checked':'')+
+        ' aria-label="'+L.l+', '+j+'"></label></td>';
+    });
+    h+='</tr>';
+  });
+  conteneur.innerHTML=h+'</tbody></table>';
+}
+function grilleLecture(slots, tle, mesCreneaux){
+  let h='<table class="slots ro'+(tle?' tle':'')+'"><thead><tr><th></th>'+JOURS.map(j=>'<th>'+j+'</th>').join('')+'</tr></thead><tbody>';
+  LIGNES.forEach(L=>{
+    h+='<tr><th class="l">'+L.l+'</th>';
+    JOURS.forEach((j,i)=>{
+      const k=L.k+'-'+i, on=slots.includes(k), moi=on&&mesCreneaux.includes(k);
+      h+='<td><span class="slot'+(on?' on':'')+(moi?' moi':'')+'" title="'+L.l+', '+j+(on?' — demandé':'')+'"></span></td>';
+    });
+    h+='</tr>';
+  });
+  return h+'</tbody></table><p class="note" style="margin-top:6px">Case colorée : moment demandé. Contour rose : tu es aussi disponible.</p>';
+}
+grille(document.getElementById('slotsDemande'),'dispoDemande',["s-0","s-1","s-3","r1-1"]);
+const slotsTuteur=document.getElementById('slotsTuteur');
+grille(slotsTuteur,'dispoTuteur',["s-0","s-1","s-3","r1-2","r2-3"]);
+const mesCreneaux=()=>[...slotsTuteur.querySelectorAll('input:checked')].map(i=>i.value);
+
+/* ---------- formulaire de demande ---------- */
+const nivP=document.getElementById('nivP'), nivT=document.getElementById('nivT');
+const selChap=document.getElementById('chap'), selGroupe=document.getElementById('groupe');
+function remplirNiveau(n){
+  nivP.setAttribute('aria-pressed', n===1); nivT.setAttribute('aria-pressed', n===0);
+  selGroupe.innerHTML=GROUPES[n].map(g=>'<option>'+g+'</option>').join('');
+  selChap.innerHTML=CHAPITRES[n].map(([theme,chs])=>'<optgroup label="'+theme+'">'+
+    chs.map(c=>'<option'+(c==="Titrage colorimétrique"?' selected':'')+'>'+c+'</option>').join('')+'</optgroup>').join('')+
+    '<option>Autre / je ne sais pas</option>';
+  if(n===1) selGroupe.selectedIndex=1;
+}
+nivP.addEventListener('click',()=>remplirNiveau(1));
+nivT.addEventListener('click',()=>remplirNiveau(0));
+remplirNiveau(1);
+
+document.querySelectorAll('.chip:not(.filtre)').forEach(c=>c.addEventListener('click',()=>{
+  const groupe=c.parentElement;
+  if(groupe.hasAttribute('data-single')){
+    groupe.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed','false'));
+    c.setAttribute('aria-pressed','true');
+  } else c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true');
 }));
 const txtA=document.getElementById('txtA'), cA=document.getElementById('cA');
-txtA.addEventListener('input',()=>cA.textContent=txtA.value.length);
+const majCompteur=()=>cA.textContent=txtA.value.length;
+txtA.addEventListener('input',majCompteur); majCompteur();
+const urgent=document.getElementById('urgent');
+document.getElementById('urgentBox').addEventListener('change',e=>urgent.classList.toggle('on',e.target.checked));
 
-document.querySelectorAll('.offre').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const carte=b.closest('.dem');
-    carte.classList.add('pris');
-    carte.querySelector('.q').textContent="Tu t'es positionné. En attente de validation par ton professeur.";
-    b.remove();
+function confirmer(btn, texte){
+  const avant=btn.textContent;
+  btn.textContent=texte; btn.classList.add('sent');
+  setTimeout(()=>{ btn.textContent=avant; btn.classList.remove('sent'); },2600);
+}
+document.getElementById('envoiDemande').addEventListener('click',e=>confirmer(e.currentTarget,'Demande envoyée à ton professeur ✓'));
+document.getElementById('envoiBilan').addEventListener('click',e=>confirmer(e.currentTarget,'Bilan envoyé à M. Van Hoorde ✓'));
+
+/* ---------- demandes vues par le tuteur ---------- */
+const DEMANDES=[
+  {id:214,n:1,chap:"Titrage colorimétrique",nat:"Le cours · La méthode",besoin:"Ponctuel",duree:"Une heure",urgent:"DS le 16/03",
+   q:"Ne comprend pas ce qui se passe à l'équivalence ni le changement de couleur ; bloque sur la quantité de réactif titré.",slots:["s-0","s-1","s-3","r1-1"]},
+  {id:219,n:0,chap:"Mouvement dans un champ uniforme",nat:"Un exercice",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"contrôle le 13/03",
+   q:"N'arrive pas à projeter sur les deux axes avant d'intégrer.",slots:["r1-2","r2-3"]},
+  {id:217,n:1,chap:"Aspects énergétiques des phénomènes mécaniques",nat:"Un exercice · La méthode",besoin:"Sur la durée",duree:"Une heure",urgent:"",
+   q:"Bloque sur les exercices avec frottements : ne sait pas quoi poser au départ.",slots:["s-1","s-3"]},
+  {id:221,n:1,chap:"Ondes mécaniques",nat:"Le cours",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"",
+   q:"Confond la période et la longueur d'onde sur les graphiques.",slots:["r1-0","r1-3","r2-4"]},
+  {id:223,n:0,chap:"Cinétique chimique",nat:"Le TP",besoin:"Sur la durée",duree:"Une heure",urgent:"",
+   q:"Ne sait pas exploiter la courbe pour trouver le temps de demi-réaction.",slots:["s-2","s-4"]},
+  {id:211,n:1,chap:"Mouvement d'un système",nat:"Un exercice",besoin:"Ponctuel",duree:"Une heure",urgent:"",
+   q:"",slots:["s-0"],pris:true}
+];
+const liste=document.getElementById('listeDemandes');
+let filtre='tous';
+function afficherDemandes(){
+  const mc=mesCreneaux();
+  liste.innerHTML='';
+  DEMANDES.filter(d=>filtre==='tous'||(filtre==='urgent'?d.urgent:filtre==='dispo'?d.slots.some(s=>mc.includes(s)):String(d.n)===filtre))
+  .forEach(d=>{
+    const el=document.createElement('article');
+    el.className='dem'+(d.n===0?' tle':'')+(d.pris?' pris':'');
+    el.innerHTML='<div class="h"><span class="badge p'+d.n+'">'+(d.n?'Première spé':'Terminale spé')+'</span>'+
+      (d.urgent?'<span class="badge wait">pressant · '+d.urgent+'</span>':'')+
+      '<span class="badge">'+d.besoin+' · '+d.duree.toLowerCase()+'</span><span class="anon">n° '+d.id+'</span></div>'+
+      '<p class="c">'+d.chap+'</p>'+
+      '<p class="q">'+(d.pris?"Un tuteur s'est déjà positionné.":'<b style="font-weight:600;color:var(--ink)">'+d.nat+'.</b> '+d.q)+'</p>'+
+      (d.pris?'':'<div class="horaires" hidden></div><div class="acts"><button class="mini ghost voir">Voir les horaires</button>'+
+      '<button class="mini offre">Je propose mon aide</button></div>');
+    if(!d.pris){
+      const hor=el.querySelector('.horaires'), voir=el.querySelector('.voir');
+      voir.addEventListener('click',()=>{
+        hor.hidden=!hor.hidden;
+        if(!hor.hidden) hor.innerHTML=grilleLecture(d.slots,d.n===0,mesCreneaux());
+        voir.textContent=hor.hidden?'Voir les horaires':'Masquer les horaires';
+      });
+      el.querySelector('.offre').addEventListener('click',()=>{
+        d.pris=true; afficherDemandes();
+        const carte=[...liste.children].find(c=>c.querySelector('.anon').textContent==='n° '+d.id);
+        if(carte) carte.querySelector('.q').textContent="Tu t'es positionné. En attente de validation par ton professeur.";
+      });
+    }
+    liste.appendChild(el);
   });
-});
+  if(!liste.children.length) liste.innerHTML='<p class="note">Aucune demande pour ce filtre.</p>';
+}
+document.querySelectorAll('.filtre').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.filtre').forEach(x=>x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true'); filtre=b.dataset.f; afficherDemandes();
+}));
+slotsTuteur.addEventListener('change',()=>{ if(filtre==='dispo') afficherDemandes(); });
+afficherDemandes();
+
+/* ---------- calendrier ---------- */
+const SEMAINES=[
+  {label:"Semaine du 9 au 13 mars", dates:["9","10","11","12","13"], c:{
+    "r1-0":{d:["Ondes mécaniques (1re)"],t:2}, "s-0":{d:["Titrage colorimétrique (1re)","Mouvement d'un système (1re)"],t:3},
+    "r1-1":{d:["Titrage colorimétrique (1re)"],t:1}, "s-1":{d:["Énergie mécanique (1re)"],t:2},
+    "r1-2":{d:["Mouvement dans un champ uniforme (Tle)"],t:1,b:["Yanis D. ← Léa B."]}, "s-2":{d:["Cinétique chimique (Tle)"],t:0},
+    "r2-3":{d:["Mouvement dans un champ uniforme (Tle)"],t:0},
+    "s-3":{d:["Titrage colorimétrique (1re)","Énergie mécanique (1re)"],t:4,b:["Manon R. ← Adrien C.","Sofia N. ← Hugo L."]},
+    "r1-3":{d:["Ondes mécaniques (1re)"],t:0}, "r2-4":{d:["Ondes mécaniques (1re)"],t:1}, "s-4":{d:["Cinétique chimique (Tle)"],t:0}
+  }},
+  {label:"Semaine du 16 au 20 mars", dates:["16","17","18","19","20"], c:{
+    "s-0":{d:["Transformations nucléaires (Tle)"],t:0}, "s-1":{d:["Énergie mécanique (1re)"],t:2,b:["Sofia N. ← Hugo L."]},
+    "r1-2":{d:["Circuit RC (Tle)"],t:1}, "s-3":{d:["Lumière : images et couleurs (1re)"],t:3}
+  }}
+];
+let semaine=0, celluleActive=null;
+const cal=document.getElementById('cal'), calDetail=document.getElementById('calDetail');
+function afficherCal(){
+  const S=SEMAINES[semaine];
+  document.getElementById('semLabel').textContent=S.label;
+  document.getElementById('semPrev').disabled=semaine===0;
+  document.getElementById('semNext').disabled=semaine===SEMAINES.length-1;
+  let h='<thead><tr><th></th>'+JOURS.map((j,i)=>'<th>'+j+'. '+S.dates[i]+'</th>').join('')+'</tr></thead><tbody>';
+  LIGNES.forEach(L=>{
+    h+='<tr><th class="l">'+L.l+'<small>'+L.s+'</small></th>';
+    JOURS.forEach((j,i)=>{
+      const k=L.k+'-'+i, c=S.c[k];
+      if(!c){ h+='<td><div class="cell vide">—</div></td>'; return; }
+      const etat=c.b?'binome':c.t>0?'possible':'manque';
+      const titre=c.b?c.b.length+' binôme'+(c.b.length>1?'s':''):c.d.length+' demande'+(c.d.length>1?'s':'');
+      h+='<td><button class="cell '+etat+'" data-k="'+k+'" aria-pressed="false"><b>'+titre+'</b>'+
+        c.d.length+' dem. · '+c.t+' tuteur'+(c.t>1?'s':'')+' dispo</button></td>';
+    });
+    h+='</tr>';
+  });
+  cal.innerHTML=h+'</tbody>';
+  calDetail.hidden=true;
+  cal.querySelectorAll('button.cell').forEach(b=>b.addEventListener('click',()=>{
+    cal.querySelectorAll('button.cell').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    const k=b.dataset.k, c=S.c[k], L=LIGNES.find(l=>l.k===k.split('-')[0]), jour=+k.split('-')[1];
+    calDetail.innerHTML='<h4>'+JOURS[jour]+'. '+S.dates[jour]+' — '+L.l+'</h4>'+
+      '<ul>'+c.d.map(x=>'<li>Demande : '+x+'</li>').join('')+'</ul>'+
+      (c.b?'<p style="margin:8px 0 0"><b style="font-weight:600">Binômes validés :</b> '+c.b.join(', ')+' <span class="hint">(noms visibles par les professeurs seulement)</span></p>':'')+
+      '<p class="note" style="margin-top:8px">'+(c.t>0?c.t+' tuteur'+(c.t>1?'s':'')+' disponible'+(c.t>1?'s':'')+' sur ce créneau.':
+      'Aucun tuteur disponible : le professeur est prévenu.')+'</p>';
+    calDetail.hidden=false;
+  }));
+}
+document.getElementById('semPrev').addEventListener('click',()=>{semaine--;afficherCal();});
+document.getElementById('semNext').addEventListener('click',()=>{semaine++;afficherCal();});
+afficherCal();
 
 /* ---------- appariements ---------- */
 document.querySelectorAll('#pairs .mini').forEach(btn=>{
@@ -651,10 +1138,10 @@ sT.addEventListener('click',()=>{sT.setAttribute('aria-pressed','true');sA.setAt
 const wave=document.getElementById('wave');
 for(let i=0;i<34;i++) wave.appendChild(document.createElement('i'));
 const rec=document.getElementById('rec'), recbtn=document.getElementById('recbtn'), timer=document.getElementById('timer');
-let running=false, left=90, id=null, envoye=false;
+let running=false, left=90, id=null, enregistre=false;
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 recbtn.addEventListener('click',()=>{
-  if(envoye){ envoye=false; left=90; timer.textContent=fmt(left); recbtn.textContent='Enregistrer'; return; }
+  if(enregistre){ enregistre=false; left=90; timer.textContent=fmt(left); recbtn.textContent='Enregistrer'; return; }
   if(!running){
     running=true; rec.classList.add('on'); recbtn.classList.add('on');
     recbtn.textContent='Arrêter'; left=90; timer.textContent=fmt(left);
@@ -663,7 +1150,7 @@ recbtn.addEventListener('click',()=>{
     running=false; clearInterval(id); rec.classList.remove('on'); recbtn.classList.remove('on');
     const used=90-left;
     timer.textContent=fmt(used)+' enregistré';
-    if(used>25){ recbtn.textContent='Envoyer à M. Van Hoorde'; envoye=true; }
+    if(used>25){ recbtn.textContent='Recommencer'; enregistre=true; }
     else recbtn.textContent='Reprendre — trop court';
   }
 });
@@ -684,8 +1171,7 @@ function dimensionnerPad(){
 }
 function position(e){
   const r=pad.getBoundingClientRect();
-  const p=e.touches?e.touches[0]:e;
-  return {x:p.clientX-r.left, y:p.clientY-r.top};
+  return {x:e.clientX-r.left, y:e.clientY-r.top};
 }
 function debut(e){ e.preventDefault(); dessine=true; vide=false; const p=position(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
 function trait(e){ if(!dessine) return; e.preventDefault(); const p=position(e); ctx.lineTo(p.x,p.y); ctx.stroke(); }
@@ -704,7 +1190,6 @@ document.getElementById('btnPdf').addEventListener('click',()=>{
   etat.style.color = vide ? '#8A5D08' : 'var(--vert)';
   etat.hidden=false;
 });
-dimensionnerPad();
 </script>
 </body>
 </html>
