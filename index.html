@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Résonance">
-<title>Résonance — maquette v3</title>
+<title>Résonance — tutorat en physique-chimie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -24,9 +24,6 @@
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
-.demo{background:#FDF0D8;color:#6B4705;border-bottom:1px solid #EBD3A0;
-  padding:10px 20px;font-size:13.5px;line-height:1.5;text-align:center}
-.demo strong{font-weight:600}
 
 /* hero */
 .hero{background:var(--deep);color:#fff;padding:22px 0 0}
@@ -41,9 +38,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16p
 .raie:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .raie.n1{color:var(--premiere)}
 .raie.n0{color:var(--terminale)}
-.raie.paired{color:var(--match);box-shadow:0 0 18px var(--match),0 0 34px rgba(255,95,162,.5)}
-.raie.pulse{animation:pulse .9s ease}
-@keyframes pulse{0%{transform:scaleX(1)}30%{transform:scaleX(4)}100%{transform:scaleX(1)}}
 .baseline{position:absolute;left:0;right:0;bottom:25px;height:1px;background:#2E3959}
 .axis{position:absolute;left:0;right:0;bottom:5px;display:flex;justify-content:space-between;padding:0 10px;
   font-family:var(--mono);font-size:11px;color:#6E7B9C}
@@ -62,8 +56,6 @@ nav .wrap{display:flex;gap:2px;padding-bottom:0;overflow-x:auto;align-items:cent
 .tab:hover{color:#fff}
 .tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--match)}
 .tab:focus-visible{outline:2px solid #fff;outline-offset:-4px}
-.tab.second{font-size:14px;color:#6E7B9C}
-.tab.second::before{content:"⌄ ";}
 .tab.prof::after{content:"prof";font-size:10.5px;font-family:var(--mono);margin-left:6px;padding:1px 5px;
   border:1px solid #3A4666;border-radius:3px;color:#8C98B4;vertical-align:1px}
 .who-btn{margin-left:auto;appearance:none;background:none;border:1px solid #3A4666;color:#C9D1E3;border-radius:16px;
@@ -145,6 +137,7 @@ textarea{resize:vertical;min-height:130px;line-height:1.5}
 .slots.ro .slot.on{background:var(--premiere);border-color:var(--premiere)}
 .slots.ro.tle .slot.on{background:var(--terminale);border-color:var(--terminale)}
 .slots.ro .slot.moi{box-shadow:inset 0 0 0 2px var(--match)}
+.slot.ferme,.slots.ro .slot.ferme{background:var(--soft);border-style:dashed;cursor:default}
 
 /* info repliable */
 details.info{margin-top:14px;border-top:1px solid var(--rule);padding-top:12px}
@@ -183,91 +176,16 @@ details.info p{font-size:14px;color:var(--muted);margin:0;max-width:66ch}
 .mini.ghost{background:#fff;color:var(--ink)}
 .mini:focus-visible{outline:2px solid var(--match);outline-offset:2px}
 
-/* calendrier */
+/* en-têtes */
 .calhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
 .calhead .sem{font-family:var(--disp);font-weight:600;font-size:18px;margin-right:auto}
-.calscroll{overflow-x:auto;margin:0 -4px}
-.cal{width:100%;min-width:620px;border-collapse:separate;border-spacing:6px}
-.cal th{font-size:13px;color:var(--muted);font-weight:600;text-align:left;padding:0 4px}
-.cal th.l{width:130px;color:var(--ink);font-weight:500;vertical-align:top;padding-top:10px}
-.cal th.l small{display:block;color:var(--muted);font-weight:400;font-size:12px}
-.cell{appearance:none;width:100%;min-height:74px;text-align:left;border:1px solid var(--rule);border-radius:8px;background:#fff;
-  font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 9px;cursor:pointer;color:var(--ink);vertical-align:top}
-.cell b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
-.cell.vide{background:var(--soft);color:#9AA3B2;cursor:default}
-.cell.possible{border-color:#9ED8BE;background:#EFFAF4}
-.cell.manque{border-color:#EBD3A0;background:#FFF8EA}
-.cell.binome{border-color:var(--match);background:#FFF0F6}
-.cell[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
-.cell:focus-visible{outline:2px solid var(--match);outline-offset:2px}
-.callegend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 0 0}
-.callegend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid}
-.detail{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 10px 10px 0;
-  padding:14px 16px;margin-top:14px;font-size:14.5px}
-.detail h4{margin:0 0 6px;font-size:15px;font-weight:600}
-.detail ul{margin:0;padding-left:18px}
-.detail li{margin:2px 0}
 
 /* prof */
-.pair{background:var(--sheet);border:1px solid var(--rule);border-left:3px solid var(--match);padding:16px 18px;
-  margin-bottom:12px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
-.pair .who{font-size:15.5px;margin:0 0 3px}
-.pair .who strong{font-weight:600}
-.pair .meta{font-size:13.5px;color:var(--muted);margin:0}
-.pair .meta em{font-style:normal;color:var(--ink)}
-.pair.done{border-left-color:var(--vert);opacity:.72}
-.pair.done .mini{display:none}
-.ok{color:var(--vert);font-size:14px;font-weight:600;white-space:nowrap}
 .tscroll{overflow-x:auto}
 table.t{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
 table.t th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);padding:0 10px 8px 0;border-bottom:1px solid var(--rule)}
 table.t td{padding:10px 10px 10px 0;border-bottom:1px solid #E7EAEF;vertical-align:top}
-.encadre{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--terminale);padding:16px 18px;margin:14px 0}
-.encadre p{margin:0 0 6px;max-width:64ch}
-.encadre p:last-child{margin-bottom:0}
-.encadre.ambre{border-left-color:var(--ambre)}
-.barres{display:flex;height:8px;border-radius:4px;overflow:hidden;width:120px;background:#E7EAEF;margin-top:5px}
-.barres span:nth-child(1){background:var(--vert)}
-.barres span:nth-child(2){background:#E3B33E}
-.barres span:nth-child(3){background:#D9534F}
 
-/* enregistrement */
-.rec{background:var(--soft);border:1px solid var(--rule);border-radius:12px;padding:18px;text-align:center}
-.wave{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:56px;margin:6px 0 14px}
-.wave i{width:4px;background:var(--rule);border-radius:2px;height:8px;display:block}
-.rec.on .wave i{background:var(--match);animation:bounce .7s ease-in-out infinite alternate}
-.wave i:nth-child(2n){animation-delay:.1s}
-.wave i:nth-child(3n){animation-delay:.22s}
-.wave i:nth-child(5n){animation-delay:.34s}
-@keyframes bounce{from{height:8px}to{height:46px}}
-.timer{font-family:var(--mono);font-size:26px;letter-spacing:.02em}
-.recbtn{appearance:none;border:0;background:var(--match);color:#fff;font-family:var(--sans);font-size:15px;
-  font-weight:600;padding:12px 22px;border-radius:24px;cursor:pointer;margin-top:6px}
-.recbtn.on{background:var(--ink)}
-.recbtn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.seance{display:flex;gap:12px;align-items:center;background:var(--soft);border-radius:10px;padding:12px 14px;margin:0 0 22px}
-.seance .av{width:38px;height:38px;border-radius:50%;background:var(--premiere);color:#fff;display:grid;place-items:center;
-  font-weight:600;flex:none}
-.seance p{margin:0;font-size:14px;color:var(--muted);line-height:1.4}
-.seance p b{color:var(--ink);font-weight:600;font-size:15px}
-
-/* attestation */
-.sheet{background:#fff;border:1px solid var(--rule);padding:44px 46px;max-width:720px;margin:0 auto;box-shadow:0 16px 40px rgba(21,27,43,.09)}
-@media(max-width:600px){.sheet{padding:26px 18px}}
-.sheet .ent{font-size:13px;color:var(--muted);margin:0 0 26px;line-height:1.5}
-.sheet h4{font-family:var(--disp);font-weight:600;font-size:22px;margin:0 0 22px;letter-spacing:-.01em}
-.sheet p{max-width:66ch}
-.spectrumline{display:flex;height:6px;margin:0 0 30px}
-.spectrumline span{flex:1}
-.stat{display:flex;gap:34px;flex-wrap:wrap;margin:26px 0 8px}
-.stat div{min-width:96px}
-.stat b{display:block;font-family:var(--disp);font-weight:800;font-size:32px;line-height:1.1}
-.stat span{font-size:13px;color:var(--muted)}
-.sigzone{margin-top:34px;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:end}
-@media(max-width:520px){.sigzone{grid-template-columns:1fr}}
-.padbox{border:1px dashed var(--rule);border-radius:4px;background:#FCFCFD}
-#pad{display:block;width:100%;height:110px;touch-action:none;cursor:crosshair}
-.sigmeta{font-size:13px;color:var(--muted);line-height:1.5}
 .barre{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
 
 /* pied de page */
@@ -285,7 +203,6 @@ footer .bas{border-top:1px solid #26304C;margin-top:26px;padding-top:14px;font-s
 /* pop-ups */
 dialog{border:0;border-radius:18px;padding:0;width:calc(100% - 32px);max-width:430px;color:var(--ink);
   box-shadow:0 30px 80px rgba(0,0,0,.35)}
-dialog.large{max-width:500px}
 dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 .dlg{padding:28px 28px 24px}
 @media(max-width:480px){.dlg{padding:22px 18px 18px}}
@@ -294,31 +211,10 @@ dialog::backdrop{background:rgba(13,20,36,.72);backdrop-filter:blur(3px)}
 .dlg .top span{flex:1}
 .dlg h2{font-size:26px;margin:0 0 2px}
 .dlg .sub{color:var(--muted);font-size:14.5px;margin:0 0 22px}
-.dlg .browse{display:block;width:100%;appearance:none;background:none;border:1px solid var(--rule);border-radius:9px;
-  font-family:var(--sans);font-size:15px;font-weight:500;color:var(--ink);padding:12px;margin-top:10px;cursor:pointer}
-.dlg .browse:hover{border-color:var(--ink)}
-.dlg .browse small{display:block;font-size:12px;color:var(--muted);font-weight:400}
-.dlg .sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:16px 0 0}
-.dlg .sep::before,.dlg .sep::after{content:"";flex:1;height:1px;background:var(--rule)}
-.q3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
-.q3 label{border:1px solid var(--rule);border-radius:10px;padding:12px 6px;text-align:center;font-size:13.5px;cursor:pointer;
-  line-height:1.3}
-.q3 label b{display:block;font-size:22px;line-height:1.1;margin-bottom:4px;font-family:var(--disp)}
-.q3 input{position:absolute;opacity:0;pointer-events:none}
-.q3 label:has(input:checked){border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 1px var(--ink)}
-.q3 label:has(input:focus-visible){outline:2px solid var(--match);outline-offset:2px}
-.merci{text-align:center;padding:20px 0 8px}
-.merci b{display:block;font-family:var(--disp);font-size:22px;margin-bottom:6px}
 
 /* rôles */
 body:not(.role-prof) .tab.prof{display:none}
-/* Connecté : on masque les parties encore fictives, on montre ce qui est branché. */
-/* Connecté : les parties pas encore branchées restent visibles, étiquetées « Exemple ». */
-body.en-ligne .fictif{position:relative;outline:2px dashed #CBD3F5;outline-offset:6px;border-radius:4px}
-body.en-ligne .fictif::before{content:attr(data-exemple);position:absolute;top:-17px;right:8px;z-index:2;
-  background:#2B3A80;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:10px}
-body.en-ligne .fictif button, body.en-ligne .fictif input, body.en-ligne .fictif textarea{pointer-events:none}
-body:not(.en-ligne) .en-ligne-seul, .bientot-carte{display:none}
+body:not(.en-ligne) .en-ligne-seul, body:not(.en-ligne) .view, body:not(.en-ligne) .tab, body.en-ligne #accueil{display:none}
 .appar{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--premiere);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px}
 .appar.tle{border-left-color:var(--terminale)}
 .appar .t1{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px;font-size:15px}
@@ -331,33 +227,29 @@ body:not(.en-ligne) .en-ligne-seul, .bientot-carte{display:none}
 .choixcren{margin:0 0 12px;padding:12px 14px;background:var(--soft);border-radius:10px}
 .choixcren .f{font-size:13.5px}
 body:not(.role-eleve) .eleve-seul{display:none}
-.bientot-carte{border-style:dashed;box-shadow:none;background:var(--soft);margin-bottom:22px}
 .mesdem{display:flex;gap:12px;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);padding:10px 0;font-size:14.5px}
 .mesdem:first-child{border-top:0}
 .mesdem small{display:block;color:var(--muted);font-size:12.5px}
 .rolebar{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 14px;margin:24px 0 -12px;
   font-size:14px;line-height:1.45;background:#EEF1FF;border:1px solid #CBD3F5;color:#2B3A80}
 .rolebar b{font-weight:600}
-.rolebar.visiteur{background:#FDF0D8;border-color:#EBD3A0;color:#6B4705}
-.cta:disabled,.mini:disabled,.recbtn:disabled{background:#B7BECB;border-color:#B7BECB;color:#fff;cursor:not-allowed}
+.cta:disabled,.mini:disabled{background:#B7BECB;border-color:#B7BECB;color:#fff;cursor:not-allowed}
 .mini.ghost:disabled{background:#fff;color:#9AA3B2;border-color:var(--rule)}
 .role-seg{margin:0 0 20px}
+
+#accueil{padding-top:36px}
+#accueil h2{margin-bottom:10px}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<div class="demo" id="bandeauDemo">
-  <strong>Maquette de démonstration.</strong> Tous les noms, demandes et chiffres sont inventés —
-  aucun élève réel n'apparaît ici et rien n'est enregistré.
-</div>
-
 <header class="hero">
   <div class="wrap">
     <div class="brandline">
       <h1 class="brand">Résonance</h1>
-      <p class="tag">tutorat en physique-chimie — première et terminale spécialité — CDI 01</p>
+      <p class="tag">tutorat en physique-chimie — première et terminale spécialité — au CDI</p>
     </div>
     <div class="spectrum" id="spectrum">
       <div class="baseline"></div>
@@ -367,19 +259,15 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <div class="legend">
       <span><i class="dot" style="background:var(--premiere)"></i>première</span>
       <span><i class="dot" style="background:var(--terminale)"></i>terminale</span>
-      <span><i class="dot" style="background:var(--match)"></i>binôme validé sur ce chapitre</span>
     </div>
   </div>
 </header>
 
 <nav>
-  <div class="wrap" role="tablist" aria-label="Vues de la maquette">
+  <div class="wrap" role="tablist" aria-label="Rubriques">
     <button class="tab" role="tab" aria-selected="true" data-view="demande">Demander de l'aide</button>
     <button class="tab" role="tab" aria-selected="false" data-view="offre">Proposer son aide</button>
-    <button class="tab" role="tab" aria-selected="false" data-view="calendrier">Calendrier</button>
-    <button class="tab" role="tab" aria-selected="false" data-view="bilan">Bilan de séance</button>
     <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
-    <button class="tab second prof" role="tab" aria-selected="false" data-view="attest">Fin de période</button>
     <button class="who-btn" id="whoBtn">Se connecter</button>
   </div>
 </nav>
@@ -387,6 +275,16 @@ body:not(.role-eleve) .eleve-seul{display:none}
 <main class="wrap">
 
 <div class="rolebar" id="rolebar" hidden></div>
+
+<!-- ================= ACCUEIL (non connecté) ================= -->
+<section id="accueil">
+  <div class="card center">
+    <h2>Bienvenue sur Résonance</h2>
+    <p class="lede">Le tutorat entre élèves de physique-chimie : demande de l'aide sur un chapitre, ou propose la tienne.</p>
+    <button class="cta" id="btnAccueil">Se connecter</button>
+    <p class="note">Identifiant et mot de passe sont sur le coupon remis par ton professeur.</p>
+  </div>
+</section>
 
 <!-- ================= DEMANDE ================= -->
 <section class="view on" id="v-demande">
@@ -401,12 +299,9 @@ body:not(.role-eleve) .eleve-seul{display:none}
 
       <div class="step">
         <span class="f">Ma classe</span>
-        <div class="row2">
-          <div class="seg" role="group" aria-label="Niveau">
-            <button id="nivP" aria-pressed="true">Première spé</button>
-            <button id="nivT" aria-pressed="false">Terminale spé</button>
-          </div>
-          <select id="groupe" aria-label="Groupe"></select>
+        <div class="seg" role="group" aria-label="Niveau">
+          <button id="nivP" aria-pressed="true">Première spé</button>
+          <button id="nivT" aria-pressed="false">Terminale spé</button>
         </div>
       </div>
 
@@ -418,9 +313,9 @@ body:not(.role-eleve) .eleve-seul{display:none}
       <div class="step">
         <span class="f">Où ça coince <span class="hint">— plusieurs choix possibles</span></span>
         <div class="chips" role="group">
-          <button class="chip" aria-pressed="true">Le cours</button>
+          <button class="chip" aria-pressed="false">Le cours</button>
           <button class="chip" aria-pressed="false">Un exercice</button>
-          <button class="chip" aria-pressed="true">La méthode</button>
+          <button class="chip" aria-pressed="false">La méthode</button>
           <button class="chip" aria-pressed="false">Le TP</button>
           <button class="chip" aria-pressed="false">Préparer une évaluation</button>
         </div>
@@ -432,20 +327,20 @@ body:not(.role-eleve) .eleve-seul{display:none}
           <label><input type="radio" name="besoin" value="ponctuel" checked><span><b>Ponctuel</b><span>Une question précise, une fois.</span></span></label>
           <label><input type="radio" name="besoin" value="duree"><span><b>Sur la durée</b><span>Plusieurs séances sur ce chapitre.</span></span></label>
           <label><input type="radio" name="duree" value="min" checked><span><b>Quelques minutes</b><span>Ça peut se régler pendant une récré.</span></span></label>
-          <label><input type="radio" name="duree" value="heure"><span><b>Une heure</b><span>Une vraie séance, de 15 h à 16 h.</span></span></label>
+          <label><input type="radio" name="duree" value="heure"><span><b>Une heure</b><span>Une vraie séance, de 15 h 15 à 16 h 20, le lundi, le jeudi ou le vendredi.</span></span></label>
         </div>
       </div>
 
       <div class="step">
         <div class="urgent" id="urgent">
           <label class="coche"><input type="checkbox" id="urgentBox"> <span><b style="font-weight:600">C'est pressant</b> — j'ai une évaluation bientôt</span></label>
-          <div class="sous"><label for="dateEval">Évaluation le</label><input type="date" id="dateEval" value="2027-03-16"></div>
+          <div class="sous"><label for="dateEval">Évaluation le</label><input type="date" id="dateEval"></div>
         </div>
       </div>
 
       <div class="step">
         <label class="f" for="txtA">Le point précis</label>
-        <textarea id="txtA" maxlength="400">Je ne comprends pas ce qui se passe à l'équivalence, ni pourquoi on change de couleur juste à ce moment-là. Dans l'exercice 12 du livre je n'arrive pas à trouver la quantité de matière de réactif titré.</textarea>
+        <textarea id="txtA" maxlength="400" placeholder="Par exemple : je ne comprends pas ce qui se passe à l'équivalence, et je bloque sur l'exercice 12 pour trouver la quantité de matière titrée."></textarea>
         <p class="count"><span id="cA">0</span>/400</p>
       </div>
 
@@ -459,9 +354,6 @@ body:not(.role-eleve) .eleve-seul{display:none}
 
       <details class="info">
         <summary>Comment ça marche</summary>
-        <h4>Deux voies d'entrée</h4>
-        <p>La demande spontanée, celle-ci. Et la demande prescrite : après un devoir, le professeur inscrit
-        directement des élèves, avec le chapitre déjà rempli.</p>
         <h4>Pourquoi 400 caractères</h4>
         <p>Assez pour décrire le blocage, pas assez pour se livrer. Le texte est effacé quinze jours après la séance.</p>
         <h4>Dans sa propre classe</h4>
@@ -480,8 +372,8 @@ body:not(.role-eleve) .eleve-seul{display:none}
 <section class="view" id="v-offre">
   <div class="center" style="max-width:900px">
     <h2>Proposer son aide</h2>
-    <p class="lede">Tu choisis une demande, pas une personne. Si ton professeur valide, vous recevez tous les deux
-    le nom de l'autre et l'horaire.</p>
+    <p class="lede">Tu choisis une demande, pas une personne. Ton professeur valide ensuite le binôme
+    et vous prévient tous les deux.</p>
 
     <div class="filtres" role="group" aria-label="Filtrer les demandes">
       <button class="chip filtre" aria-pressed="true" data-f="tous">Toutes</button>
@@ -494,7 +386,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <div class="grid2" id="listeDemandes"></div>
 
     <div class="card" style="margin-top:22px">
-      <span class="f">Mes disponibilités de tuteur <span class="hint">— sert au calendrier et aux appariements du professeur</span></span>
+      <span class="f">Mes disponibilités de tuteur <span class="hint">— ton professeur s'en sert pour former les binômes</span></span>
       <div id="slotsTuteur"></div>
       <details class="info">
         <summary>Comment ça marche</summary>
@@ -506,119 +398,6 @@ body:not(.role-eleve) .eleve-seul{display:none}
         le professeur arbitre.</p>
         <h4>Si personne ne se positionne</h4>
         <p>Le professeur peut créer le binôme lui-même : se déclarer disponible sur un créneau vaut accord.</p>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CALENDRIER ================= -->
-<section class="view" id="v-calendrier">
-  <h2>Calendrier des rencontres</h2>
-  <p class="lede">Mis à jour à partir des demandes et des disponibilités des tuteurs. Clique sur une case pour voir le détail.</p>
-
-  <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
-    <p class="note" style="margin:0">Le calendrier sera calculé à partir des vraies demandes et disponibilités à l'étape suivante.
-    En attendant, indique tes moments libres dans « Demander de l'aide » ou « Proposer son aide ».</p></div>
-  <div class="card fictif" data-exemple="Exemple — calendrier réel bientôt disponible">
-    <div class="calhead">
-      <span class="sem" id="semLabel"></span>
-      <button class="mini ghost" id="semPrev" aria-label="Semaine précédente">←</button>
-      <button class="mini ghost" id="semNext" aria-label="Semaine suivante">→</button>
-    </div>
-    <div class="calscroll"><table class="cal" id="cal"></table></div>
-    <div class="callegend">
-      <span><i style="background:#FFF0F6;border-color:var(--match)"></i>binôme validé</span>
-      <span><i style="background:#EFFAF4;border-color:#9ED8BE"></i>rencontre possible</span>
-      <span><i style="background:#FFF8EA;border-color:#EBD3A0"></i>demande sans tuteur</span>
-      <span><i style="background:var(--soft);border-color:var(--rule)"></i>rien pour l'instant</span>
-    </div>
-    <div class="detail" id="calDetail" hidden></div>
-    <details class="info">
-      <summary>Et dans le site final ?</summary>
-      <p>Le calendrier sera calculé automatiquement par le serveur à chaque nouvelle demande ou disponibilité.
-      Il pourra aussi être proposé en abonnement (lien .ics) dans l'agenda du téléphone ou dans celui des
-      professeurs. Les élèves n'y voient que des chapitres et des nombres, jamais de noms.</p>
-    </details>
-  </div>
-</section>
-
-<!-- ================= BILAN ================= -->
-<section class="view" id="v-bilan">
-  <div class="center">
-    <h2>Bilan de séance</h2>
-    <p class="lede">Quelques cases, puis 60 à 90 secondes de voix ou cinq lignes écrites. C'est cette trace qui compte pour le bonus.</p>
-
-    <div class="card bientot-carte"><span class="f">Bientôt disponible</span>
-      <p class="note" style="margin:0">Le bilan s'ouvrira ici après une séance validée par ton professeur.</p></div>
-    <div class="card fictif" data-exemple="Exemple — s'ouvrira après une séance validée">
-      <div class="seance">
-        <div class="av" aria-hidden="true">MR</div>
-        <p><b>Jeudi 12 mars, 15 h — CDI 01</b><br>Titrage colorimétrique · première spécialité</p>
-      </div>
-
-      <div class="step">
-        <span class="f">Qui était présent</span>
-        <label class="coche"><input type="checkbox" checked> Manon Rivière (1re spé 2)</label>
-        <label class="coche"><input type="checkbox"> Inès Garnier (1re spé 2) <span class="hint">— ajoutée au binôme par le professeur</span></label>
-      </div>
-
-      <div class="step">
-        <span class="f">Durée réelle</span>
-        <div class="chips" role="group" data-single>
-          <button class="chip" aria-pressed="false">Moins de 15 min</button>
-          <button class="chip" aria-pressed="false">30 min</button>
-          <button class="chip" aria-pressed="true">Une heure</button>
-        </div>
-      </div>
-
-      <div class="step">
-        <span class="f">Comment ça s'est passé</span>
-        <div class="choix" style="grid-template-columns:repeat(3,1fr)">
-          <label><input type="radio" name="passe" checked><span><b>Bien</b><span>Elle a compris.</span></span></label>
-          <label><input type="radio" name="passe"><span><b>En partie</b><span>Il reste un point.</span></span></label>
-          <label><input type="radio" name="passe"><span><b>Difficile</b><span>Ça n'a pas pris.</span></span></label>
-        </div>
-      </div>
-
-      <div class="step">
-        <label class="coche"><input type="checkbox" checked> Elle a refait un exercice seule à la fin</label>
-        <label class="coche"><input type="checkbox"> Il faudrait une autre séance sur ce chapitre</label>
-        <label class="coche"><input type="checkbox"> J'ai bloqué sur un point : j'aimerais en parler au professeur</label>
-      </div>
-
-      <div class="step">
-        <span class="f">Ton explication</span>
-        <div class="seg" role="group" aria-label="Format du bilan" style="margin-bottom:14px">
-          <button id="segAudio" aria-pressed="true">Audio</button>
-          <button id="segTexte" aria-pressed="false">Écrit</button>
-        </div>
-        <div id="paneAudio">
-          <div class="rec" id="rec">
-            <div class="wave" id="wave"></div>
-            <div class="timer" id="timer">1:30</div>
-            <button class="recbtn" id="recbtn">Enregistrer</button>
-          </div>
-          <p class="note"><strong style="font-weight:600;color:var(--ink)">Ce qu'on attend :</strong>
-          le point expliqué, comment tu t'y es pris, et ce que tu as compris de sa difficulté.</p>
-        </div>
-        <div id="paneTexte" hidden>
-          <textarea id="bilanTxt" style="min-height:190px" aria-label="Ton bilan écrit">Elle croyait que le changement de couleur provoquait l'équivalence, alors que c'est l'inverse. On a refait le tableau d'avancement à trois moments : avant, à l'équivalence, après. Ensuite je lui ai fait dire ce qui restait en excès à chaque fois. À la fin elle a retrouvé seule pourquoi l'indicateur vire juste là.</textarea>
-          <p class="count">5 lignes minimum</p>
-        </div>
-      </div>
-
-      <button class="cta" id="envoiBilan">Envoyer mon bilan</button>
-
-      <details class="info">
-        <summary>Le barème et la présence</summary>
-        <h4>Sur 3 points de bonus</h4>
-        <p>La séance a eu lieu et le bilan est déposé. Le point traité est identifié précisément. La difficulté de
-        l'autre élève est nommée — c'est le critère le plus exigeant, et celui qui fait progresser le tuteur.</p>
-        <h4>La présence se prouve ailleurs</h4>
-        <p>Le registre visé au CDI fait foi. Le tutoré confirme la séance d'un appui et donne son ressenti,
-        sans jamais noter son tuteur.</p>
-        <h4>Ce que ça construit</h4>
-        <p>Une banque d'explications par les pairs, classée par chapitre, réutilisable en classe.</p>
       </details>
     </div>
   </div>
@@ -640,63 +419,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <div style="height:44px"></div>
   </div>
 
-  <div class="fictif" data-exemple="Exemple — validation des binômes et retours bientôt disponibles">
-  <h2>Jeudi 12 mars — quatre binômes à arbitrer</h2>
-  <p class="lede">Rien ne se met en relation sans vous. La validation allume la raie du chapitre dans le spectre, en haut de page.</p>
-
-  <div id="pairs">
-    <div class="pair" data-raie="2">
-      <div>
-        <p class="who"><strong>Manon Rivière</strong> (1re spé 2) ← <strong>Adrien Costa</strong> (Tle spé 1)</p>
-        <p class="meta">Titrage colorimétrique · <em>positionné par le tuteur</em> · <span class="badge wait">pressant — DS le 16/03</span> · 15 h, CDI 01</p>
-      </div>
-      <button class="mini">Valider</button>
-    </div>
-    <div class="pair" data-raie="9">
-      <div>
-        <p class="who"><strong>Sofia Nguyen</strong> (1re spé 2) ← <strong>Hugo Lemaire</strong> (Tle spé 1)</p>
-        <p class="meta">Énergie mécanique · <em>demande prescrite après le DS n° 2</em> · sur la durée · 15 h, CDI 01</p>
-      </div>
-      <button class="mini">Valider</button>
-    </div>
-    <div class="pair" data-raie="18" style="border-left-color:var(--terminale)">
-      <div>
-        <p class="who"><strong>Yanis Delorme</strong> (Tle spé 1) ← <strong>Léa Bouchard</strong> (Tle spé 1)</p>
-        <p class="meta">Mouvement dans un champ uniforme · <em>intra-classe</em> · quelques minutes · récré de 9 h 55</p>
-      </div>
-      <button class="mini">Valider</button>
-    </div>
-    <div class="pair" data-raie="7" style="border-left-color:var(--premiere)">
-      <div>
-        <p class="who"><strong>Nolan Perrin</strong> (1re spé 3) ← <em style="font-style:normal;color:var(--muted)">aucun tuteur positionné</em></p>
-        <p class="meta">Mouvement d'un système · <em>3 tuteurs disponibles sur ses créneaux</em></p>
-      </div>
-      <button class="mini ghost">Choisir un tuteur</button>
-    </div>
-  </div>
-
-  <div class="encadre">
-    <p><strong style="font-weight:600">Alerte de plafond.</strong> Yanis Delorme et Léa Bouchard en
-    sont à leur deuxième séance ensemble cette période. Au-delà, le binôme ne sera plus proposé.</p>
-  </div>
-
-  <h3>Retours des élèves aidés</h3>
-  <p class="libre" style="color:var(--muted);margin:0">Recueillis par le pop-up qui s'affiche à la connexion après une séance. Le tuteur ne les voit pas.</p>
-  <div class="tscroll">
-  <table class="t">
-    <thead><tr><th>Tuteur</th><th>Séances</th><th>« Ça m'a aidé »</th><th>Ce qui ressort</th><th></th></tr></thead>
-    <tbody>
-      <tr><td>Théo Marchand</td><td>14</td><td>12 oui · 2 en partie<div class="barres"><span style="flex:12"></span><span style="flex:2"></span></div></td><td>« Il explique avec des schémas »</td><td><span class="badge vert">rien à signaler</span></td></tr>
-      <tr><td>Adrien Costa</td><td>5</td><td>4 oui · 1 en partie<div class="barres"><span style="flex:4"></span><span style="flex:1"></span></div></td><td>—</td><td><span class="badge vert">rien à signaler</span></td></tr>
-      <tr><td>Hugo Lemaire</td><td>3</td><td>1 oui · 2 pas vraiment<div class="barres"><span style="flex:1"></span><span style="flex:0"></span><span style="flex:2"></span></div></td><td>« Il allait trop vite », « il a fait l'exercice à ma place »</td><td><span class="badge wait">à rencontrer</span></td></tr>
-      <tr><td>Léa Bouchard</td><td>1</td><td>en attente de retour</td><td>—</td><td><span class="badge">—</span></td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p style="margin-top:12px"><button class="mini ghost" id="voirFeedback">Voir le pop-up côté élève</button></p>
-  </div>
-
-  <div class="card" id="corresp" style="margin-top:34px">
+  <div class="card" id="corresp" style="margin-top:0">
     <span class="f">Correspondance identifiants ↔ noms</span>
     <p class="note" id="correspEtat" style="margin:0 0 12px">Aucune correspondance chargée sur cet appareil : les élèves apparaissent par leur identifiant.</p>
     <div class="barre" style="margin-top:0">
@@ -713,84 +436,10 @@ body:not(.role-eleve) .eleve-seul{display:none}
   <table class="t">
     <thead><tr><th>Élève</th><th>Classe</th><th>Chapitre</th><th>Type</th><th>Besoin</th><th>Statut</th></tr></thead>
     <tbody id="tabDepots">
-      <tr><td>Manon Rivière</td><td>1re spé 2</td><td>Titrage colorimétrique</td><td>Demande</td><td>ponctuel · 1 h · <b style="color:#8A5D08;font-weight:600">pressant</b></td><td><span class="badge live">binôme proposé</span></td></tr>
-      <tr><td>Adrien Costa</td><td>Tle spé 1</td><td>Titrages, acides-bases</td><td>Offre</td><td>lun., mar., jeu. 15 h</td><td><span class="badge live">positionné</span></td></tr>
-      <tr><td>Sofia Nguyen</td><td>1re spé 2</td><td>Énergie mécanique</td><td>Demande</td><td>sur la durée · 1 h</td><td><span class="badge">prescrit</span></td></tr>
-      <tr><td>Nolan Perrin</td><td>1re spé 3</td><td>Mouvement d'un système</td><td>Demande</td><td>ponctuel · récré</td><td><span class="badge wait">sans tuteur</span></td></tr>
-      <tr><td>Élise Rambaud</td><td>Tle spé 2</td><td>Ondes, lumière</td><td>Offre</td><td>récrés du mardi</td><td><span class="badge wait">disponible</span></td></tr>
-      <tr><td>Théo Marchand</td><td>Tle spé 1</td><td>6 chapitres</td><td>Offre</td><td>tous les jours 15 h</td><td><span class="badge vert">14 séances faites</span></td></tr>
     </tbody>
   </table>
   </div>
 
-  <details class="info">
-    <summary>Ce que voit l'administrateur en plus</summary>
-    <p>Le journal complet des dépôts et des retraits, les textes libres avant effacement, les séances déclarées
-    mais non confirmées par l'autre élève, et le compteur d'attestation de chaque tuteur. Les collègues de
-    physique-chimie ont la même vue, chacun ne pouvant afficher les noms que pour ses propres élèves.</p>
-  </details>
-</section>
-
-<!-- ================= ATTESTATION ================= -->
-<section class="view" id="v-attest">
-  <div class="center" style="max-width:720px">
-    <h2>Fin de période</h2>
-    <p class="lede">Compteurs remplis automatiquement. Vous ajoutez une mention, vous signez, vous exportez.</p>
-  </div>
-
-  <div class="card bientot-carte center" style="max-width:720px"><span class="f">Bientôt disponible</span>
-    <p class="note" style="margin:0">Les attestations seront remplies automatiquement à partir des séances et des bilans.</p></div>
-  <div class="sheet fictif" id="attestation" data-exemple="Exemple — attestations bientôt disponibles">
-    <div class="spectrumline">
-      <span style="background:var(--premiere)"></span>
-      <span style="background:var(--terminale)"></span>
-      <span style="background:var(--match)"></span>
-    </div>
-    <p class="ent">Lycée Isaac de l'Étoile — Poitiers<br>Année scolaire 2026-2027</p>
-    <h4>Attestation de tutorat entre pairs</h4>
-    <p>Théo Marchand, élève de terminale spécialité physique-chimie, a participé au dispositif de
-    tutorat entre pairs de l'établissement, au CDI, du 25 septembre 2026 au 22 mai 2027.</p>
-
-    <div class="stat">
-      <div><b>14</b><span>séances</span></div>
-      <div><b>14 h</b><span>d'accompagnement</span></div>
-      <div><b>9</b><span>élèves accompagnés</span></div>
-      <div><b>6</b><span>chapitres couverts</span></div>
-    </div>
-
-    <p style="margin-top:26px">Chapitres traités : composition d'un système initial, titrage colorimétrique,
-    mouvement d'un système, aspects énergétiques des phénomènes mécaniques, ondes mécaniques,
-    lumière : images et couleurs. Niveau accompagné : première spécialité. Régularité : présent sur
-    14 des 16 séances auxquelles il s'était engagé.</p>
-
-    <p>Chaque séance a donné lieu à un bilan déposé par l'élève et validé par l'enseignant.</p>
-
-    <label class="f" for="mention" style="margin-top:26px">Mention particulière</label>
-    <textarea id="mention" style="min-height:70px">Théo a montré une capacité rare à identifier l'origine d'une erreur plutôt qu'à corriger le résultat.</textarea>
-
-    <div class="sigzone">
-      <div>
-        <label class="f" for="pad">Signature</label>
-        <div class="padbox"><canvas id="pad"></canvas></div>
-      </div>
-      <p class="sigmeta">Fait à Poitiers,<br>le 22 mai 2027<br>M. Van Hoorde,<br>professeur de physique-chimie</p>
-    </div>
-
-    <div class="barre">
-      <button class="mini" id="btnPdf">Exporter en PDF</button>
-      <button class="mini ghost" id="btnEffacer">Effacer la signature</button>
-      <span id="etatPdf" class="ok" hidden>attestation-marchand-2027.pdf</span>
-    </div>
-  </div>
-
-  <div class="center" style="max-width:720px">
-    <details class="info">
-      <summary>Et Parcoursup ?</summary>
-      <p>La rubrique « Activités et centres d'intérêt » est déclarative et mentionne explicitement le tutorat :
-      c'est l'élève qui écrit, en 1 500 caractères. L'attestation et une ligne dans l'appréciation lui donnent
-      son poids, et ses bilans lui permettent d'écrire ce qu'il en a tiré sans rien inventer.</p>
-    </details>
-  </div>
 </section>
 
 </main>
@@ -800,9 +449,12 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <div class="fcols">
       <div>
         <h5>Les créneaux</h5>
-        <div class="creneau"><b>Séance, tous les jours</b><span>15 h – 16 h, CDI 01<br>inscription et binôme validé</span></div>
-        <div class="creneau"><b>Récré du matin</b><span>9 h 55<br>accès libre, question rapide</span></div>
-        <div class="creneau"><b>Récré de l'après-midi</b><span>15 h 15<br>accès libre, question rapide</span></div>
+        <div class="creneau"><b>Séance</b><span>lundi, jeudi, vendredi<br>15 h 15 – 16 h 20, binôme validé</span></div>
+        <div class="creneau"><b>Récré du matin</b><span>tous les jours, 9 h 55<br>question rapide</span></div>
+        <div class="creneau"><b>Récré de l'après-midi</b><span>sauf le mercredi, 15 h 15<br>question rapide</span></div>
+        <p style="margin-top:12px"><b style="color:#fff;font-weight:500">Où :</b> au CDI, salle CDI 2 en priorité
+        (accès en autonomie). La salle CDI 1 est fermée à clé : il faut demander l'accès au CDI.
+        La salle est confirmée avec le binôme.</p>
       </div>
       <div>
         <h5>Tes données</h5>
@@ -819,7 +471,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
         <p>Une question sur le dispositif : ton professeur de physique-chimie.</p>
       </div>
     </div>
-    <div class="bas">Résonance — lycée Isaac de l'Étoile, Poitiers — maquette v3</div>
+    <div class="bas">Résonance — lycée Isaac de l'Étoile, Poitiers</div>
   </div>
 </footer>
 
@@ -828,7 +480,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
   <form method="dialog" class="dlg" id="loginForm">
     <div class="top"><span style="background:var(--premiere)"></span><span style="background:var(--terminale)"></span><span style="background:var(--match)"></span></div>
     <h2 id="loginTitre">Résonance</h2>
-    <p class="sub">Tutorat en physique-chimie — CDI 01</p>
+    <p class="sub">Tutorat en physique-chimie</p>
 
     <div class="seg role-seg" role="group" aria-label="Je suis">
       <button type="button" id="roleEleve" aria-pressed="true">Je suis élève</button>
@@ -845,44 +497,12 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <button class="cta" value="login" id="btnLogin">Se connecter</button>
     <p class="note" style="text-align:center;margin-top:8px" id="loginAide">Identifiant et mot de passe sont sur le coupon remis par ton professeur.</p>
 
-    <div class="sep">ou</div>
-    <button class="browse" value="browse">Parcourir sans se connecter
-      <small>temporaire — pour découvrir le site pendant la phase de test</small></button>
 
     <details class="info">
       <summary>Pourquoi un identifiant et pas mon nom</summary>
       <p>Ton nom n'est écrit nulle part en ligne : le serveur ne connaît que ton identifiant, la correspondance
       reste sur les ordinateurs des professeurs.</p>
     </details>
-  </form>
-</dialog>
-
-<!-- ================= POP-UP RETOUR ================= -->
-<dialog id="dlgFeedback" class="large" aria-labelledby="fbTitre">
-  <form method="dialog" class="dlg" id="fbForm">
-    <div class="top"><span style="background:var(--match)"></span></div>
-    <div id="fbCorps">
-      <h2 id="fbTitre" style="font-size:22px">Ta séance de jeudi</h2>
-      <p class="sub">Titrage colorimétrique, avec Adrien — jeudi 12 mars, 15 h</p>
-
-      <span class="f">Est-ce que ça t'a aidé ?</span>
-      <div class="q3">
-        <label><input type="radio" name="aide" value="oui"><b>Oui</b>j'ai compris</label>
-        <label><input type="radio" name="aide" value="partie"><b>En partie</b>il reste un point</label>
-        <label><input type="radio" name="aide" value="non"><b>Pas vraiment</b>je bloque encore</label>
-      </div>
-
-      <label class="coche"><input type="checkbox"> La séance a bien eu lieu</label>
-      <label class="coche"><input type="checkbox"> Je voudrais une autre séance sur ce chapitre</label>
-      <label class="coche" style="margin-bottom:14px"><input type="checkbox"> Je préférerais en parler à mon professeur</label>
-
-      <label class="f" for="fbTxt">Un mot pour ton professeur <span class="hint">— facultatif</span></label>
-      <textarea id="fbTxt" maxlength="200" style="min-height:70px"></textarea>
-
-      <p class="note" style="margin:10px 0 16px">Seuls tes professeurs lisent ce retour. Adrien ne le voit pas et n'est pas noté dessus.</p>
-      <button class="cta" value="send" id="fbEnvoyer">Envoyer</button>
-      <button class="browse" value="later" style="margin-top:8px">Plus tard</button>
-    </div>
   </form>
 </dialog>
 
@@ -895,7 +515,7 @@ const SUPABASE_URL="https://mnqcmjmypkleptbmqtws.supabase.co";
 const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ucWNtam15cGtsZXB0Ym1xdHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3OTg2MzgsImV4cCI6MjEwNTM3NDYzOH0.6D3QDDW4DYm_xErBwCom6xdKeMhOUf1TbUDZPN-Q0bc";
 const DOMAINE_COMPTES="resonance.invalid"; // identique à DOMAINE dans la fonction premiere-connexion
 const sb=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON):null;
-let session=null; // session Supabase réelle ; null = visiteur (données d'exemple)
+let session=null; // session Supabase ; null = pas connecté
 const enLigne=()=>!!session;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -956,36 +576,8 @@ const CHAPITRES = {
       "4.6 - Dynamique d'un système électrique"]]
   ]
 };
-const GROUPES = {1:["1re spé 1","1re spé 2","1re spé 3"], 0:["Tle spé 1","Tle spé 2"]};
 
 /* ---------- spectre ---------- */
-const raies = [
-  {n:1,x:4, h:30,t:"1re — Composition d'un système initial",d:"1 demande · 2 tuteurs"},
-  {n:1,x:8, h:22,t:"1re — Suivi d'une transformation chimique",d:"1 demande · 2 tuteurs"},
-  {n:1,x:12,h:50,t:"1re — Titrage colorimétrique",d:"2 demandes · 3 tuteurs"},
-  {n:1,x:16,h:26,t:"1re — Structure et cohésion",d:"1 demande · 1 tuteur"},
-  {n:1,x:20,h:18,t:"1re — Chimie organique",d:"0 demande · 2 tuteurs"},
-  {n:1,x:24,h:20,t:"1re — Interactions et champs",d:"0 demande · 2 tuteurs"},
-  {n:1,x:28,h:16,t:"1re — Fluide au repos",d:"0 demande · 1 tuteur"},
-  {n:1,x:32,h:44,t:"1re — Mouvement d'un système",d:"2 demandes · 3 tuteurs"},
-  {n:1,x:36,h:24,t:"1re — Énergie électrique",d:"1 demande · 1 tuteur"},
-  {n:1,x:40,h:54,t:"1re — Énergie mécanique",d:"3 demandes · 2 tuteurs"},
-  {n:1,x:44,h:34,t:"1re — Ondes mécaniques",d:"1 demande · 2 tuteurs"},
-  {n:1,x:48,h:28,t:"1re — Lumière",d:"1 demande · 2 tuteurs"},
-  {n:0,x:54,  h:32,t:"Tle — Acide-base",d:"1 demande · 2 tuteurs"},
-  {n:0,x:57.5,h:36,t:"Tle — Cinétique chimique",d:"2 demandes · 1 tuteur"},
-  {n:0,x:61,  h:22,t:"Tle — Transformations nucléaires",d:"1 demande · 0 tuteur"},
-  {n:0,x:64.5,h:20,t:"Tle — Piles et électrolyse",d:"0 demande · 1 tuteur"},
-  {n:0,x:68,  h:18,t:"Tle — Synthèse organique",d:"0 demande · 1 tuteur"},
-  {n:0,x:71.5,h:26,t:"Tle — Deuxième loi de Newton",d:"1 demande · 2 tuteurs"},
-  {n:0,x:75,  h:40,t:"Tle — Mouvement dans un champ uniforme",d:"2 demandes · 2 tuteurs"},
-  {n:0,x:78.5,h:24,t:"Tle — Champ de gravitation",d:"1 demande · 1 tuteur"},
-  {n:0,x:82,  h:14,t:"Tle — Écoulement d'un fluide",d:"0 demande · 1 tuteur"},
-  {n:0,x:85.5,h:30,t:"Tle — Thermodynamique",d:"1 demande · 1 tuteur"},
-  {n:0,x:89,  h:22,t:"Tle — Phénomènes ondulatoires",d:"1 demande · 2 tuteurs"},
-  {n:0,x:92.5,h:18,t:"Tle — Lunette et photons",d:"0 demande · 1 tuteur"},
-  {n:0,x:96,  h:28,t:"Tle — Circuit RC",d:"1 demande · 1 tuteur"}
-];
 const spec=document.getElementById('spectrum'), tip=document.getElementById('tip');
 let raieEls=[];
 function construireSpectre(liste){
@@ -1016,20 +608,19 @@ function spectreReel(demandes){
   });
   construireSpectre(liste);
 }
-construireSpectre(raies);
+spectreReel([]);
 
 /* ---------- navigation ---------- */
 function ouvrirVue(nom){
   document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', x.dataset.view===nom?'true':'false'));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id==='v-'+nom));
-  if(nom==='attest') dimensionnerPad();
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   ouvrirVue(t.dataset.view); window.scrollTo({top:0,behavior:'smooth'});
 }));
 
 /* ---------- pop-up connexion ---------- */
-const dlgLogin=document.getElementById('dlgLogin'), dlgFb=document.getElementById('dlgFeedback');
+const dlgLogin=document.getElementById('dlgLogin');
 const whoBtn=document.getElementById('whoBtn');
 const rolebar=document.getElementById('rolebar');
 const roleEleve=document.getElementById('roleEleve'), roleProf=document.getElementById('roleProf');
@@ -1077,34 +668,27 @@ document.getElementById('loginForm').addEventListener('submit',async e=>{
 roleEleve.addEventListener('click',()=>choisirLogin('eleve'));
 roleProf.addEventListener('click',()=>choisirLogin('prof'));
 
-/* Seul un élève connecté peut agir ; l'enseignant et le visiteur voient tout sans pouvoir réserver. */
+/* Seul un élève connecté peut agir ; l'enseignant voit les écrans élèves sans pouvoir réserver. */
 const peutAgir=()=>role==='eleve';
 function appliquerRole(r){
   role=r;
   document.body.classList.remove('role-eleve','role-prof','role-visiteur');
   document.body.classList.add('role-'+r);
   document.body.classList.toggle('en-ligne',enLigne());
-  document.getElementById('bandeauDemo').innerHTML=enLigne()
-    ? '<strong>Version de test.</strong> Les demandes sont réellement enregistrées. Les parties « bientôt disponible » ne sont pas encore branchées.'
-    : '<strong>Maquette de démonstration.</strong> Tous les noms, demandes et chiffres sont inventés — aucun élève réel n\'apparaît ici et rien n\'est enregistré.';
-  document.querySelectorAll('#envoiDemande,#envoiBilan,#recbtn').forEach(b=>b.disabled=!peutAgir());
+  document.querySelectorAll('#envoiDemande').forEach(b=>b.disabled=!peutAgir());
   afficherDemandes();
   const ident=esc(identifiantDeSession(session));
   if(r==='prof'){
     rolebar.className='rolebar';
     rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les onglets élèves montrent exactement ce que voient les élèves, '+
-      'mais vous ne pouvez ni déposer une demande, ni vous positionner, ni prendre un rendez-vous. '+
-      '<span class="hint">Les parties pas encore branchées (binômes, calendrier, bilans, retours, attestation) sont marquées « bientôt disponible ».</span></span>';
+      'mais vous ne pouvez ni déposer une demande, ni vous positionner.</span>';
     whoBtn.innerHTML='Enseignant · <span class="id">'+ident+'</span> · se déconnecter';
   } else if(r==='eleve'){
     rolebar.className='rolebar'; rolebar.innerHTML='';
     whoBtn.innerHTML='<span class="id">'+ident+'</span> · se déconnecter';
   } else {
-    rolebar.className='rolebar visiteur';
-    rolebar.innerHTML='<span aria-hidden="true">ⓘ</span><span><b>Mode découverte.</b> Vous parcourez le site sans compte : '+
-      'rien ne peut être envoyé. <a href="#" id="lienConnexion">Se connecter</a></span>';
-    rolebar.querySelector('#lienConnexion').addEventListener('click',e=>{e.preventDefault();ouvrirConnexion();});
-    whoBtn.textContent='Visiteur · se connecter';
+    rolebar.className='rolebar'; rolebar.innerHTML='';
+    whoBtn.textContent='Se connecter';
   }
   rolebar.hidden=!rolebar.innerHTML;
   const active=document.querySelector('.tab[aria-selected="true"]');
@@ -1112,38 +696,33 @@ function appliquerRole(r){
   else if(active && active.classList.contains('prof')) ouvrirVue('demande');
 }
 function ouvrirConnexion(){ dlgLogin.returnValue=''; loginErreur.hidden=true; dlgLogin.showModal(); }
-dlgLogin.addEventListener('close',()=>{
-  if(dlgLogin.returnValue==='login' && session) entrer();
-  else if(!session) appliquerRole('visiteur');
-});
+dlgLogin.addEventListener('close',()=>{ if(dlgLogin.returnValue==='login' && session) entrer(); });
+document.getElementById('btnAccueil').addEventListener('click',ouvrirConnexion);
 whoBtn.addEventListener('click',async()=>{
-  if(session){ await sb.auth.signOut(); session=null; restaurerDemo(); appliquerRole('visiteur'); }
+  // Déconnexion : on recharge la page pour ne rien laisser du compte précédent à l'écran.
+  if(session){ await sb.auth.signOut(); location.reload(); return; }
   ouvrirConnexion();
 });
-/* Après connexion (ou session retrouvée) : on quitte les données d'exemple pour les vraies. */
+/* « Première 2 », « 1re spé 2 » → 1 ; « Terminale 1 », « Tle spé 1 » → 0 ; sinon inconnu. */
+function niveauDeClasse(c){
+  c=String(c||'').trim();
+  return /^(1|p)/i.test(c)?1:/^t/i.test(c)?0:null;
+}
 async function entrer(){
   appliquerRole(roleDeSession(session));
+  const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
+  if(role==='eleve' && n!==null) remplirNiveau(n);
   await chargerDonneesReelles();
 }
 
-/* ---------- pop-up retour ---------- */
-const fbCorps=document.getElementById('fbCorps'), fbHTML=fbCorps.innerHTML;
-dlgFb.addEventListener('close',()=>{ setTimeout(()=>{ fbCorps.innerHTML=fbHTML; },200); });
-document.getElementById('fbForm').addEventListener('submit',e=>{
-  if(e.submitter && e.submitter.value==='send'){
-    e.preventDefault();
-    fbCorps.innerHTML='<div class="merci"><b>Merci !</b><p class="note" style="margin:0 0 18px">Ton retour est transmis à ton professeur.</p>'+
-      '<button class="cta" value="ok">Fermer</button></div>';
-  }
-});
-document.getElementById('voirFeedback').addEventListener('click',()=>dlgFb.showModal());
-
 /* ---------- grilles de créneaux ---------- */
 const JOURS=["Lun","Mar","Mer","Jeu","Ven"];
+/* Horaires du CDI (septembre 2026) : pas de récré le mercredi après-midi,
+   séances d'une heure le lundi, le jeudi et le vendredi seulement. `jours` : indices dans JOURS. */
 const LIGNES=[
-  {k:"r1", l:"Récré 9 h 55", s:"quelques minutes"},
-  {k:"r2", l:"Récré 15 h 15", s:"quelques minutes"},
-  {k:"s",  l:"Séance 15 h – 16 h", s:"une heure"}
+  {k:"r1", l:"Récré 9 h 55", s:"quelques minutes", jours:[0,1,2,3,4]},
+  {k:"r2", l:"Récré 15 h 15", s:"quelques minutes", jours:[0,1,3,4]},
+  {k:"s",  l:"Séance 15 h 15 – 16 h 20", s:"une heure", jours:[0,3,4]}
 ];
 function grille(conteneur, nom, coches){
   let h='<table class="slots"><thead><tr><th></th>'+JOURS.map(j=>'<th>'+j+'</th>').join('')+'</tr></thead><tbody>';
@@ -1151,6 +730,7 @@ function grille(conteneur, nom, coches){
     h+='<tr><th class="l">'+L.l+'<small>'+L.s+'</small></th>';
     JOURS.forEach((j,i)=>{
       const k=L.k+'-'+i;
+      if(!L.jours.includes(i)){ h+='<td><span class="slot ferme" title="'+L.l+', '+j+' : pas de créneau"></span></td>'; return; }
       h+='<td><label class="slot"><input type="checkbox" name="'+nom+'" value="'+k+'"'+(coches.includes(k)?' checked':'')+
         ' aria-label="'+L.l+', '+j+'"></label></td>';
     });
@@ -1164,6 +744,7 @@ function grilleLecture(slots, tle, mesCreneaux){
     h+='<tr><th class="l">'+L.l+'</th>';
     JOURS.forEach((j,i)=>{
       const k=L.k+'-'+i, on=slots.includes(k), moi=on&&mesCreneaux.includes(k);
+      if(!on && !L.jours.includes(i)){ h+='<td><span class="slot ferme"></span></td>'; return; }
       h+='<td><span class="slot'+(on?' on':'')+(moi?' moi':'')+'" title="'+L.l+', '+j+(on?' — demandé':'')+'"></span></td>';
     });
     h+='</tr>';
@@ -1175,21 +756,20 @@ function libCreneau(k){
   const [l,j]=String(k).split('-'), L=LIGNES.find(x=>x.k===l);
   return (JOURS[+j]||'?')+'. · '+(L?L.l.replace(/^Récré/,'récré').replace(/^Séance/,'séance'):k);
 }
-grille(document.getElementById('slotsDemande'),'dispoDemande',["s-0","s-1","s-3","r1-1"]);
+grille(document.getElementById('slotsDemande'),'dispoDemande',[]);
 const slotsTuteur=document.getElementById('slotsTuteur');
-grille(slotsTuteur,'dispoTuteur',["s-0","s-1","s-3","r1-2","r2-3"]);
+grille(slotsTuteur,'dispoTuteur',[]);
 const mesCreneaux=()=>[...slotsTuteur.querySelectorAll('input:checked')].map(i=>i.value);
 
 /* ---------- formulaire de demande ---------- */
 const nivP=document.getElementById('nivP'), nivT=document.getElementById('nivT');
-const selChap=document.getElementById('chap'), selGroupe=document.getElementById('groupe');
+const selChap=document.getElementById('chap');
 function remplirNiveau(n){
   nivP.setAttribute('aria-pressed', n===1); nivT.setAttribute('aria-pressed', n===0);
-  selGroupe.innerHTML=GROUPES[n].map(g=>'<option>'+g+'</option>').join('');
-  selChap.innerHTML=CHAPITRES[n].map(([theme,chs])=>'<optgroup label="'+theme+'">'+
-    chs.map(c=>'<option'+(c==="Titrage colorimétrique"?' selected':'')+'>'+c+'</option>').join('')+'</optgroup>').join('')+
+  selChap.innerHTML='<option value="">— choisir un chapitre —</option>'+
+    CHAPITRES[n].map(([theme,chs])=>'<optgroup label="'+theme+'">'+
+    chs.map(c=>'<option>'+c+'</option>').join('')+'</optgroup>').join('')+
     '<option>Autre / je ne sais pas</option>';
-  if(n===1) selGroupe.selectedIndex=1;
 }
 nivP.addEventListener('click',()=>remplirNiveau(1));
 nivT.addEventListener('click',()=>remplirNiveau(0));
@@ -1206,6 +786,7 @@ const txtA=document.getElementById('txtA'), cA=document.getElementById('cA');
 const majCompteur=()=>cA.textContent=txtA.value.length;
 txtA.addEventListener('input',majCompteur); majCompteur();
 const urgent=document.getElementById('urgent');
+document.getElementById('dateEval').min=new Date().toISOString().slice(0,10);
 document.getElementById('urgentBox').addEventListener('change',e=>urgent.classList.toggle('on',e.target.checked));
 
 function confirmer(btn, texte){
@@ -1229,8 +810,9 @@ function lireDemande(){
   };
 }
 btnDemande.addEventListener('click',async()=>{
-  if(!enLigne()){ confirmer(btnDemande,'Demande envoyée à ton professeur ✓'); return; }
+  if(!enLigne()) return;
   const d=lireDemande();
+  if(!d.chapitre){ alert("Choisis le chapitre sur lequel tu as besoin d'aide."); return; }
   if(!d.creneaux.length){ alert("Coche au moins un moment où tu peux venir."); return; }
   if(!d.texte){ alert("Décris en quelques mots le point précis qui te bloque."); return; }
   btnDemande.disabled=true;
@@ -1241,24 +823,9 @@ btnDemande.addEventListener('click',async()=>{
   txtA.value=''; majCompteur();
   chargerMesDemandes();
 });
-document.getElementById('envoiBilan').addEventListener('click',e=>confirmer(e.currentTarget,'Bilan envoyé à M. Van Hoorde ✓'));
 
 /* ---------- demandes vues par le tuteur ---------- */
-const DEMO_DEMANDES=[
-  {id:214,n:1,chap:"Titrage colorimétrique",nat:"Le cours · La méthode",besoin:"Ponctuel",duree:"Une heure",urgent:"DS le 16/03",
-   q:"Ne comprend pas ce qui se passe à l'équivalence ni le changement de couleur ; bloque sur la quantité de réactif titré.",slots:["s-0","s-1","s-3","r1-1"]},
-  {id:219,n:0,chap:"2.3 - Mouvement dans un champ uniforme",nat:"Un exercice",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"contrôle le 13/03",
-   q:"N'arrive pas à projeter sur les deux axes avant d'intégrer.",slots:["r1-2","r2-3"]},
-  {id:217,n:1,chap:"Aspects énergétiques des phénomènes mécaniques",nat:"Un exercice · La méthode",besoin:"Sur la durée",duree:"Une heure",urgent:"",
-   q:"Bloque sur les exercices avec frottements : ne sait pas quoi poser au départ.",slots:["s-1","s-3"]},
-  {id:221,n:1,chap:"Ondes mécaniques",nat:"Le cours",besoin:"Ponctuel",duree:"Quelques minutes",urgent:"",
-   q:"Confond la période et la longueur d'onde sur les graphiques.",slots:["r1-0","r1-3","r2-4"]},
-  {id:223,n:0,chap:"1.5 - Cinétique chimique",nat:"Le TP",besoin:"Sur la durée",duree:"Une heure",urgent:"",
-   q:"Ne sait pas exploiter la courbe pour trouver le temps de demi-réaction.",slots:["s-2","s-4"]},
-  {id:211,n:1,chap:"Mouvement d'un système",nat:"Un exercice",besoin:"Ponctuel",duree:"Une heure",urgent:"",
-   q:"",slots:["s-0"],pris:true}
-];
-let DEMANDES=DEMO_DEMANDES.map(d=>({...d}));
+let DEMANDES=[];
 const liste=document.getElementById('listeDemandes');
 let filtre='tous';
 function afficherDemandes(){
@@ -1297,17 +864,15 @@ function afficherDemandes(){
       el.querySelector('.annuler').addEventListener('click',()=>{ choix.hidden=true; principal.hidden=false; });
       btnConfirmer.addEventListener('click',async()=>{
         const creneaux=[...choix.querySelectorAll('input:checked')].map(i=>i.value);
-        if(enLigne()){
-          btnConfirmer.disabled=true;
-          const {error}=await sb.from('positionnements').insert({demande_id:d.id, creneaux});
-          if(error){ alert("Impossible de se positionner : "+error.message); btnConfirmer.disabled=false; return; }
-        }
+        btnConfirmer.disabled=true;
+        const {error}=await sb.from('positionnements').insert({demande_id:d.id, creneaux});
+        if(error){ alert("Impossible de se positionner : "+error.message); btnConfirmer.disabled=false; return; }
         d.moi=true; afficherDemandes();
       });
     }
     liste.appendChild(el);
   });
-  if(!liste.children.length) liste.innerHTML='<p class="note">Aucune demande pour ce filtre.</p>';
+  if(!liste.children.length) liste.innerHTML='<p class="note">'+(DEMANDES.length?'Aucune demande pour ce filtre.':'Aucune demande ouverte pour l\'instant. Reviens bientôt !')+'</p>';
 }
 document.querySelectorAll('.filtre').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.filtre').forEach(x=>x.setAttribute('aria-pressed','false'));
@@ -1315,134 +880,6 @@ document.querySelectorAll('.filtre').forEach(b=>b.addEventListener('click',()=>{
 }));
 slotsTuteur.addEventListener('change',()=>{ if(filtre==='dispo') afficherDemandes(); });
 afficherDemandes();
-
-/* ---------- calendrier ---------- */
-const SEMAINES=[
-  {label:"Semaine du 9 au 13 mars", dates:["9","10","11","12","13"], c:{
-    "r1-0":{d:["Ondes mécaniques (1re)"],t:2}, "s-0":{d:["Titrage colorimétrique (1re)","Mouvement d'un système (1re)"],t:3},
-    "r1-1":{d:["Titrage colorimétrique (1re)"],t:1}, "s-1":{d:["Énergie mécanique (1re)"],t:2},
-    "r1-2":{d:["Mouvement dans un champ uniforme (Tle)"],t:1,b:["Yanis D. ← Léa B."]}, "s-2":{d:["Cinétique chimique (Tle)"],t:0},
-    "r2-3":{d:["Mouvement dans un champ uniforme (Tle)"],t:0},
-    "s-3":{d:["Titrage colorimétrique (1re)","Énergie mécanique (1re)"],t:4,b:["Manon R. ← Adrien C.","Sofia N. ← Hugo L."]},
-    "r1-3":{d:["Ondes mécaniques (1re)"],t:0}, "r2-4":{d:["Ondes mécaniques (1re)"],t:1}, "s-4":{d:["Cinétique chimique (Tle)"],t:0}
-  }},
-  {label:"Semaine du 16 au 20 mars", dates:["16","17","18","19","20"], c:{
-    "s-0":{d:["Transformations nucléaires (Tle)"],t:0}, "s-1":{d:["Énergie mécanique (1re)"],t:2,b:["Sofia N. ← Hugo L."]},
-    "r1-2":{d:["Circuit RC (Tle)"],t:1}, "s-3":{d:["Lumière : images et couleurs (1re)"],t:3}
-  }}
-];
-let semaine=0, celluleActive=null;
-const cal=document.getElementById('cal'), calDetail=document.getElementById('calDetail');
-function afficherCal(){
-  const S=SEMAINES[semaine];
-  document.getElementById('semLabel').textContent=S.label;
-  document.getElementById('semPrev').disabled=semaine===0;
-  document.getElementById('semNext').disabled=semaine===SEMAINES.length-1;
-  let h='<thead><tr><th></th>'+JOURS.map((j,i)=>'<th>'+j+'. '+S.dates[i]+'</th>').join('')+'</tr></thead><tbody>';
-  LIGNES.forEach(L=>{
-    h+='<tr><th class="l">'+L.l+'<small>'+L.s+'</small></th>';
-    JOURS.forEach((j,i)=>{
-      const k=L.k+'-'+i, c=S.c[k];
-      if(!c){ h+='<td><div class="cell vide">—</div></td>'; return; }
-      const etat=c.b?'binome':c.t>0?'possible':'manque';
-      const titre=c.b?c.b.length+' binôme'+(c.b.length>1?'s':''):c.d.length+' demande'+(c.d.length>1?'s':'');
-      h+='<td><button class="cell '+etat+'" data-k="'+k+'" aria-pressed="false"><b>'+titre+'</b>'+
-        c.d.length+' dem. · '+c.t+' tuteur'+(c.t>1?'s':'')+' dispo</button></td>';
-    });
-    h+='</tr>';
-  });
-  cal.innerHTML=h+'</tbody>';
-  calDetail.hidden=true;
-  cal.querySelectorAll('button.cell').forEach(b=>b.addEventListener('click',()=>{
-    cal.querySelectorAll('button.cell').forEach(x=>x.setAttribute('aria-pressed','false'));
-    b.setAttribute('aria-pressed','true');
-    const k=b.dataset.k, c=S.c[k], L=LIGNES.find(l=>l.k===k.split('-')[0]), jour=+k.split('-')[1];
-    calDetail.innerHTML='<h4>'+JOURS[jour]+'. '+S.dates[jour]+' — '+L.l+'</h4>'+
-      '<ul>'+c.d.map(x=>'<li>Demande : '+x+'</li>').join('')+'</ul>'+
-      (c.b?'<p style="margin:8px 0 0"><b style="font-weight:600">Binômes validés :</b> '+c.b.join(', ')+' <span class="hint">(noms visibles par les professeurs seulement)</span></p>':'')+
-      '<p class="note" style="margin-top:8px">'+(c.t>0?c.t+' tuteur'+(c.t>1?'s':'')+' disponible'+(c.t>1?'s':'')+' sur ce créneau.':
-      'Aucun tuteur disponible : le professeur est prévenu.')+'</p>';
-    calDetail.hidden=false;
-  }));
-}
-document.getElementById('semPrev').addEventListener('click',()=>{semaine--;afficherCal();});
-document.getElementById('semNext').addEventListener('click',()=>{semaine++;afficherCal();});
-afficherCal();
-
-/* ---------- appariements ---------- */
-document.querySelectorAll('#pairs .mini').forEach(btn=>{
-  if(btn.classList.contains('ghost')) return;
-  btn.addEventListener('click',()=>{
-    const card=btn.closest('.pair');
-    card.classList.add('done');
-    const ok=document.createElement('span'); ok.className='ok'; ok.textContent='Validé';
-    card.appendChild(ok);
-    const el=raieEls[+card.dataset.raie];
-    if(el){ el.classList.add('paired','pulse'); setTimeout(()=>el.classList.remove('pulse'),900); }
-  });
-});
-
-/* ---------- bilan ---------- */
-const sA=document.getElementById('segAudio'), sT=document.getElementById('segTexte');
-const pA=document.getElementById('paneAudio'), pT=document.getElementById('paneTexte');
-sA.addEventListener('click',()=>{sA.setAttribute('aria-pressed','true');sT.setAttribute('aria-pressed','false');pA.hidden=false;pT.hidden=true;});
-sT.addEventListener('click',()=>{sT.setAttribute('aria-pressed','true');sA.setAttribute('aria-pressed','false');pT.hidden=false;pA.hidden=true;});
-
-const wave=document.getElementById('wave');
-for(let i=0;i<34;i++) wave.appendChild(document.createElement('i'));
-const rec=document.getElementById('rec'), recbtn=document.getElementById('recbtn'), timer=document.getElementById('timer');
-let running=false, left=90, id=null, enregistre=false;
-const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
-recbtn.addEventListener('click',()=>{
-  if(enregistre){ enregistre=false; left=90; timer.textContent=fmt(left); recbtn.textContent='Enregistrer'; return; }
-  if(!running){
-    running=true; rec.classList.add('on'); recbtn.classList.add('on');
-    recbtn.textContent='Arrêter'; left=90; timer.textContent=fmt(left);
-    id=setInterval(()=>{ left--; timer.textContent=fmt(left); if(left<=0) recbtn.click(); },1000);
-  } else {
-    running=false; clearInterval(id); rec.classList.remove('on'); recbtn.classList.remove('on');
-    const used=90-left;
-    timer.textContent=fmt(used)+' enregistré';
-    if(used>25){ recbtn.textContent='Recommencer'; enregistre=true; }
-    else recbtn.textContent='Reprendre — trop court';
-  }
-});
-
-/* ---------- signature ---------- */
-const pad=document.getElementById('pad');
-const ctx=pad.getContext('2d');
-let dessine=false, vide=true;
-function dimensionnerPad(){
-  const r=pad.getBoundingClientRect();
-  if(!r.width) return;
-  const image=vide?null:pad.toDataURL();
-  const ratio=window.devicePixelRatio||1;
-  pad.width=r.width*ratio; pad.height=r.height*ratio;
-  ctx.setTransform(ratio,0,0,ratio,0,0);
-  ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#151B2B';
-  if(image){ const i=new Image(); i.onload=()=>ctx.drawImage(i,0,0,r.width,r.height); i.src=image; }
-}
-function position(e){
-  const r=pad.getBoundingClientRect();
-  return {x:e.clientX-r.left, y:e.clientY-r.top};
-}
-function debut(e){ e.preventDefault(); dessine=true; vide=false; const p=position(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
-function trait(e){ if(!dessine) return; e.preventDefault(); const p=position(e); ctx.lineTo(p.x,p.y); ctx.stroke(); }
-function fin(){ dessine=false; }
-pad.addEventListener('pointerdown',debut);
-pad.addEventListener('pointermove',trait);
-window.addEventListener('pointerup',fin);
-window.addEventListener('resize',dimensionnerPad);
-document.getElementById('btnEffacer').addEventListener('click',()=>{
-  ctx.clearRect(0,0,pad.width,pad.height); vide=true;
-  document.getElementById('etatPdf').hidden=true;
-});
-document.getElementById('btnPdf').addEventListener('click',()=>{
-  const etat=document.getElementById('etatPdf');
-  etat.textContent = vide ? 'signature manquante' : 'attestation-marchand-2027.pdf';
-  etat.style.color = vide ? '#8A5D08' : 'var(--vert)';
-  etat.hidden=false;
-});
 
 /* ---------- correspondance identifiants ↔ noms (reste sur l'appareil) ---------- */
 const CLE_CORRESP='resonance-correspondance';
@@ -1488,18 +925,11 @@ document.getElementById('correspOublier').addEventListener('click',()=>{
 });
 
 /* ---------- données réelles (Supabase) ---------- */
-const tabDepots=document.getElementById('tabDepots'), DEMO_DEPOTS=tabDepots.innerHTML, DEMO_DISPOS=mesCreneaux();
+const tabDepots=document.getElementById('tabDepots');
 const LIB_BESOIN={ponctuel:'Ponctuel',duree:'Sur la durée'}, LIB_DUREE={min:'Quelques minutes',heure:'Une heure'};
 const LIB_STATUT={ouverte:['wait','sans tuteur'],positionnee:['live','tuteur positionné'],binome:['vert','binôme validé'],close:['','close']};
 const dateCourte=s=>s?new Date(s).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'';
 
-function restaurerDemo(){
-  DEMANDES=DEMO_DEMANDES.map(d=>({...d}));
-  tabDepots.innerHTML=DEMO_DEPOTS;
-  slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=DEMO_DISPOS.includes(i.value));
-  afficherDemandes();
-  construireSpectre(raies);
-}
 async function chargerDonneesReelles(){
   txtA.value=''; majCompteur();
   document.querySelectorAll('#v-demande .chips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));
@@ -1620,7 +1050,7 @@ lireCorresp();
     if(data.session){ session=data.session; await entrer(); return; }
   }
   appliquerRole('visiteur');
-  dlgLogin.showModal();
+  ouvrirConnexion();
 })();
 </script>
 </body>
