@@ -703,10 +703,10 @@ whoBtn.addEventListener('click',async()=>{
   if(session){ await sb.auth.signOut(); location.reload(); return; }
   ouvrirConnexion();
 });
-/* « Première 2 », « 1re spé 2 » → 1 ; « Terminale 1 », « Tle spé 1 » → 0 ; sinon inconnu. */
+/* « B3_P_3_PH-CH_CASTEL2 », « 1re spé 2 » → 1 ; « B1_T_3_PH-CH_VANHOORDE », « Tle spé 1 » → 0 ; sinon inconnu. */
 function niveauDeClasse(c){
   c=String(c||'').trim();
-  return /^(1|p)/i.test(c)?1:/^t/i.test(c)?0:null;
+  return /_P_/i.test(c)||/^(1|p)/i.test(c)?1:/_T_/i.test(c)||/^t/i.test(c)?0:null;
 }
 async function entrer(){
   appliquerRole(roleDeSession(session));
