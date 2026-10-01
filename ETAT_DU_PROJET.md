@@ -68,7 +68,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 - [x] Premier lancement réel de `generer_identifiants.py` : coupons et registres créés (19/09/2026).
 - [x] Coupons distribués aux élèves de première (22/09/2026). Inscription des terminales de M. Van Hoorde le 23/09/2026.
-- [ ] Trombinoscope de la collègue : à traiter plus tard avec `generer_identifiants.py`.
+- [x] Trombinoscope de Mme Husson traité : coupons élèves et compte enseignant `PR-…` créés, import Supabase fait (01/10/2026).
 - [ ] Suivre `supabase/MISE_EN_PLACE.md` :
   - fermer l'inscription libre ;
   - lancer `schema.sql` ;
@@ -93,6 +93,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
+- **01/10/2026** — Classe de Mme Husson (`B2_P_3_PH-CH_HUSSON`) ajoutée : coupons élèves, compte enseignant, import dans Supabase.
 - **22/09/2026** — Site nettoyé de sa présentation (maquette, exemples, mode visiteur, onglets non branchés) et horaires du CDI intégrés, avant l'inscription des terminales.
 - **19/09/2026** — Mise en ligne de la maquette v2, puis de la v3.
 - **19/09/2026** — Ajout du script d'analyse et du générateur d'identifiants, du `.gitignore` et de ce fichier.
