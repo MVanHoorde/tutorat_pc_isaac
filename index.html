@@ -936,8 +936,13 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
   if(!window.XLSX){ alert("Le lecteur de fichiers Excel n'est pas chargé : vérifiez la connexion Internet."); return; }
   try{
     const wb=XLSX.read(await f.arrayBuffer());
-    const eleves={};
-    XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]).forEach(l=>{
+    const eleves={}, ws=wb.Sheets[wb.SheetNames[0]];
+    // Plage recalculée d'après les cellules réelles : celle déclarée dans le fichier peut être périmée
+    // (fichier complété par un script), et la lecture s'arrêterait alors avant les dernières lignes.
+    const cases=Object.keys(ws).filter(k=>k[0]!=='!').map(k=>XLSX.utils.decode_cell(k));
+    if(cases.length) ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},
+      e:{r:Math.max(...cases.map(c=>c.r)), c:Math.max(...cases.map(c=>c.c))}});
+    XLSX.utils.sheet_to_json(ws).forEach(l=>{
       if(l['Identifiant']) eleves[String(l['Identifiant']).trim()]=((l['Prénom']||'')+' '+(l['Nom']||'')).trim();
     });
     if(!Object.keys(eleves).length) throw new Error("aucune colonne « Identifiant » trouvée");

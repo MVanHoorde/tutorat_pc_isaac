@@ -112,6 +112,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
+- **08/10/2026** — Correction : la correspondance s'arrêtait à 78 personnes (élèves de Mme Husson absents), car le fichier déclarait une plage de cellules périmée. Le site recalcule désormais la plage d'après les cellules réelles.
 - **08/10/2026** — Notifications sur les tablettes : écran d'accueil, service worker, fonction `notifier`, migration `003`.
 - **08/10/2026** — Validation des binômes par l'enseignant, liste des séances à venir, avis de séance pour les élèves à la connexion.
 - **01/10/2026** — Classe de Mme Husson (`B2_P_3_PH-CH_HUSSON`) ajoutée : coupons élèves, compte enseignant, import dans Supabase.
