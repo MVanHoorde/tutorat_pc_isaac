@@ -2,7 +2,7 @@
 
 Tutorat entre pairs en physique-chimie (première et terminale spécialité), lycée Isaac de l'Étoile, Poitiers.
 
-*Dernière mise à jour : 22 septembre 2026*
+*Dernière mise à jour : 8 octobre 2026*
 
 ## En ligne
 
@@ -20,6 +20,9 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `supabase/schema.sql` | Tables et règles d'accès de la base (élève / enseignant) |
 | `supabase/functions/premiere-connexion/` | Fonction Supabase : première connexion avec le mot de passe du coupon |
 | `supabase/MISE_EN_PLACE.md` | Les étapes à suivre dans Supabase, dans l'ordre |
+| `sw.js`, `manifest.webmanifest`, `icone-*.png` | Résonance sur l'écran d'accueil de l'iPad, et réception des notifications |
+| `supabase/functions/notifier/` | Fonction Supabase : envoie les notifications (séance validée ou annulée, essai) |
+| `supabase/migrations/` | Modifications de la base à coller dans Supabase, dans l'ordre |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public |
 | `ETAT_DU_PROJET.md` | Ce fichier |
 
@@ -49,6 +52,19 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Onglets retirés tant qu'ils ne sont pas branchés : Calendrier, Bilan de séance, Fin de période (et le pop-up de retour). Leur maquette reste dans l'historique git (commit `2a26f9e`).
   - Le niveau (première / terminale) est présélectionné d'après la classe du compte ; le menu des groupes est supprimé.
   - Horaires du CDI dans les grilles et le pied de page (voir ci-dessous).
+
+- **Validation des binômes** (08/10/2026) : branchée sur la table `seances` existante, sans changement dans Supabase.
+  - Tableau de bord : bouton « Valider ce binôme » pour chaque tuteur positionné ou disponible, et « Associer un autre élève… » pour choisir n'importe quel élève par son identifiant (liste avec les noms si la correspondance est chargée).
+  - On choisit le créneau et la date (le prochain jour du créneau est proposé). La demande passe à « binôme validé ».
+  - Liste « Séances validées à venir », avec annulation (la demande redevient à apparier).
+  - Côté élève : un encadré en haut de page, dès la connexion, annonce la date, l'horaire, le chapitre et le rôle (« tu aides » / « un tuteur t'aide »), sans le nom de l'autre. Le professeur prévient les élèves de qui est leur binôme.
+
+- **Notifications sur les tablettes** (08/10/2026), écrites mais **pas encore activées** (étape 6 de `supabase/MISE_EN_PLACE.md`).
+  - Résonance s'installe sur l'écran d'accueil de l'iPad, avec sa propre icône.
+  - Ouvert depuis cette icône, il propose « Activer les notifications ». Sinon, un bandeau explique comment l'ajouter à l'écran d'accueil.
+  - Les deux élèves reçoivent une notification quand une séance est validée ou annulée : date, horaire, chapitre et rôle, jamais de nom. Après validation, l'enseignant voit qui l'a reçue.
+  - Bouton « Envoyer un essai » pour vérifier un appareil. À la déconnexion, l'appareil ne reçoit plus les notifications du compte.
+  - Clés d'envoi déjà dans les secrets Supabase ; la clé privée n'est écrite nulle part ailleurs.
 
 ## Horaires et lieu (CDI, septembre 2026)
 
@@ -81,7 +97,10 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Chapitres de première : progression de Mme Castel (liste à fournir).
 - [ ] Classes à afficher : « Première spé — Mme Castel » et « Terminale spé — M. Van Hoorde », sans numéro de groupe.
 - [ ] « Pressant » : exiger une évaluation à plus de trois jours, sans révision de dernière minute (demande de Mme Castel, à préciser).
-- [ ] Validation des binômes : décider comment les deux élèves savent avec qui ils ont rendez-vous, puisque les noms ne sont pas en ligne.
+- [x] Validation des binômes : le prof valide sur le site ; les élèves voient la séance à leur connexion, le prof leur dit avec qui (08/10/2026).
+- [ ] Notifications : coller la migration `003` et déployer la fonction `notifier` (étape 6 de `MISE_EN_PLACE.md`), puis tester avec les élèves la semaine du 12/10/2026. En attendant, et pour donner le nom du binôme : message École Directe.
+- [ ] Vérifier que les iPads du lycée (s'ils sont gérés par l'établissement) autorisent les notifications des sites ajoutés à l'écran d'accueil.
+- [ ] Plusieurs séances pour une même demande « sur la durée » (aujourd'hui : une séance par validation).
 - [ ] Remettre une demande à « ouverte » quand tous les tuteurs se sont retirés.
 - [x] Horaires : réglés avec le CDI (22/09/2026), voir « Horaires et lieu ».
 - [ ] Salle : CDI 2 ou CDI 1, à redéfinir plus tard avec le CDI.
@@ -93,6 +112,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
+- **08/10/2026** — Notifications sur les tablettes : écran d'accueil, service worker, fonction `notifier`, migration `003`.
+- **08/10/2026** — Validation des binômes par l'enseignant, liste des séances à venir, avis de séance pour les élèves à la connexion.
 - **01/10/2026** — Classe de Mme Husson (`B2_P_3_PH-CH_HUSSON`) ajoutée : coupons élèves, compte enseignant, import dans Supabase.
 - **22/09/2026** — Site nettoyé de sa présentation (maquette, exemples, mode visiteur, onglets non branchés) et horaires du CDI intégrés, avant l'inscription des terminales.
 - **19/09/2026** — Mise en ligne de la maquette v2, puis de la v3.

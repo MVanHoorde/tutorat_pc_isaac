@@ -49,10 +49,22 @@ Pour chaque nouvel enseignant et chaque nouvelle classe, relancez le script et r
 2. Dans **Tableau de bord → Correspondance**, chargez `correspondance_resonance.xlsx`.
 3. Connectez-vous avec un coupon élève (`PC-…`), déposez une demande, puis vérifiez qu'elle apparaît chez l'enseignant avec le nom de l'élève.
 
+## 6. Notifications sur les tablettes (octobre 2026)
+
+Les clés d'envoi (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) sont déjà enregistrées dans **Edge Functions → Secrets**. Ne les modifiez pas : la clé publique est aussi écrite dans `index.html`.
+
+1. **SQL Editor → New query** : collez `supabase/migrations/003_notifications.sql`, puis **Run**.
+2. Déployez la fonction `notifier`, au choix :
+   - dans un terminal, depuis le dossier du projet : `supabase functions deploy notifier --project-ref mnqcmjmypkleptbmqtws --use-api` ;
+   - ou dans **Edge Functions → Deploy a new function → Via Editor** : nom **`notifier`**, collez `supabase/functions/notifier/index.ts`, puis **Deploy**.
+3. Laissez **« Verify JWT »** activé : seuls les comptes connectés peuvent l'appeler.
+4. Essai : sur un iPad (iPadOS 16.4 ou plus), ouvrez le site dans Safari, puis **Partager → Sur l'écran d'accueil**. Ouvrez Résonance depuis l'icône, connectez-vous, touchez **Activer les notifications**, puis **Envoyer un essai**.
+
 ## Où sont les données
 
 | Donnée | Emplacement |
 |---|---|
 | Identifiants, classes, demandes, disponibilités, positionnements | Supabase (Paris) |
 | Mots de passe | Supabase Auth, sous forme d'empreinte uniquement |
+| Abonnements aux notifications (adresse technique de l'appareil, sans nom) | Supabase (Paris) ; envoi par le service de notification d'Apple ou de Google |
 | Noms et prénoms | Le fichier Excel dans OneDrive, et la mémoire de l'appareil de l'enseignant qui l'a chargé |

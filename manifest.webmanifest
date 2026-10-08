@@ -1,0 +1,14 @@
+{
+  "name": "Résonance — tutorat en physique-chimie",
+  "short_name": "Résonance",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#131A2E",
+  "theme_color": "#131A2E",
+  "lang": "fr",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

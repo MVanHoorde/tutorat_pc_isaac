@@ -7,6 +7,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Résonance">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#131A2E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="icon" type="image/png" href="icone-192.png">
 <title>Résonance — tutorat en physique-chimie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -237,6 +242,22 @@ body:not(.role-eleve) .eleve-seul{display:none}
 .mini.ghost:disabled{background:#fff;color:#9AA3B2;border-color:var(--rule)}
 .role-seg{margin:0 0 20px}
 
+.valider{margin:12px 0 0;padding:12px 14px;background:var(--soft);border-radius:10px}
+.valider .champs{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin:0 0 12px}
+.valider .champs label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:4px}
+.valider select,.valider input{width:auto;min-width:160px;padding:7px 9px;font-size:14px}
+.appar .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tut .mini{padding:4px 10px;font-size:13px}
+.notif{border-radius:12px;padding:14px 16px;margin:24px 0 -12px;background:#FFE6F0;border:1px solid #F7B5D0;color:#5E0E33;font-size:14.5px}
+.notif b{font-weight:600}
+.notif .s{display:flex;gap:10px;align-items:baseline;padding:4px 0}
+.notif .note{color:#7A3A58;margin:6px 0 0}
+
+.rolebar.alerte{background:#FFF8EA;border-color:#EBD3A0;color:#5C3D05;flex-wrap:wrap;align-items:center}
+.rolebar.alerte.ok{background:#E2F3EA;border-color:#B5DEC8;color:#1E6E48}
+.rolebar.alerte .txt{flex:1 1 280px}
+.rolebar.alerte .mini{padding:6px 12px;font-size:13.5px}
+
 #accueil{padding-top:36px}
 #accueil h2{margin-bottom:10px}
 
@@ -275,6 +296,8 @@ body:not(.role-eleve) .eleve-seul{display:none}
 <main class="wrap">
 
 <div class="rolebar" id="rolebar" hidden></div>
+<div class="notif" id="mesSeances" role="status" hidden></div>
+<div class="rolebar alerte" id="blocNotif" hidden></div>
 
 <!-- ================= ACCUEIL (non connecté) ================= -->
 <section id="accueil">
@@ -413,6 +436,12 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <p class="lede">Pour chaque demande ouverte : les tuteurs qui se sont positionnés, et ceux qui sont disponibles sur les
     mêmes créneaux. Les créneaux en vert sont communs à l'élève et au tuteur.</p>
     <div id="appariements"><p class="note">Chargement…</p></div>
+    <datalist id="listeEleves"></datalist>
+
+    <h3>Séances validées à venir</h3>
+    <p class="lede" style="margin-bottom:8px">Les deux élèves les voient en haut de leur page à leur prochaine connexion
+    (date, horaire, chapitre, rôle), sans le nom de l'autre : c'est à vous de leur dire avec qui.</p>
+    <div id="seancesProf"><p class="note">Chargement…</p></div>
 
     <h3>Disponibilités déclarées par les tuteurs</h3>
     <div id="dispoTuteurs"><p class="note">Chargement…</p></div>
@@ -700,7 +729,7 @@ dlgLogin.addEventListener('close',()=>{ if(dlgLogin.returnValue==='login' && ses
 document.getElementById('btnAccueil').addEventListener('click',ouvrirConnexion);
 whoBtn.addEventListener('click',async()=>{
   // Déconnexion : on recharge la page pour ne rien laisser du compte précédent à l'écran.
-  if(session){ await sb.auth.signOut(); location.reload(); return; }
+  if(session){ await oublierAppareil(); await sb.auth.signOut(); location.reload(); return; }
   ouvrirConnexion();
 });
 /* « B3_P_3_PH-CH_CASTEL2 », « 1re spé 2 » → 1 ; « B1_T_3_PH-CH_VANHOORDE », « Tle spé 1 » → 0 ; sinon inconnu. */
@@ -712,6 +741,7 @@ async function entrer(){
   appliquerRole(roleDeSession(session));
   const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
   if(role==='eleve' && n!==null) remplirNiveau(n);
+  majBlocNotif();
   await chargerDonneesReelles();
 }
 
@@ -947,7 +977,7 @@ async function chargerDonneesReelles(){
   afficherDemandes();
   spectreReel(DEMANDES);
   if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements()]);
-  if(role==='eleve') await chargerMesDemandes();
+  if(role==='eleve') await Promise.all([chargerMesDemandes(), chargerMesSeances()]);
 }
 
 /* ---------- appariement (enseignant) ---------- */
@@ -955,36 +985,69 @@ const chipsCren=(liste,communs=[])=>(liste||[]).length
   ? liste.map(k=>'<span class="cren'+(communs.includes(k)?' commun':'')+'">'+esc(libCreneau(k))+'</span>').join('')
   : '<span class="hint">aucun</span>';
 const communs=(a,b)=>(a||[]).filter(k=>(b||[]).includes(k));
+/* « s-0 » → « Séance 15 h 15 – 16 h 20 » ; date ISO → « lundi 12 octobre » */
+const horaireCreneau=k=>{ const L=LIGNES.find(x=>x.k===String(k).split('-')[0]); return L?L.l:k; };
+const dateLongue=s=>new Date(s+'T12:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+const isoLocal=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const aujourdhui=()=>isoLocal(new Date());
+/* Prochain jour (aujourd'hui compris) correspondant au créneau : « s-0 » → prochain lundi. */
+function prochaineDate(k){
+  const j=+String(k).split('-')[1], d=new Date();
+  while(d.getDay()!==j+1) d.setDate(d.getDate()+1);
+  return isoLocal(d);
+}
+let APPAR={demandes:[],positionnements:[],eleves:[]};
 async function chargerAppariements(){
   const zone=document.getElementById('appariements'), zoneDispo=document.getElementById('dispoTuteurs');
-  const [rd,rp,rdis]=await Promise.all([
+  const [rd,rp,rdis,rel,rs]=await Promise.all([
     sb.from('demandes').select('id,niveau,chapitre,creneaux,urgent,date_eval,besoin,duree,statut,auteur,profils!demandes_auteur_fkey(identifiant,classe)')
       .in('statut',['ouverte','positionnee']).order('urgent',{ascending:false}).order('cree_le'),
     sb.from('positionnements').select('demande_id,creneaux,tuteur,profils(identifiant,classe)'),
-    sb.from('disponibilites').select('eleve,creneaux,maj_le,profils(identifiant,classe)')
+    sb.from('disponibilites').select('eleve,creneaux,maj_le,profils(identifiant,classe)'),
+    sb.from('profils').select('id,identifiant,classe').eq('role','eleve').order('identifiant'),
+    sb.from('seances').select('id,demande_id,tuteur,tutores,chapitre,creneau,jour').gte('jour',aujourdhui()).order('jour')
   ]);
-  const err=rd.error||rp.error||rdis.error;
+  const err=rd.error||rp.error||rdis.error||rel.error||rs.error;
   if(err){ zone.innerHTML='<p class="note">Erreur : '+esc(err.message)+'</p>'; zoneDispo.innerHTML=''; return; }
+  APPAR={demandes:rd.data, positionnements:rp.data, eleves:rel.data};
   const dispos=rdis.data.filter(x=>x.creneaux && x.creneaux.length);
+  const parId=Object.fromEntries(rel.data.map(p=>[p.id,p]));
+  document.getElementById('listeEleves').innerHTML=rel.data.map(p=>{
+    const n=corresp && corresp.eleves[p.identifiant];
+    return '<option value="'+esc(p.identifiant)+'">'+esc((n?n+' — ':'')+(p.classe||''))+'</option>';
+  }).join('');
 
   zone.innerHTML=rd.data.length ? rd.data.map(d=>{
     const auteur=d.profils||{};
     const positionnes=rp.data.filter(p=>p.demande_id===d.id);
     const idsPos=positionnes.map(p=>p.tuteur);
     const autres=dispos.filter(x=>x.eleve!==d.auteur && !idsPos.includes(x.eleve) && communs(x.creneaux,d.creneaux).length);
-    const ligneTuteur=(profil,cr)=>'<div class="tut">'+nomAffiche(profil&&profil.identifiant)+
-      ' <span class="hint">'+esc(profil&&profil.classe||'')+'</span> '+chipsCren(communs(cr,d.creneaux),communs(cr,d.creneaux))+'</div>';
-    return '<div class="appar'+(d.niveau===0?' tle':'')+'">'+
+    const ligneTuteur=(uuid,profil,cr)=>'<div class="tut">'+nomAffiche(profil&&profil.identifiant)+
+      ' <span class="hint">'+esc(profil&&profil.classe||'')+'</span> '+chipsCren(communs(cr,d.creneaux),communs(cr,d.creneaux))+
+      ' <button class="mini valid" data-d="'+d.id+'" data-t="'+esc(uuid)+'">Valider ce binôme</button></div>';
+    return '<div class="appar'+(d.niveau===0?' tle':'')+'" data-d="'+d.id+'">'+
       '<p class="t1">'+nomAffiche(auteur.identifiant)+' <span class="hint">'+esc(auteur.classe||'')+'</span> · <b>'+esc(d.chapitre)+'</b>'+
         (d.urgent?' <span class="badge wait">pressant'+(d.date_eval?' — éval. le '+dateCourte(d.date_eval):'')+'</span>':'')+
         ' <span class="badge">'+esc(((LIB_BESOIN[d.besoin]||'')+' · '+(LIB_DUREE[d.duree]||'')).toLowerCase())+'</span></p>'+
       '<p class="ligne"><b>Créneaux demandés :</b> '+chipsCren(d.creneaux)+'</p>'+
       '<p class="ligne"><b>Tuteurs positionnés :</b></p>'+
-        (positionnes.length?positionnes.map(p=>ligneTuteur(p.profils,p.creneaux)).join(''):'<div class="tut hint">personne pour l\'instant</div>')+
+        (positionnes.length?positionnes.map(p=>ligneTuteur(p.tuteur,p.profils,p.creneaux)).join(''):'<div class="tut hint">personne pour l\'instant</div>')+
       '<p class="ligne"><b>Autres tuteurs disponibles sur ces créneaux :</b></p>'+
-        (autres.length?autres.map(x=>ligneTuteur(x.profils,x.creneaux)).join(''):'<div class="tut hint">aucun</div>')+
+        (autres.length?autres.map(x=>ligneTuteur(x.eleve,x.profils,x.creneaux)).join(''):'<div class="tut hint">aucun</div>')+
+      '<div class="acts"><button class="mini ghost manuel" data-d="'+d.id+'">Associer un autre élève…</button></div>'+
+      '<div class="valider" hidden></div>'+
     '</div>';
   }).join('') : '<p class="note">Aucune demande ouverte pour l\'instant.</p>';
+
+  const zoneSeances=document.getElementById('seancesProf');
+  const nomDe=uuid=>nomAffiche(parId[uuid]&&parId[uuid].identifiant);
+  zoneSeances.innerHTML=rs.data.length
+    ? '<div class="tscroll"><table class="t"><thead><tr><th>Quand</th><th>Tuteur</th><th>Élève aidé</th><th>Chapitre</th><th></th></tr></thead><tbody>'+
+      rs.data.map(s=>'<tr><td>'+esc(dateLongue(s.jour))+'<br><span class="hint">'+esc(horaireCreneau(s.creneau))+'</span></td><td>'+
+        nomDe(s.tuteur)+'</td><td>'+(s.tutores||[]).map(nomDe).join('<br>')+'</td><td>'+esc(s.chapitre)+'</td><td>'+
+        '<button class="mini ghost annulerSeance" data-s="'+s.id+'" data-d="'+(s.demande_id||'')+'">Annuler</button></td></tr>').join('')+
+      '</tbody></table></div>'
+    : '<p class="note">Aucune séance validée à venir.</p>';
 
   zoneDispo.innerHTML=dispos.length
     ? '<div class="tscroll"><table class="t"><thead><tr><th>Tuteur</th><th>Classe</th><th>Créneaux</th><th>Mis à jour</th></tr></thead><tbody>'+
@@ -992,6 +1055,89 @@ async function chargerAppariements(){
         chipsCren(x.creneaux)+'</td><td>'+dateCourte(x.maj_le)+'</td></tr>').join('')+'</tbody></table></div>'
     : '<p class="note">Aucun élève n\'a encore déclaré de disponibilités de tuteur.</p>';
 }
+/* Validation d'un binôme : le tuteur est soit choisi dans la liste (data-t), soit saisi (« Associer un autre élève »). */
+function ouvrirValidation(carte, d, tuteurUuid){
+  const box=carte.querySelector('.valider');
+  const pos=APPAR.positionnements.find(p=>p.demande_id===d.id && p.tuteur===tuteurUuid);
+  const crTuteur=pos?pos.creneaux:[];
+  const demandes=d.creneaux||[];
+  const tous=LIGNES.flatMap(L=>L.jours.map(j=>L.k+'-'+j)).filter(k=>!demandes.includes(k));
+  const opt=k=>'<option value="'+esc(k)+'">'+esc(libCreneau(k))+(crTuteur.includes(k)?' ✓ commun':'')+'</option>';
+  const ordonnes=[...demandes.filter(k=>crTuteur.includes(k)),...demandes.filter(k=>!crTuteur.includes(k))];
+  const tuteur=APPAR.eleves.find(p=>p.id===tuteurUuid);
+  box.innerHTML='<div class="champs">'+
+    (tuteur?'<label>Tuteur<span style="font-weight:400">'+nomAffiche(tuteur.identifiant)+'</span></label>'
+           :'<label>Tuteur (identifiant)<input type="text" class="vTuteur" list="listeEleves" placeholder="PC-XXXXX" style="font-family:var(--mono);text-transform:uppercase" autocapitalize="characters"></label>')+
+    '<label>Créneau<select class="vCren">'+
+      (ordonnes.length?'<optgroup label="Demandés par l\'élève">'+ordonnes.map(opt).join('')+'</optgroup>':'')+
+      '<optgroup label="Autres créneaux">'+tous.map(opt).join('')+'</optgroup></select></label>'+
+    '<label>Date<input type="date" class="vJour"></label></div>'+
+    '<div class="acts" style="margin:0"><button class="mini vOk">Confirmer le binôme</button><button class="mini ghost vNon">Annuler</button></div>';
+  box.hidden=false;
+  const sel=box.querySelector('.vCren'), jour=box.querySelector('.vJour');
+  jour.min=aujourdhui();
+  const majJour=()=>jour.value=prochaineDate(sel.value);
+  sel.addEventListener('change',majJour); majJour();
+  box.querySelector('.vNon').addEventListener('click',()=>{ box.hidden=true; box.innerHTML=''; });
+  const ok=box.querySelector('.vOk');
+  ok.addEventListener('click',async()=>{
+    let tid=tuteurUuid;
+    if(!tid){
+      const saisi=box.querySelector('.vTuteur').value.trim().toUpperCase();
+      const p=APPAR.eleves.find(x=>x.identifiant===saisi);
+      if(!p){ alert("Identifiant inconnu : "+saisi); return; }
+      tid=p.id;
+    }
+    if(tid===d.auteur){ alert("Le tuteur ne peut pas être l'élève qui a fait la demande."); return; }
+    if(!jour.value){ alert("Choisissez une date."); return; }
+    if(new Date(jour.value+'T12:00').getDay()!==+sel.value.split('-')[1]+1 &&
+       !confirm("La date choisie ne tombe pas le jour du créneau. Valider quand même ?")) return;
+    ok.disabled=true;
+    const {data:seance,error}=await sb.from('seances').insert({demande_id:d.id, tuteur:tid, tutores:[d.auteur], chapitre:d.chapitre, creneau:sel.value, jour:jour.value})
+      .select('id').single();
+    if(error){ alert("Binôme non enregistré : "+error.message); ok.disabled=false; return; }
+    const r=await sb.from('demandes').update({statut:'binome'}).eq('id',d.id);
+    if(r.error) alert("Séance enregistrée, mais le statut de la demande n'a pas été mis à jour : "+r.error.message);
+    const envoi=await prevenir({seance_id:seance.id});
+    const recu=id=>envoi.atteints.includes(id)?'oui':'non';
+    alert('Binôme validé.\n'+(envoi
+      ? 'Notification reçue — tuteur : '+recu(tid)+' · élève aidé : '+recu(d.auteur)+'.'
+      : 'Les notifications n\'ont pas pu être envoyées.')+
+      '\nLes deux élèves verront aussi la séance à leur prochaine connexion. Pensez à leur dire avec qui (École Directe).');
+    await chargerDonneesReelles();
+  });
+}
+document.getElementById('appariements').addEventListener('click',e=>{
+  const b=e.target.closest('.valid,.manuel'); if(!b) return;
+  const d=APPAR.demandes.find(x=>x.id===+b.dataset.d); if(!d) return;
+  ouvrirValidation(b.closest('.appar'), d, b.dataset.t||null);
+});
+document.getElementById('seancesProf').addEventListener('click',async e=>{
+  const b=e.target.closest('.annulerSeance'); if(!b) return;
+  if(!confirm("Annuler cette séance ? Les deux élèves ne la verront plus, et la demande redevient à apparier.")) return;
+  b.disabled=true;
+  await prevenir({seance_id:+b.dataset.s, annulation:true});
+  const {error}=await sb.from('seances').delete().eq('id',+b.dataset.s);
+  if(error){ alert("Impossible d'annuler : "+error.message); b.disabled=false; return; }
+  if(b.dataset.d){
+    const {count}=await sb.from('positionnements').select('tuteur',{count:'exact',head:true}).eq('demande_id',+b.dataset.d);
+    await sb.from('demandes').update({statut:count?'positionnee':'ouverte'}).eq('id',+b.dataset.d).eq('statut','binome');
+  }
+  await chargerDonneesReelles();
+});
+
+/* ---------- séances à venir (élève) : l'avis affiché à la connexion ---------- */
+async function chargerMesSeances(){
+  const zone=document.getElementById('mesSeances');
+  const {data,error}=await sb.from('seances').select('id,tuteur,chapitre,creneau,jour').gte('jour',aujourdhui()).order('jour');
+  if(error || !data.length){ zone.hidden=true; zone.innerHTML=''; return; }
+  zone.innerHTML='<b>📅 '+(data.length>1?'Tes séances de tutorat validées':'Ta séance de tutorat est validée')+'</b>'+
+    data.map(s=>'<div class="s"><span><b>'+esc(dateLongue(s.jour))+'</b>, '+esc(horaireCreneau(s.creneau).toLowerCase())+
+      ' — '+(s.tuteur===session.user.id?'tu aides un camarade':'un tuteur t\'aide')+' sur <i>'+esc(s.chapitre)+'</i></span></div>').join('')+
+    '<p class="note">Au CDI, salle CDI 2. Ton professeur te dit avec qui. Si tu ne peux pas venir, préviens-le au plus vite.</p>';
+  zone.hidden=false;
+}
+
 document.getElementById('actualiser').addEventListener('click',async e=>{
   const b=e.currentTarget; b.disabled=true;
   await chargerDonneesReelles(); b.disabled=false;
@@ -1038,6 +1184,90 @@ async function chargerDepots(){
     return '<tr><td>'+nomAffiche(p.identifiant)+'</td><td>'+esc(p.classe)+'</td><td>'+esc(d.chapitre)+'</td><td>Demande</td><td>'+
       besoin+'</td><td><span class="badge '+st[0]+'">'+esc(st[1])+'</span></td></tr>';
   }).join('');
+}
+
+/* ---------- notifications sur l'appareil (Web Push) ----------
+   Sur iPad, elles ne marchent que si Résonance est ouvert depuis son icône de l'écran d'accueil (iPadOS 16.4 ou plus).
+   La clé privée correspondante est dans les secrets Supabase de la fonction « notifier ». */
+const VAPID_PUBLIC="BIv2flnJSfE7mNGuiRcbqJxN6McdhkAxqSBx4NKiyES8wURKuwDUhxWeTLEWFG71cBSnHIIh67OUb7So5SOPIwc";
+const blocNotif=document.getElementById('blocNotif');
+const pushPossible=()=>'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const estIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const ecranAccueil=()=>navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+let notifPlusTard=false;
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+function cleVapid(){
+  const b=atob(VAPID_PUBLIC.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-VAPID_PUBLIC.length%4)%4));
+  return Uint8Array.from(b,c=>c.charCodeAt(0));
+}
+async function abonnerAppareil(){
+  const reg=await navigator.serviceWorker.ready;
+  const abo=(await reg.pushManager.getSubscription())||
+    await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:cleVapid()});
+  const j=abo.toJSON();
+  const {error}=await sb.rpc('enregistrer_abonnement',{p_endpoint:j.endpoint, p_p256dh:j.keys.p256dh, p_auth:j.keys.auth});
+  if(error) throw error;
+}
+/* À la déconnexion : l'appareil ne doit plus recevoir les notifications de ce compte. */
+async function oublierAppareil(){
+  try{
+    const reg='serviceWorker' in navigator && await navigator.serviceWorker.getRegistration();
+    const abo=reg && reg.pushManager && await reg.pushManager.getSubscription();
+    if(abo) await sb.from('abonnements_push').delete().eq('endpoint',abo.endpoint);
+  }catch(e){}
+}
+function montrerBlocNotif(ok, texte, boutons){
+  blocNotif.className='rolebar alerte'+(ok?' ok':'');
+  blocNotif.innerHTML='<span aria-hidden="true">🔔</span><span class="txt">'+texte+'</span>'+(boutons||'');
+  blocNotif.hidden=false;
+}
+async function majBlocNotif(){
+  blocNotif.hidden=true;
+  if(!enLigne() || notifPlusTard) return;
+  const quand=role==='prof'?'pour tester l\'envoi sur votre iPad':'quand ton professeur valide une séance de tutorat';
+  const plusTard='<button class="mini ghost nPlusTard">Plus tard</button>';
+  if(!pushPossible()){
+    if(estIOS() && !ecranAccueil()) montrerBlocNotif(false,
+      '<b>Notifications</b> '+quand+' : touche <b>Partager</b> (le carré avec la flèche) puis <b>« Sur l\'écran d\'accueil »</b>. '+
+      'Ouvre ensuite Résonance depuis cette icône et reconnecte-toi.', plusTard);
+    return;
+  }
+  if(Notification.permission==='denied'){
+    montrerBlocNotif(false,'<b>Notifications bloquées sur cet appareil.</b> Pour les autoriser : Réglages → Notifications → Résonance.', plusTard);
+    return;
+  }
+  if(Notification.permission==='granted'){
+    try{ await abonnerAppareil(); }
+    catch(e){ montrerBlocNotif(false,'Les notifications n\'ont pas pu être activées ('+esc(e.message)+').','<button class="mini nActiver">Réessayer</button>'+plusTard); return; }
+    montrerBlocNotif(true,'<b>Notifications activées sur cet appareil.</b>','<button class="mini ghost nEssai">Envoyer un essai</button>');
+    return;
+  }
+  montrerBlocNotif(false,'<b>Reçois une notification</b> '+quand+'.','<button class="mini nActiver">Activer les notifications</button>'+plusTard);
+}
+blocNotif.addEventListener('click',async e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.classList.contains('nPlusTard')){ notifPlusTard=true; blocNotif.hidden=true; return; }
+  b.disabled=true;
+  if(b.classList.contains('nActiver')){
+    // La demande d'autorisation doit partir directement du geste (exigence de Safari).
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){ majBlocNotif(); return; }
+  }
+  if(b.classList.contains('nEssai')){
+    const r=await prevenir({test:true});
+    alert(!r?"L'envoi n'a pas fonctionné : la fonction de notification n'est peut-être pas encore installée."
+      :r.atteints.length?"Essai envoyé : la notification doit apparaître dans quelques secondes."
+      :"Aucun appareil enregistré pour ce compte : désactivez puis réactivez les notifications.");
+    b.disabled=false; return;
+  }
+  majBlocNotif();
+});
+/* Appelle la fonction « notifier » ; renvoie {atteints, non_atteints} (comptes), ou null si l'envoi a échoué. */
+async function prevenir(corps){
+  try{
+    const {data,error}=await sb.functions.invoke('notifier',{body:corps});
+    return error||!data||!data.ok?null:data;
+  }catch(e){ return null; }
 }
 
 /* ---------- démarrage ---------- */
