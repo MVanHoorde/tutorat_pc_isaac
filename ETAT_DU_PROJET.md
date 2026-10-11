@@ -2,7 +2,7 @@
 
 Tutorat entre pairs en physique-chimie (première et terminale spécialité), lycée Isaac de l'Étoile, Poitiers.
 
-*Dernière mise à jour : 8 octobre 2026*
+*Dernière mise à jour : 11 octobre 2026*
 
 ## En ligne
 
@@ -98,6 +98,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Classes à afficher : « Première spé — Mme Castel » et « Terminale spé — M. Van Hoorde », sans numéro de groupe.
 - [ ] « Pressant » : exiger une évaluation à plus de trois jours, sans révision de dernière minute (demande de Mme Castel, à préciser).
 - [x] Validation des binômes : le prof valide sur le site ; les élèves voient la séance à leur connexion, le prof leur dit avec qui (08/10/2026).
+- [x] Bouton « Voir » dans le champ mot de passe de la connexion : l'élève relit ce qu'il a tapé depuis son coupon ; masqué de nouveau à l'envoi (demande des élèves, 11/10/2026).
 - [ ] Notifications : coller la migration `003` et déployer la fonction `notifier` (étape 6 de `MISE_EN_PLACE.md`), puis tester avec les élèves la semaine du 12/10/2026. En attendant, et pour donner le nom du binôme : message École Directe.
 - [ ] Vérifier que les iPads du lycée (s'ils sont gérés par l'établissement) autorisent les notifications des sites ajoutés à l'écran d'accueil.
 - [ ] Plusieurs séances pour une même demande « sur la durée » (aujourd'hui : une séance par validation).
