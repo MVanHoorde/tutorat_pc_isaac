@@ -60,6 +60,18 @@ Les clés d'envoi (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) sont déjà enregist
 3. Laissez **« Verify JWT »** activé : seuls les comptes connectés peuvent l'appeler.
 4. Essai : sur un iPad (iPadOS 16.4 ou plus), ouvrez le site dans Safari, puis **Partager → Sur l'écran d'accueil**. Ouvrez Résonance depuis l'icône, connectez-vous, touchez **Activer les notifications**, puis **Envoyer un essai**.
 
+## 7. Participation orale et dépôts bonus (octobre 2026)
+
+Uniquement des ajouts : les tables du tutorat ne sont pas touchées.
+
+1. **SQL Editor → New query** : collez `supabase/migrations/004_participation.sql`, puis **Run**. La migration crée aussi l'espace de stockage privé `depots` (10 Mo par fichier).
+2. Publiez d'abord la nouvelle version du site de participation (dépôt `participation_terminale`), puis celle de Résonance : l'onglet Participation ouvre les pages de participation dans un cadre.
+3. Sur l'iPad de l'enseignant, depuis l'icône Résonance : connectez-vous, chargez la correspondance (Tableau de bord), puis ouvrez l'onglet **Participation**.
+   - Restaurez votre sauvegarde de participation (onglet Suivi de l'application, « Restaurer ») : l'icône Résonance a sa propre mémoire, elle ne voit pas les données de l'ancienne icône.
+   - Vérifiez les liens nom ↔ compte, puis touchez **Ouvrir les onglets à cette classe**.
+   - Touchez **Sauvegarder ma clé** et rangez le fichier hors des dépôts.
+4. Facultatif, pour verrouiller : recopiez l'empreinte affichée dans `EMPREINTES_PROF` en haut de `participation.js`. Les élèves refuseront alors toute autre clé.
+
 ## Où sont les données
 
 | Donnée | Emplacement |
@@ -68,3 +80,7 @@ Les clés d'envoi (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) sont déjà enregist
 | Mots de passe | Supabase Auth, sous forme d'empreinte uniquement |
 | Abonnements aux notifications (adresse technique de l'appareil, sans nom) | Supabase (Paris) ; envoi par le service de notification d'Apple ou de Google |
 | Noms et prénoms | Le fichier Excel dans OneDrive, et la mémoire de l'appareil de l'enseignant qui l'a chargé |
+| Listes de noms des séances et relevés des observateurs | Chiffrés sur la tablette : Supabase ne stocke que des boîtes illisibles, effacées à la validation de la séance |
+| Liens noms ↔ identifiants de la participation | La mémoire de l'appareil de l'enseignant |
+| Points de participation (par identifiant), dépôts et fichiers déposés | Supabase (Paris) |
+| Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |

@@ -23,6 +23,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `sw.js`, `manifest.webmanifest`, `icone-*.png` | Résonance sur l'écran d'accueil de l'iPad, et réception des notifications |
 | `supabase/functions/notifier/` | Fonction Supabase : envoie les notifications (séance validée ou annulée, essai) |
 | `supabase/migrations/` | Modifications de la base à coller dans Supabase, dans l'ordre |
+| `participation.js` | Onglets Participation et Dépôts bonus : chiffrement de bout en bout, liens noms ↔ comptes, envoi des séances, réception des relevés, suivi, dépôts |
+| `supabase/migrations/004_participation.sql` | Tables de la participation et des dépôts, stockage `depots` |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public |
 | `ETAT_DU_PROJET.md` | Ce fichier |
 
@@ -65,6 +67,14 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Les deux élèves reçoivent une notification quand une séance est validée ou annulée : date, horaire, chapitre et rôle, jamais de nom. Après validation, l'enseignant voit qui l'a reçue.
   - Bouton « Envoyer un essai » pour vérifier un appareil. À la déconnexion, l'appareil ne reçoit plus les notifications du compte.
   - Clés d'envoi déjà dans les secrets Supabase ; la clé privée n'est écrite nulle part ailleurs.
+
+- **Participation orale et dépôts bonus** (11/10/2026), branche `participation`, **pas encore en ligne** (étape 7 de `supabase/MISE_EN_PLACE.md`).
+  - Deux onglets, visibles des seules classes ouvertes par l'enseignant : Participation et Dépôts bonus.
+  - Participation : l'application de participation (dépôt `participation_terminale`) est ouverte dans un cadre. À l'ouverture d'une séance, la liste est chiffrée pour les tablettes des deux observateurs ; leur relevé revient chiffré pour l'enseignant, d'un bouton « Envoyer au professeur ». Les QR codes restent en secours.
+  - Chiffrement : une paire de clés ECDH P-256 par appareil, clé privée dans l'appareil, AES-GCM. Le serveur ne voit que des boîtes fermées, effacées à la validation de la séance. Sauvegarde de la clé de l'enseignant par phrase de passe.
+  - Liens noms ↔ identifiants faits sur l'appareil de l'enseignant à partir de la correspondance ; rien de nominatif en ligne.
+  - Suivi : points de période publiés par identifiant après chaque séance validée ; chaque élève ne voit que sa ligne.
+  - Dépôts : lien ou fichier (10 Mo), validé par l'enseignant avant d'être montré à la classe sans le nom de l'auteur, avec points bonus facultatifs.
 
 ## Horaires et lieu (CDI, septembre 2026)
 
@@ -111,7 +121,13 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Calendrier calculé automatiquement, avec export .ics.
 - [ ] Vérifications RGPD avec la direction et le DPO, en particulier pour les bilans audio (la voix est une donnée personnelle). À faire avant l'ouverture aux élèves.
 
+- [ ] Participation : coller la migration `004`, publier `participation_terminale` puis Résonance (étape 7 de `MISE_EN_PLACE.md`), tester avec deux comptes de test avant la classe.
+- [ ] Participation : inscrire l'empreinte de la clé de l'enseignant dans `EMPREINTES_PROF` (`participation.js`).
+- [ ] Dépôts : vérifier avec le DPO (fichiers déposés par les élèves, conservation jusqu'à fin août).
+
 ## Journal
+
+- **11/10/2026** — Participation orale (sans QR code, chiffrée de bout en bout) et dépôts bonus, sur la branche `participation`.
 
 - **08/10/2026** — Correction : la correspondance s'arrêtait à 78 personnes (élèves de Mme Husson absents), car le fichier déclarait une plage de cellules périmée. Le site recalcule désormais la plage d'après les cellules réelles.
 - **08/10/2026** — Notifications sur les tablettes : écran d'accueil, service worker, fonction `notifier`, migration `003`.

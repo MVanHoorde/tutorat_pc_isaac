@@ -264,6 +264,19 @@ body:not(.role-eleve) .eleve-seul{display:none}
 .rolebar.alerte .txt{flex:1 1 280px}
 .rolebar.alerte .mini{padding:6px 12px;font-size:13.5px}
 
+/* participation et dépôts (participation.js) */
+body:not(.module-participation) .tab.module{display:none}
+body:not(.role-prof) .prof-seul{display:none}
+.cadre{position:relative;height:82vh;min-height:520px;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:#fff}
+.cadre iframe{width:100%;height:100%;border:0;display:block}
+.cadre .sortir{display:none}
+.cadre.plein{position:fixed;inset:0;height:auto;min-height:0;border:0;border-radius:0;z-index:100}
+.cadre.plein .sortir{display:block;position:absolute;right:12px;bottom:12px;z-index:2;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+body.cadre-plein{overflow:hidden}
+.depot-form input[type=url]{width:100%;font-family:var(--sans);font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--rule);border-radius:7px;padding:10px 11px}
+.depot-form textarea{min-height:80px}
+a.mini{display:inline-block;text-decoration:none}
+
 #accueil{padding-top:36px}
 #accueil h2{margin-bottom:10px}
 
@@ -294,6 +307,8 @@ body:not(.role-eleve) .eleve-seul{display:none}
   <div class="wrap" role="tablist" aria-label="Rubriques">
     <button class="tab" role="tab" aria-selected="true" data-view="demande">Demander de l'aide</button>
     <button class="tab" role="tab" aria-selected="false" data-view="offre">Proposer son aide</button>
+    <button class="tab module" role="tab" aria-selected="false" data-view="participation">Participation</button>
+    <button class="tab module" role="tab" aria-selected="false" data-view="depots">Dépôts bonus</button>
     <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
     <button class="who-btn" id="whoBtn">Se connecter</button>
   </div>
@@ -304,6 +319,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
 <div class="rolebar" id="rolebar" hidden></div>
 <div class="notif" id="mesSeances" role="status" hidden></div>
 <div class="rolebar alerte" id="blocNotif" hidden></div>
+<div class="notif" id="pAvisObs" role="status" hidden></div>
 
 <!-- ================= ACCUEIL (non connecté) ================= -->
 <section id="accueil">
@@ -432,6 +448,97 @@ body:not(.role-eleve) .eleve-seul{display:none}
   </div>
 </section>
 
+<!-- ================= PARTICIPATION (participation.js) ================= -->
+<section class="view" id="v-participation">
+  <div class="eleve-seul center">
+    <h2>Participation</h2>
+    <p class="lede">Quand ton professeur te tire au sort comme observateur, le relevé s'ouvre ici, sans QR code.
+    En dessous : où tu en es.</p>
+    <div id="pObs"></div>
+    <div class="card" style="margin-top:22px">
+      <span class="f">Où j'en suis</span>
+      <div id="pSuivi"><p class="note" style="margin:0">Chargement…</p></div>
+    </div>
+    <details class="info">
+      <summary>Comment ça marche</summary>
+      <h4>Qui voit mon relevé</h4>
+      <p>Seul ton professeur. Les noms et le relevé sont chiffrés sur la tablette : le serveur les transporte sans pouvoir les lire.</p>
+      <h4>Qui voit mes points</h4>
+      <p>Toi et ton professeur. Personne d'autre : il n'y a pas de classement.</p>
+    </details>
+  </div>
+
+  <div class="prof-seul">
+    <div class="calhead" style="margin-bottom:6px">
+      <h2 class="sem" style="margin:0">Participation</h2>
+      <button class="mini ghost" id="pPleinProf">Plein écran</button>
+    </div>
+    <p class="lede">Votre application habituelle. Quand vous ouvrez une séance, elle part chiffrée sur les tablettes des
+    deux observateurs, et leurs relevés reviennent ici. Les QR codes restent un secours.</p>
+    <div class="rolebar alerte" id="pSeanceBar" style="margin:0 0 14px" hidden></div>
+    <div class="cadre" id="pCadreProf"><button class="mini sortir" id="pSortirProf">Quitter le plein écran</button></div>
+
+    <h3>Comptes Résonance des élèves</h3>
+    <p class="lede" style="margin-bottom:8px">Chaque nom de la participation est relié à un identifiant, sur cet appareil
+    seulement, grâce à la correspondance chargée dans le Tableau de bord. Les noms ne partent jamais en ligne.</p>
+    <div class="card">
+      <select id="pLiensClasse" style="width:auto;margin-bottom:12px" hidden></select>
+      <div id="pLiens"></div>
+      <div class="barre">
+        <button class="mini" id="pOuvrir">Ouvrir les onglets à cette classe</button>
+        <button class="mini ghost" id="pPublier">Publier le suivi aux élèves</button>
+      </div>
+      <p class="note" id="pClasses"></p>
+      <p class="note">Le suivi est publié automatiquement à chaque séance validée. Chaque élève ne voit que sa propre ligne.</p>
+    </div>
+
+    <h3>Clé de chiffrement de cet appareil</h3>
+    <div class="card">
+      <p class="note" id="pCle" style="margin:0 0 12px">…</p>
+      <div class="barre" style="margin-top:0">
+        <button class="mini" id="pSauverCle">Sauvegarder ma clé</button>
+        <label class="mini ghost" style="display:inline-block">Restaurer une sauvegarde
+          <input type="file" id="pRestaurerCle" accept=".json,application/json" hidden></label>
+      </div>
+      <p class="note">Les relevés ne peuvent être lus qu'avec cette clé. Sauvegardez-la (fichier protégé par une phrase de passe)
+      et gardez le fichier hors du dépôt : sans elle, un iPad perdu ou effacé rend illisibles les relevés en attente.
+      Ouvrez Résonance depuis la même icône à chaque fois : Safari et l'écran d'accueil ont chacun leur clé.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DÉPÔTS (participation.js) ================= -->
+<section class="view" id="v-depots">
+  <div class="eleve-seul center">
+    <h2>Dépôts bonus</h2>
+    <p class="lede">Partage une ressource utile à la classe : fiche, carte mentale, vidéo, exercice corrigé…
+    Ton professeur la vérifie avant de la montrer à tes camarades, et peut t'accorder des points bonus.</p>
+    <div class="card depot-form">
+      <div class="step"><label class="f" for="dTitre">Titre</label><input type="text" id="dTitre" maxlength="120" placeholder="Fiche méthode : dosage par titrage"></div>
+      <div class="step"><label class="f" for="dDesc">En quelques mots <span class="hint">— facultatif</span></label><textarea id="dDesc" maxlength="600"></textarea></div>
+      <div class="step"><label class="f" for="dLien">Lien <span class="hint">— ou un fichier, ou les deux</span></label><input type="url" id="dLien" placeholder="https://"></div>
+      <div class="step"><label class="f" for="dFichier">Fichier <span class="hint">— PDF, image ou document, 10 Mo au plus</span></label><input type="file" id="dFichier"
+        accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.docx,.pptx,.xlsx,.odt,.odp,application/pdf,image/*"></div>
+      <button class="cta" id="dEnvoyer">Déposer</button>
+      <p class="note">Pas de photo de personne, pas de nom de camarade, pas de copie d'un sujet d'évaluation.
+      Ta ressource est montrée à la classe sans ton nom.</p>
+    </div>
+    <div class="card" style="margin-top:22px"><span class="f">Mes dépôts</span><div id="dMes"></div></div>
+    <h3>Ressources de la classe</h3>
+    <div class="grid2" id="dClasse"></div>
+  </div>
+
+  <div class="prof-seul">
+    <h2>Dépôts à valider</h2>
+    <p class="lede">Une ressource validée est montrée à toute la classe de l'élève, sans son nom.</p>
+    <div id="dAValider"></div>
+    <h3>Ressources validées</h3>
+    <div id="dValides"></div>
+    <h3>Points bonus par élève</h3>
+    <div id="dBonus"></div>
+  </div>
+</section>
+
 <!-- ================= PROF ================= -->
 <section class="view" id="v-prof">
   <div class="en-ligne-seul">
@@ -546,6 +653,7 @@ body:not(.role-eleve) .eleve-seul{display:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<script src="participation.js"></script>
 <script>
 /* ---------- Supabase ---------- */
 // Clé « anon » : publique par conception, les droits réels sont fixés par les règles de la base (supabase/schema.sql).
@@ -760,6 +868,8 @@ async function entrer(){
   const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
   if(role==='eleve' && n!==null) remplirNiveau(n);
   majBlocNotif();
+  // Participation et dépôts : à part, une panne ne doit pas bloquer le tutorat.
+  if(window.participationEntrer) participationEntrer().catch(e=>console.error('participation',e));
   await chargerDonneesReelles();
 }
 
