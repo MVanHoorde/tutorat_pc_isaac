@@ -114,6 +114,12 @@ label.f,.f{display:block;font-size:14px;font-weight:600;margin:0 0 8px;color:var
 select,textarea,input[type=text],input[type=password],input[type=date]{width:100%;font-family:var(--sans);font-size:15px;
   color:var(--ink);background:#fff;border:1px solid var(--rule);border-radius:7px;padding:10px 11px}
 select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.mdp-bloc{position:relative;margin-bottom:18px}
+.mdp-bloc input{padding-right:84px}
+.mdp-bloc button{position:absolute;top:5px;right:5px;bottom:5px;min-width:70px;padding:0 10px;appearance:none;
+  border:1px solid var(--rule);border-radius:6px;background:var(--soft);color:var(--ink);font-family:var(--sans);
+  font-size:13px;font-weight:600;cursor:pointer}
+.mdp-bloc button:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
 textarea{resize:vertical;min-height:130px;line-height:1.5}
 .count{font-size:12.5px;color:var(--muted);text-align:right;margin:5px 0 0}
 .cta{width:100%;appearance:none;border:0;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--sans);
@@ -520,7 +526,10 @@ body:not(.role-eleve) .eleve-seul{display:none}
     <input id="idf" type="text" placeholder="PC-XXXXX" style="font-family:var(--mono);margin-bottom:14px;text-transform:uppercase"
       autocomplete="username" autocapitalize="characters" spellcheck="false">
     <label class="f" for="mdp">Mot de passe</label>
-    <input id="mdp" type="password" placeholder="Mot-Mot-99" style="margin-bottom:18px" autocomplete="current-password">
+    <div class="mdp-bloc">
+      <input id="mdp" type="password" placeholder="Mot-Mot-99" autocomplete="current-password">
+      <button type="button" id="voirMdp" aria-controls="mdp" aria-label="Afficher le mot de passe">Voir</button>
+    </div>
 
     <p class="note" id="loginErreur" role="alert" style="color:#B3261E;margin:-6px 0 12px" hidden></p>
     <button class="cta" value="login" id="btnLogin">Se connecter</button>
@@ -664,6 +673,14 @@ function choisirLogin(r){
   document.getElementById('loginAide').textContent=AIDE[r].txt;
 }
 const loginErreur=document.getElementById('loginErreur'), btnLogin=document.getElementById('btnLogin');
+/* Bouton « Voir » : relire le mot de passe du coupon avant d'envoyer. Masqué de nouveau à l'envoi. */
+const voirMdp=document.getElementById('voirMdp');
+function montrerMdp(visible){
+  mdp.type=visible?'text':'password';
+  voirMdp.textContent=visible?'Cacher':'Voir';
+  voirMdp.setAttribute('aria-label', visible?'Masquer le mot de passe':'Afficher le mot de passe');
+}
+voirMdp.addEventListener('click',()=>montrerMdp(mdp.type==='password'));
 async function seConnecter(identifiant, motDePasse){
   if(!sb) throw new Error("Connexion au serveur impossible (vérifiez Internet).");
   const email=identifiant.toLowerCase()+'@'+DOMAINE_COMPTES;
@@ -683,6 +700,7 @@ document.getElementById('loginForm').addEventListener('submit',async e=>{
   if(!e.submitter || e.submitter.value!=='login') return;
   e.preventDefault();
   const identifiant=idf.value.trim().toUpperCase(), motDePasse=mdp.value;
+  montrerMdp(false);
   loginErreur.hidden=true;
   if(!/^P[CR]-[A-Z0-9]{5}$/.test(identifiant)){ loginErreur.textContent="L'identifiant ressemble à PC-XXXXX (5 caractères après le tiret)."; loginErreur.hidden=false; return; }
   btnLogin.disabled=true; btnLogin.textContent='Connexion…';
