@@ -109,7 +109,7 @@ Règles posées par la base :
 - accorder le bonus marque le signalement traité, à la date du serveur ; le retirer efface aussi « vu » ;
 - l'élève n'obtient que ses bonus pas encore vus (`mes_bonus_signalement()`), et ne peut marquer « vus » que les siens (`bonus_signalement_vus()`).
 
-Seul endroit de la base où figure un nom : le message, que l'élève commence par son nom et son prénom (champs obligatoires du formulaire). Effacement en fin d'année avec le reste : `delete from public.signalements;`.
+Le formulaire ne demande ni nom ni prénom : l'élève est reconnu par son compte. Seuls les élèves de terminale ont le bouton. Un +0,5 accordé s'ajoute aux points bonus de l'élève (tableau « Points bonus » de la rubrique Dépôts). Effacement en fin d'année avec le reste : `delete from public.signalements;`.
 
 ## Où sont les données
 
@@ -124,5 +124,5 @@ Seul endroit de la base où figure un nom : le message, que l'élève commence p
 | Points de participation (par identifiant), dépôts et fichiers déposés | Supabase (Paris) |
 | Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |
 | Exercices réussis du parcours Python (identifiant, niveau, exercice, date ; jamais le code) | Supabase (Paris) |
-| Signalements « J'ai vu un bug » (identifiant, rubrique, page, étape, appareil résumé, message **commençant par le nom et le prénom écrits par l'élève**, +0,5 et « vu ») | Supabase (Paris) |
+| Signalements « J'ai vu un bug » (identifiant, rubrique, page, étape, appareil résumé, message, +0,5 et « vu » ; aucun nom) | Supabase (Paris) |
 | Python lui-même (Pyodide, ~20 Mo) | Le cache de l'appareil, après la première ouverture d'un niveau |

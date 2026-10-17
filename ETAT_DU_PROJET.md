@@ -95,8 +95,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Parcours Python relié : même connexion ; l'élève connecté voit « ← Résonance » et ce qui est enregistré ; ses réussites vont dans `python_reussites` (migration 005) et reviennent cochées sur tout appareil. Tableau de bord : vue « Parcours Python », exercices réussis par élève et par niveau, noms tirés de la correspondance chargée sur l'appareil.
   - `sw.js` garde Pyodide (environ 20 Mo, scipy à la demande) dans l'appareil après la première ouverture.
 - **« J'ai vu un bug » et +0,5** (17/10/2026), sur la branche locale `signalements`, **pas encore en ligne** : coller la migration `006` (étape 9 de `supabase/MISE_EN_PLACE.md`), dérouler la section G de `docs/plan-test-refonte.md`, puis fusionner dans `main`. Repris du site pédagogique de M. Van Hoorde.
-  - Tout élève connecté, premières comprises, a un bouton discret 🐞 « J'ai vu un bug » en bas à droite : sur toutes les vues de Résonance et toutes les pages du parcours Python. Ni visiteur ni enseignant.
-  - Le formulaire demande le **nom et le prénom** (obligatoires), écrits en tête du message, puis le problème. Il envoie la rubrique (`cle` : `accueil`, `tutorat`, `participation`, `outils`, `python`, `python-n1` à `python-n5`), le fichier, la vue ou l'exercice à l'écran, et un résumé court de l'appareil (« iPad · Safari · 1024×768 »). Vingt signalements par élève et par jour au plus. L'élève ne relit pas ses signalements.
+  - Tout élève de **terminale** connecté (pas les premières, décision du 17/10/2026) a un bouton discret 🐞 « J'ai vu un bug » en bas à droite : sur toutes les vues de Résonance et toutes les pages du parcours Python. Ni visiteur ni enseignant.
+  - Le formulaire ne demande que le problème : ni nom ni prénom, le compte suffit (l'enseignant retrouve l'élève par son identifiant et la correspondance chargée sur son appareil). Il envoie la rubrique (`cle` : `accueil`, `tutorat`, `participation`, `outils`, `python`, `python-n1` à `python-n5`), le fichier, la vue ou l'exercice à l'écran, et un résumé court de l'appareil (« iPad · Safari · 1024×768 »). Vingt signalements par élève et par jour au plus. L'élève ne relit pas ses signalements.
   - Tableau de bord, section **Signalements** (pastille du nombre à traiter sur l'onglet) : cartes récentes d'abord, à traiter seulement ou toutes ; identifiant (et nom si la correspondance est chargée), classe, rubrique, page, étape, appareil, message ; **Traité**, **Supprimer**, **Accorder +0,5** / **Retirer le +0,5**, et « vu par l'élève ». L'enseignant ne voit que les élèves de ses classes (`mes_classes_prof()`) : les signalements de premières n'arrivent que si leur classe est rattachée à un compte enseignant.
   - **Le +0,5 ne s'accorde qu'aux élèves de terminale** (règle de M. Van Hoorde : ses élèves). Le bouton n'apparaît que pour eux, et la base refuse le bonus pour toute autre classe (`classe_terminale()`, même règle que `espaceComplet`). Accorder marque traité ; la date est celle du serveur.
   - L'élève en est prévenu **une fois** par une fenêtre « 🎁 +0,5 au prochain contrôle », à l'accueil de Résonance, jamais par-dessus un formulaire, un relevé de participation ou un cadre en plein écran. « Vu » est enregistré en base.
@@ -110,7 +110,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Principes de protection des données
 
-- Aucun nom d'élève en ligne, avec une seule exception : le message d'un signalement « J'ai vu un bug », où l'élève écrit lui-même son nom et son prénom (décision de M. Van Hoorde, reprise du site pédagogique, alerte RGPD donnée ; ils servent à retrouver l'élève pour le +0,5). Pour le reste, le serveur ne connaît que l'identifiant et la classe.
+- Aucun nom d'élève en ligne. Le serveur ne connaît que l'identifiant et la classe ; un signalement « J'ai vu un bug » ne demande ni nom ni prénom.
 - Parcours Python : seuls l'identifiant de l'exercice réussi, son niveau et la date sont enregistrés, jamais le code tapé ; rien du tout sans connexion.
 - Aucune police ni aucun script de Google : polices dans `polices/`.
 - La correspondance entre noms et identifiants (`correspondance_resonance.xlsx`) reste dans OneDrive, réservée aux professeurs.
@@ -159,7 +159,6 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Refonte : dérouler `docs/plan-test-refonte.md` avec de vrais comptes (connexion, tutorat, participation, parcours relié, iPad).
 - [ ] Signalements : coller la migration `006` (étape 9 de `MISE_EN_PLACE.md`), dérouler la section G de `docs/plan-test-refonte.md`, fusionner la branche `signalements` dans `main`.
 - [ ] Signalements de premières : rattacher leurs classes à un compte enseignant (`profils.classes`), sinon personne ne les lit.
-- [ ] Signalements : mentionner au DPO les noms et prénoms écrits dans les messages (seul nom de la base).
 - [ ] Polices en double (`polices/` et `outils/python/polices/`) : faire importer `../../polices/polices.css` par `parcours.css`, puis supprimer la copie du parcours.
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.

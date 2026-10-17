@@ -121,7 +121,7 @@ async function demarrer() {
   }
   if (!session) return;
   const R = window.RESONANCE, role = R.role(session), ident = R.identifiant(session);
-  if (role === 'eleve') installerSignalement(sb);
+  if (role === 'eleve' && R.espaceComplet(session)) installerSignalement(sb);   // terminales seulement
 
   if (role !== 'eleve') {
     bandeau(role === 'prof' ? 'Vue enseignant : vos essais ne sont pas enregistrés.' : '');

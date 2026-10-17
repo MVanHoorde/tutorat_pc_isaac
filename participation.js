@@ -579,11 +579,18 @@ async function chargerDepotsProf(){
     valides.map(d => '<tr><td>'+qui(d)+'</td><td>'+esc(d.titre)+'<br>'+liensDepot(d, urls)+'</td><td>'+String(d.points_bonus).replace('.', ',')+'</td>'+
       '<td><button class="mini ghost dRetirerP" data-id="'+d.id+'">Retirer de la classe</button></td></tr>').join('')+'</tbody></table></div>'
     : '<p class="note">Aucune ressource validée.</p>';
-  const tot = {};
-  valides.forEach(d => { const k = d.profils && d.profils.identifiant; if(k) tot[k] = (tot[k] || 0) + Number(d.points_bonus || 0); });
-  const ks = Object.keys(tot).filter(k => tot[k]);
-  zB.innerHTML = ks.length ? '<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Points bonus</th></tr></thead><tbody>'+
-    ks.sort((a, b) => tot[b] - tot[a]).map(k => '<tr><td>'+nomAffiche(k)+'</td><td>'+String(tot[k]).replace('.', ',')+'</td></tr>').join('')+'</tbody></table></div>'
+  // Points bonus par élève : dépôts validés + signalements « J'ai vu un bug » retenus (+0,5 chacun, terminales).
+  const totD = {}, totS = {};
+  valides.forEach(d => { const k = d.profils && d.profils.identifiant; if(k) totD[k] = (totD[k] || 0) + Number(d.points_bonus || 0); });
+  try {
+    const s = await sb.from('signalements').select('bonus_le,profils(identifiant)').not('bonus_le', 'is', null);
+    (s.data || []).forEach(x => { const k = x.profils && x.profils.identifiant; if(k) totS[k] = (totS[k] || 0) + 0.5; });
+  } catch(e) { /* signalements indisponibles : les dépôts seuls */ }
+  const virg = v => String(v || 0).replace('.', ',');
+  const ks = [...new Set([...Object.keys(totD), ...Object.keys(totS)])].filter(k => (totD[k] || 0) + (totS[k] || 0));
+  const total = k => (totD[k] || 0) + (totS[k] || 0);
+  zB.innerHTML = ks.length ? '<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Dépôts</th><th>Signalements</th><th>Total</th></tr></thead><tbody>'+
+    ks.sort((a, b) => total(b) - total(a)).map(k => '<tr><td>'+nomAffiche(k)+'</td><td>'+virg(totD[k])+'</td><td>'+virg(totS[k])+'</td><td><b>'+virg(total(k))+'</b></td></tr>').join('')+'</tbody></table></div>'
     : '<p class="note">Aucun point bonus attribué.</p>';
   zA.querySelectorAll('.appar').forEach(carte => {
     const id = +carte.dataset.id;

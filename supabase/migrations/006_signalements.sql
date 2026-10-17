@@ -22,9 +22,8 @@
 --     (un bonus accordé de nouveau se notifie de nouveau).
 --
 -- RGPD
---   Le formulaire demande le nom et le prénom, écrits par l'élève en tête du message (décision de
---   M. Van Hoorde, 11/10/2026 sur le site, alerte RGPD donnée : retrouver l'élève pour le +0,5 sans dépendre
---   de la correspondance). C'est le SEUL endroit de la base où figure un nom. L'« appareil » est un résumé
+--   Le formulaire ne demande ni nom ni prénom (décision de M. Van Hoorde, 17/10/2026) : l'élève est
+--   reconnu par son compte. Bouton réservé aux élèves de terminale (côté pages). L'« appareil » est un résumé
 --   court (« iPad · Safari · 1024×768 »), jamais l'empreinte du navigateur. La suppression d'un compte
 --   emporte ses signalements ; fin d'année : delete from public.signalements;
 

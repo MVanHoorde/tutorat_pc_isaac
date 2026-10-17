@@ -5,8 +5,9 @@
      RESONANCE_SIGNALEMENT.installer({ sb, contexte })   → bouton + formulaire, ÉLÈVE CONNECTÉ seulement ;
      RESONANCE_SIGNALEMENT.annoncerBonus({ sb, occupe }) → la fenêtre 🎁, une fois (accueil de Résonance).
    Base : table signalements et fonctions mes_bonus_signalement / bonus_signalement_vus (migration 006).
-   L'élève écrit ses signalements et ne les relit pas. Le nom et le prénom qu'il tape partent en tête du
-   message : c'est le seul endroit de la base où figure un nom (décision de M. Van Hoorde). */
+   Élèves de TERMINALE seulement (la page appelante vérifie espaceComplet). L'élève écrit ses signalements et
+   ne les relit pas ; il n'écrit ni son nom ni son prénom : son compte suffit à son professeur pour le retrouver
+   (décision de M. Van Hoorde, 17/10/2026). */
 (function(){
 "use strict";
 
@@ -99,21 +100,13 @@ function installer(opts){
     '<form class="rs-form" novalidate>' +
       '<h2 id="rs-bug-titre">🐞 Qu’est-ce qui ne marche pas&nbsp;?</h2>' +
       '<p class="rs-ou"></p>' +
-      '<div class="rs-deux">' +
-        '<div><label for="rs-bug-nom">Ton nom</label>' +
-          '<input id="rs-bug-nom" type="text" maxlength="60" autocomplete="family-name" autocapitalize="words" spellcheck="false" required></div>' +
-        '<div><label for="rs-bug-prenom">Ton prénom</label>' +
-          '<input id="rs-bug-prenom" type="text" maxlength="60" autocomplete="given-name" autocapitalize="words" spellcheck="false" required></div>' +
-      '</div>' +
-      '<p class="rs-note">Ton nom et ton prénom servent à ton professeur pour te retrouver (pour un bonus, par exemple). ' +
-        'C’est le seul endroit où Résonance enregistre un nom.</p>' +
       '<label for="rs-bug-msg">Le problème</label>' +
       '<textarea id="rs-bug-msg" maxlength="900" rows="5" placeholder="Ce que tu as fait, ce qui s’est passé, ce que tu attendais. Pas d’information personnelle."></textarea>' +
       '<p class="rs-etat" role="status" aria-live="polite"></p>' +
       '<div class="rs-actions"><button type="button" class="rs-btn rs-ghost" data-annuler>Annuler</button>' +
         '<button type="submit" class="rs-btn" data-envoyer>Envoyer à mon professeur</button></div>' +
     '</form>');
-  const form = d.querySelector('form'), nom = d.querySelector('#rs-bug-nom'), prenom = d.querySelector('#rs-bug-prenom');
+  const form = d.querySelector('form');
   const ta = d.querySelector('textarea'), etat = d.querySelector('.rs-etat'), envoyer = d.querySelector('[data-envoyer]');
   let ctx = {}, minuteur = null;
 
@@ -125,9 +118,9 @@ function installer(opts){
     d.querySelector('.rs-ou').textContent = 'Ton professeur saura où tu étais' + (ctx.ou ? ' : ' + ctx.ou : '') +
       '. Il verra aussi ton identifiant et ton appareil.';
     dire(''); envoyer.disabled = false;
-    [nom, prenom, ta].forEach(x => x.removeAttribute('aria-invalid'));
+    ta.removeAttribute('aria-invalid');
     d.showModal();
-    (!nom.value.trim() ? nom : !prenom.value.trim() ? prenom : ta).focus();
+    ta.focus();
   });
   d.querySelector('[data-annuler]').addEventListener('click', fermer);
   // Toucher le fond sombre ferme, comme Échap (natif du <dialog>).
@@ -141,11 +134,9 @@ function installer(opts){
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (envoyer.disabled) return;
-    const n = court(nom.value, 60), p = court(prenom.value, 60), m = ta.value.trim();
-    const manque = n.length < 2 ? [nom, 'Écris ton nom.'] : p.length < 2 ? [prenom, 'Écris ton prénom.']
-                 : m.length < 3 ? [ta, 'Écris au moins quelques mots.'] : null;
-    if (manque){ manque[0].setAttribute('aria-invalid', 'true'); dire(manque[1], true); manque[0].focus(); return; }
-    [nom, prenom, ta].forEach(x => x.removeAttribute('aria-invalid'));
+    const m = ta.value.trim();
+    if (m.length < 3){ ta.setAttribute('aria-invalid', 'true'); dire('Écris au moins quelques mots.', true); ta.focus(); return; }
+    ta.removeAttribute('aria-invalid');
     envoyer.disabled = true; dire('Envoi…');
     let erreur = null;
     try {
@@ -153,7 +144,7 @@ function installer(opts){
         cle: court(ctx.cle, 40) || 'inconnue',
         page: court(ctx.page, 120) || 'inconnue',
         etape: court(ctx.etape, 120) || null,
-        message: '👤 ' + n + ' ' + p + '\n' + m,
+        message: m,
         appareil: court(resumeAppareil(), 120)
       });
       erreur = r && r.error;
@@ -166,7 +157,7 @@ function installer(opts){
       return;
     }
     dire('✅ Merci, c’est transmis à ton professeur.');
-    ta.value = '';   // le nom et le prénom restent, pour cette visite seulement (rien n'est gardé sur l'appareil)
+    ta.value = '';
     minuteur = setTimeout(fermer, 1600);
   });
 }

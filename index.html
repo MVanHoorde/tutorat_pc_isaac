@@ -669,7 +669,7 @@ a.outil h3{margin:0 0 6px}
     <!-- « J'ai vu un bug » (migration 006) : la base ne rend que les signalements des élèves de vos classes. -->
     <h3 id="signalements">Signalements <span class="sig-n" id="sigN" hidden></span></h3>
     <p class="lede" style="margin-bottom:8px">Envoyés par les élèves avec le bouton 🐞 « J'ai vu un bug », sur Résonance et dans le
-    parcours Python. Chacun dit où l'élève était et sur quel appareil ; l'élève écrit son nom et son prénom en tête du message.
+    parcours Python. Chacun dit où l'élève était et sur quel appareil ; l'élève est reconnu par son compte (bouton réservé aux terminales).
     Le +0,5 au prochain contrôle ne s'accorde qu'aux élèves de terminale : il marque le signalement traité, et l'élève en est
     prévenu une fois, à sa prochaine ouverture de Résonance.</p>
     <div class="barre" style="margin:0 0 12px">
@@ -728,8 +728,7 @@ a.outil h3{margin:0 0 6px}
       <div>
         <h5>Tes données</h5>
         <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
-        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom,
-        sauf si tu l'écris toi-même dans un signalement « J'ai vu un bug ».</p>
+        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom.</p>
         <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
         <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
         tout le reste fin août. Effacement sur simple demande.</p>
@@ -1029,7 +1028,8 @@ async function entrer(){
   if(role==='eleve' && n!==null) remplirNiveau(n);
   aller(demandee||'accueil',true);
   majBlocNotif();
-  if(role==='eleve') installerSignalement();
+  // « J'ai vu un bug » : élèves de terminale seulement (décision du 17/10/2026).
+  if(role==='eleve' && window.RESONANCE.espaceComplet(session)) installerSignalement();
   // Participation et dépôts : à part, une panne ne doit pas bloquer le tutorat.
   // Le droit de voir la rubrique arrive avec la réponse du serveur : on rouvre alors la vue demandée.
   if(window.participationEntrer) participationEntrer().then(()=>{
