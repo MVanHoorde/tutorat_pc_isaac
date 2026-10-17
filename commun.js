@@ -39,6 +39,17 @@ window.RESONANCE = {
   },
   role: s => (s && s.user && s.user.app_metadata && s.user.app_metadata.role) || 'visiteur',
   identifiant: s => (s && s.user && s.user.app_metadata && s.user.app_metadata.identifiant) || '',
+  /* Espace complet (Tutorat + Participation + Outils) : enseignants et élèves de terminale.
+     Les premières n'ont que le Tutorat (décision de M. Van Hoorde, 17/10/2026). La classe vient du
+     compte (« B1_T_3_… » terminale, « B1_P_3_… » première ; « TEST » compte comme terminale).
+     Classe inconnue : Tutorat seulement, par prudence. */
+  espaceComplet(s){
+    const r = this.role(s);
+    if (r === 'prof') return true;
+    if (r !== 'eleve') return false;
+    const c = String((s.user.app_metadata && s.user.app_metadata.classe) || '').trim();
+    return /_T_/i.test(c) || /^t/i.test(c);
+  },
   esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 };
 })();

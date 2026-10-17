@@ -92,6 +92,8 @@ async function demarrer() {
     bandeau(role === 'prof' ? 'Vue enseignant : vos essais ne sont pas enregistrés.' : '');
     return;
   }
+  // Le parcours Python est réservé à l'espace de terminale : rien n'est enregistré pour les premières.
+  if (!R.espaceComplet(session)) { bandeau(''); return; }
   bandeau('Connecté·e (' + ident + ') : tes exercices réussis sont enregistrés sur ton compte, jamais ton code.');
 
   // Envoi : une requête à la fois ; une réussite déjà enregistrée est ignorée par la base.

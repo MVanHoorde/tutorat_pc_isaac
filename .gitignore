@@ -12,3 +12,6 @@ A0*-resonance-*.html
 
 # Python
 __pycache__/
+
+# Configuration locale de la CLI Supabase (lien vers le projet)
+supabase/.temp/

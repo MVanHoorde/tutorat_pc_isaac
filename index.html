@@ -300,6 +300,9 @@ body:not([data-section="outils"]) .tab[data-section="outils"]{display:none}
 .carte .acts{display:flex;gap:8px;flex-wrap:wrap}
 body:not(.module-participation) .carte.participation{display:none}
 body:not(.role-prof) .carte.prof{display:none}
+/* Premières (et classe inconnue) : Tutorat seulement. */
+body:not(.espace-complet) .carte.participation,body:not(.espace-complet) .carte.outils,
+body:not(.espace-complet) .tab[data-section="participation"],body:not(.espace-complet) .tab[data-section="outils"]{display:none}
 a.outil{display:block;text-decoration:none;color:inherit;margin:0 0 14px}
 a.outil:hover h3{text-decoration:underline}
 a.outil:focus-visible{outline:2px solid var(--match);outline-offset:3px;border-radius:14px}
@@ -381,7 +384,7 @@ a.outil h3{margin:0 0 6px}
     </div>
     <div class="carte outils">
       <h3>Outils</h3>
-      <p>Pour travailler seul, à ton rythme : le parcours Python de terminale. D'autres outils viendront.</p>
+      <p>Pour travailler seul, à ton rythme : le parcours Python de terminale, et une banque d'outils pour t'entraîner sur les sujets officiels.</p>
       <div class="acts">
         <a class="mini" href="outils/python/index.html">Parcours Python</a>
         <button class="mini ghost" data-aller="outils">Tous les outils</button>
@@ -406,6 +409,16 @@ a.outil h3{margin:0 0 6px}
       <p class="note" style="margin:0">Apprendre Python en révisant le cours de physique-chimie, en cinq niveaux, de la boîte à outils de l'ECE
       jusqu'à ce qui t'attend dans le supérieur. Python tourne dans la tablette : la première ouverture télécharge
       une vingtaine de mégaoctets, gardés ensuite sur l'appareil.</p>
+    </a>
+
+    <h3 style="margin-top:34px">Banque d'outils</h3>
+    <p class="note">Des sites choisis par ton professeur. Ils s'ouvrent dans un nouvel onglet : ce sont des sites extérieurs,
+    Résonance ne leur transmet rien.</p>
+    <a class="outil card" href="https://www.labolycee.org/" target="_blank" rel="noopener noreferrer">
+      <h3>Labo Lycée <span class="badge p0">Terminale spé</span></h3>
+      <p class="note" style="margin:0">Tous les sujets officiels du bac de physique-chimie, avec leurs corrections, classés par thème.
+      S'il y a un endroit où t'entraîner en permanence, c'est celui-là : travailler sur les sujets officiels est ce qu'il y a de
+      plus efficace, une fois que tu maîtrises ton cours dans sa globalité.</p>
     </a>
     <p class="note">D'autres outils viendront ici.</p>
   </div>
@@ -855,6 +868,8 @@ function ouvrirVue(nom){
 function vueAutorisee(nom){
   if(!Object.prototype.hasOwnProperty.call(SECTION,nom)) return false;
   if(nom==='prof') return role==='prof';
+  // Premières : Tutorat seulement ; Participation et Outils sont l'espace de terminale.
+  if((SECTION[nom]==='participation'||SECTION[nom]==='outils') && !document.body.classList.contains('espace-complet')) return false;
   if(SECTION[nom]==='participation') return document.body.classList.contains('module-participation');
   return true;
 }
@@ -980,6 +995,7 @@ function niveauDeClasse(c){
 async function entrer(){
   const demandee=vueDeAdresse(); // ex. retour d'un outil vers #outils, ou rechargement de la page
   appliquerRole(roleDeSession(session));
+  document.body.classList.toggle('espace-complet', window.RESONANCE.espaceComplet(session));
   const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
   if(role==='eleve' && n!==null) remplirNiveau(n);
   aller(demandee||'accueil',true);
