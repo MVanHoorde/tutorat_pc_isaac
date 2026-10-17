@@ -29,7 +29,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `supabase/migrations/004_participation.sql` | Tables de la participation et des dépôts, stockage `depots` |
 | `supabase/migrations/005_python.sql` | Table `python_reussites` (compte, niveau, exercice, date ; jamais le code) ; l'enseignant ne lit que ses classes |
 | `docs/plan-test-refonte.md` | Plan de test manuel de l'accueil à trois entrées et du parcours Python relié |
-| `outils/python/` | Parcours Python de terminale (rubrique Outils) : `index.html` (les 5 niveaux), `niveau-1.html`, moteur `parcours.js` + `py-worker.js` + `py-prelude.py`, `parcours.css`, `polices/` auto-hébergées, `fiches/` (mémos PDF), `PARCOURS.md` (structure des niveaux), `audit/` (audits du 17/10/2026), `progression-resonance.js` (enregistre les réussites de l'élève connecté) |
+| `outils/python/` | Parcours Python de terminale (rubrique Outils) : `index.html` (les 5 niveaux), `niveau-1.html` à `niveau-5.html` (le 3 se génère depuis `sources/niveau-3/`), moteur `parcours.js` + `py-worker.js` + `py-prelude.py`, `parcours.css`, `polices/` auto-hébergées, `fiches/` (mémos PDF), `PARCOURS.md` (structure des niveaux), `A-VALIDER.md` (points de fond à trancher), `progression-resonance.js` (enregistre les réussites de l'élève connecté) |
 | `vendor/pyodide/`, `vendor/codemirror/` | Python dans le navigateur (Pyodide 314.0.7 : numpy, matplotlib, friendly-traceback) et l'éditeur de code, auto-hébergés ; voir leur `LISEZMOI.md` |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public. Exceptions, par leur propre `.gitignore` : `outils/python/fiches/*.pdf` et `vendor/pyodide/pyodide-lock.json` |
 | `ETAT_DU_PROJET.md` | Ce fichier |
@@ -81,11 +81,11 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Liens noms ↔ identifiants faits sur l'appareil de l'enseignant à partir de la correspondance ; rien de nominatif en ligne.
   - Suivi : points de période publiés par identifiant après chaque séance validée ; chaque élève ne voit que sa ligne.
   - Dépôts : lien ou fichier (10 Mo), validé par l'enseignant avant d'être montré à la classe sans le nom de l'auteur, avec points bonus facultatifs.
-- **Parcours Python, niveau 1 en audit** (17/10/2026), dans `outils/python/`, **pas encore en ligne** : le parcours et `vendor/` ne sont pas versionnés.
-  - Cinq niveaux validés ; structure et pistes dans `outils/python/PARCOURS.md`. Niveau 1, « la boîte à outils de l'ECE », réécrit après le premier audit : 8 séances, 27 exercices, mémo PDF de 3 pages. Les fonctions passent au niveau 3, `if` au niveau 2.
+- **Parcours Python en ligne, en audit** (17/10/2026), dans `outils/python/`. Audit prioritaire : niveaux 1 et 2 (annoncé aux élèves sur l'accueil du parcours) ; points de fond dans `outils/python/A-VALIDER.md`. Les audits préparatoires (`outils/python/audit/`) restent sur le PC du professeur : ils décrivent ses fichiers et ne sont pas publiés.
+  - Structure dans `outils/python/PARCOURS.md`. Niveau 1, boîte à outils de l'ECE (8 étapes, 27 exercices) ; niveau 2, mini-projets d'ECE (19) ; niveau 3, autonomie et fichiers de données (23) ; niveau 4, attendus du supérieur étiquetés (21) ; niveau 5, 2e année et spécialités (16). Un mémo PDF par niveau. Les sections s'appellent « Étape N ».
   - Python tourne dans la tablette (Pyodide dans un worker, sans accès au jeton de connexion), messages d'erreur courts en français, correction automatique par indices, solution après un premier essai.
   - Libre accès. Sans connexion à Résonance, rien n'est enregistré ni envoyé.
-- **Accueil à trois entrées** (17/10/2026), branche `refonte-accueil`, **pas encore en ligne** (plan de test : `docs/plan-test-refonte.md`).
+- **Accueil à trois entrées** (17/10/2026), **en ligne** ; migration `005` collée le 17/10/2026. Tests réels avec les élèves (plan : `docs/plan-test-refonte.md`).
   - Après connexion : trois cartes, Tutorat (demander / proposer de l'aide), Participation (classes ouvertes seulement), Outils ; une quatrième, Tableau de bord, pour les enseignants. **Les premières n'ont que le Tutorat** : Participation et Outils forment l'espace de terminale (règle `espaceComplet` de `commun.js`, lue d'après la classe du compte : `_T_` terminale, `_P_` première ; classe inconnue : Tutorat seulement). Dans une rubrique, la barre ne montre que ses onglets et « Accueil » ; l'onglet Tableau de bord reste visible partout pour l'enseignant.
   - Choix : des vues dans `index.html`, et non des pages séparées. `participation.js` vit des variables de la page et garde en mémoire la séance ouverte et le cadre de participation : changer de page couperait une séance en cours. Seuls les Outils sont des pages à part (charte propre, moteur Python lourd), reliées par `commun.js`.
   - Chaque vue a son adresse : rechargement, bouton retour de Safari et retour depuis les Outils (`index.html#outils`) ramènent au bon endroit.
@@ -144,19 +144,18 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Participation : inscrire l'empreinte de la clé de l'enseignant dans `EMPREINTES_PROF` (`participation.js`).
 - [ ] Dépôts : vérifier avec le DPO (fichiers déposés par les élèves, conservation jusqu'à fin août).
 
-- [ ] Parcours Python : audit du niveau 1 par M. Van Hoorde, puis niveau 2.
+- [ ] Parcours Python : audit des niveaux 1 et 2 par M. Van Hoorde (prioritaire), puis 3 à 5 ; trancher `outils/python/A-VALIDER.md`.
 - [ ] Parcours Python : tester sur un iPad du lycée, sur le wifi du lycée (chargement, clavier, guillemets courbes, mémoire).
-- [x] Accueil à trois entrées, connexion commune, progression dans Supabase, cache de Pyodide, polices auto-hébergées : écrits sur la branche `refonte-accueil` (17/10/2026).
-- [ ] Refonte : coller la migration `005` (étape 8 de `MISE_EN_PLACE.md`) et vérifier les classes des comptes enseignants (`profils.classes`).
-- [ ] Refonte : ajouter `<script src="progression-resonance.js" type="module"></script>` après `parcours.js` dans `outils/python/index.html` et chaque `niveau-N.html`.
-- [ ] Refonte : versionner `outils/python/` et `vendor/` **avant** de fusionner la branche (sinon la carte Outils mène à une page absente), puis dérouler `docs/plan-test-refonte.md`.
+- [x] Accueil à trois entrées, espaces terminale / première, connexion commune, progression dans Supabase, cache de Pyodide, polices auto-hébergées : en ligne (17/10/2026).
+- [x] Migration `005` collée et vérifiée (table, 3 règles, fonction) ; compte enseignant rattaché à `B1_T_3_PH-CH_VANHOORDE`, compte de test à `TEST` (17/10/2026).
+- [ ] Refonte : dérouler `docs/plan-test-refonte.md` avec de vrais comptes (connexion, tutorat, participation, parcours relié, iPad).
 - [ ] Polices en double (`polices/` et `outils/python/polices/`) : faire importer `../../polices/polices.css` par `parcours.css`, puis supprimer la copie du parcours.
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.
 
 ## Journal
 
-- **17/10/2026** — Accueil à trois entrées (Tutorat, Participation, Outils), `commun.js`, polices auto-hébergées, parcours Python relié à Supabase (migration `005`), cache de Pyodide dans `sw.js`, sur la branche `refonte-accueil`.
+- **17/10/2026** — Mise en ligne : accueil à trois entrées (Tutorat, Participation, Outils ; premières limitées au Tutorat), banque d'outils (Labo Lycée), `commun.js`, polices auto-hébergées, parcours Python en cinq niveaux relié à Supabase (migration `005`), cache de Pyodide dans `sw.js`.
 - **11/10/2026** — Participation orale (sans QR code, chiffrée de bout en bout) et dépôts bonus, sur la branche `participation`.
 
 - **08/10/2026** — Correction : la correspondance s'arrêtait à 78 personnes (élèves de Mme Husson absents), car le fichier déclarait une plage de cellules périmée. Le site recalcule désormais la plage d'après les cellules réelles.

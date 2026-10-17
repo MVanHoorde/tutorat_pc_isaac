@@ -15,3 +15,6 @@ __pycache__/
 
 # Configuration locale de la CLI Supabase (lien vers le projet)
 supabase/.temp/
+
+# Audits internes du parcours Python : décrivent les fichiers du professeur, restent sur son PC
+outils/python/audit/

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Le parcours</title>
+<link rel="stylesheet" href="parcours.css">
+<style>
+  .niveaux { list-style: none; padding: 0; margin: 24px 0; display: grid; gap: 14px; }
+  .niveau { background: var(--sheet, #fff); border: 1px solid var(--rule, #D6DCE4); border-radius: 10px; padding: 18px 20px; display: grid; grid-template-columns: 64px 1fr; gap: 4px 16px; align-items: start; }
+  .niveau .n { grid-row: span 3; font-family: var(--mono, "IBM Plex Mono", monospace); font-size: 30px; font-weight: 500; color: var(--terminale, #9B6BFF); line-height: 1; padding-top: 4px; }
+  .niveau h2 { font-size: 20px; margin: 0; }
+  .niveau p { margin: 0; color: var(--muted, #5C6679); }
+  .niveau .etat { font-size: 13.5px; margin-top: 6px; }
+  .niveau.ouvert { border-left: 5px solid var(--terminale, #9B6BFF); }
+  .niveau.ouvert h2 a { color: inherit; }
+  .niveau.creation { border-style: dashed; }
+  .niveau.creation h2 a { color: inherit; }
+  .niveau .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .niveau .tags span { font-family: var(--mono, "IBM Plex Mono", monospace); font-size: 12px; border: 1px solid var(--rule, #D6DCE4); border-radius: 999px; padding: 2px 9px; color: var(--muted, #5C6679); background: var(--soft, #F4F6F9); }
+  /* L'accueil n'a pas de sommaire : une seule colonne centrée. */
+  body.pp.pp-hub { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "main"; }
+  body.pp-hub > main.pp-accueil { grid-column: 1; max-width: 860px; margin: 0 auto; padding: 8px 16px 48px; }
+  .niveau > :not(.n) { grid-column: 2; }
+  .niveaux > .niveau { max-width: none; }
+  .pp-accueil > p { font-size: 17px; }
+</style>
+</head>
+<body class="pp pp-hub">
+
+<header class="pp-head">
+  <p class="pp-invite">&gt;&gt;&gt; python · terminale spé PC</p>
+  <h1>Le parcours Python</h1>
+  <p class="pp-sous-titre">cinq niveaux · un vrai Python dans la page · le cours révisé au passage</p>
+  <p class="pp-chapeau">Chaque exercice se fait directement dans la page et révise en même temps une notion du cours de physique-chimie. En libre accès, à votre rythme.</p>
+</header>
+
+<main class="pp-accueil">
+  <div class="info">
+    <h4>Pour préparer l'ECE</h4>
+    <p><b>Faites les niveaux 1 et 2, dans l'ordre.</b> Ils contiennent tout ce que demande la partie Python de l'épreuve.</p>
+    <p>Les niveaux 3, 4 et 5 sont en cours de création. Ils sont déjà utilisables, mais pas encore assez relus par M. Van Hoorde pour qu'il en garantisse la pertinence à 100 %.</p>
+  </div>
+
+  <ol class="niveaux">
+    <li class="niveau ouvert">
+      <span class="n" aria-hidden="true">1</span>
+      <h2><a href="niveau-1.html">La boîte à outils de l'ECE</a></h2>
+      <p>Tous les outils de l'ECE, un par un : calculs, variables, affichage, numpy, listes, statistiques, pyplot, messages d'erreur.</p>
+      <p class="etat"><b>Prioritaire pour l'ECE</b> · mémo PDF à télécharger</p>
+    </li>
+    <li class="niveau ouvert">
+      <span class="n" aria-hidden="true">2</span>
+      <h2><a href="niveau-2.html">Mini-projets d'ECE</a></h2>
+      <p>Les outils du niveau 1 rassemblés dans des mini-projets complets, comme le jour de l'épreuve.</p>
+      <p class="etat"><b>Prioritaire pour l'ECE</b> · mémo PDF à télécharger</p>
+    </li>
+    <li class="niveau creation">
+      <span class="n" aria-hidden="true">3</span>
+      <h2><a href="niveau-3.html">Vers l'autonomie</a></h2>
+      <p>Écrire ses fonctions, lire un fichier de données, dérivée numérique, droite d'étalonnage, méthode d'Euler : de petits programmes complets, sur tout le programme.</p>
+      <p class="etat">En cours de création · utilisable</p>
+    </li>
+    <li class="niveau creation">
+      <span class="n" aria-hidden="true">4</span>
+      <h2><a href="niveau-4.html">Ouverture vers le supérieur</a></h2>
+      <p>Loi normale, Monte-Carlo, régression raisonnée, chercher dans la documentation pour personnaliser un graphique : les premiers attendus du supérieur.</p>
+      <div class="tags"><span>PCSI</span><span>MPSI</span><span>BCPST</span><span>BUT Mesures physiques</span><span>BUT Chimie</span><span>BTS</span></div>
+      <p class="etat">En cours de création · utilisable</p>
+    </li>
+    <li class="niveau creation">
+      <span class="n" aria-hidden="true">5</span>
+      <h2><a href="niveau-5.html">Pour aller plus loin</a></h2>
+      <p>Spectre d'un son, échantillonnage, filtrage, simulations : ce qu'on fait en deuxième année.</p>
+      <div class="tags"><span>PC</span><span>PSI</span><span>MP</span><span>BUT</span></div>
+      <p class="etat">En cours de création · utilisable</p>
+    </li>
+  </ol>
+</main>
+
+<script src="progression-resonance.js" type="module"></script>
+</body>
+</html>

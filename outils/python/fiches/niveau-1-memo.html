@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mémo Python — Niveau 1</title>
+<link rel="stylesheet" href="../polices/polices.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg:#e9edf4; --ink:#161f33; --ink-soft:#4a566e; --ink-faint:#8b97ad; --line:#d3dae7; --surface-2:#f4f6fb;
+    --bleu:#2445c7; --bleu-w:#e7ebfb; --vert:#12805c; --vert-w:#e0f2ea; --violet:#6b4a9a; --violet-w:#efe9f7;
+    --orange:#c26a12; --orange-w:#faeede; --rouge:#c33a2f; --rouge-w:#fbe6e3; --cyan:#0f6d63; --cyan-w:#e0f1ef;
+    --deep:#131A2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 9.6pt; line-height: 1.36; }
+  .feuille { width: 210mm; height: 297mm; padding: 11mm 13mm 10mm; overflow: hidden; page-break-after: always; position: relative; }
+  .feuille:last-child { page-break-after: auto; }
+  code, pre, .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+  code { font-size: 8.8pt; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; white-space: nowrap; }
+
+  .hero { background: linear-gradient(135deg, #f4f6fb 0%, #e7ebfb 100%); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px 10px; margin-bottom: 8px; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--bleu); margin: 0; }
+  .hero h1 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; font-weight: 800; font-size: 25pt; letter-spacing: -.02em; line-height: 1.05; margin: 2px 0 1px; }
+  .hero .sous { font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-size: 10.5pt; margin: 0; }
+
+  .bloc { --a: var(--bleu); --w: var(--bleu-w); border-left: 4px solid var(--a); padding: 0 0 0 9px; margin: 7px 0 0; }
+  .bloc > .lab { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase; color: var(--a); font-weight: 500; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  .bloc > .lab::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .bloc h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 12.5pt; margin: 0 0 3px; }
+  .b-vert { --a: var(--vert); --w: var(--vert-w); } .b-violet { --a: var(--violet); --w: var(--violet-w); }
+  .b-orange { --a: var(--orange); --w: var(--orange-w); } .b-rouge { --a: var(--rouge); --w: var(--rouge-w); } .b-cyan { --a: var(--cyan); --w: var(--cyan-w); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border-bottom: 1px solid var(--line); padding: 2.4px 5px; vertical-align: top; }
+  td:first-child { width: 33%; color: var(--ink-soft); }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+  pre.ex { background: #fbfcfe; border: 1px solid var(--line); border-left: 4px solid var(--a, var(--bleu)); border-radius: 6px; padding: 7px 10px; margin: 4px 0 0; font-size: 8.3pt; line-height: 1.42; white-space: pre; }
+  pre.ex .c { color: #6b7a90; font-style: italic; }
+  pre.ex .k { color: var(--violet); font-weight: 500; }
+  pre.ex .s { color: var(--vert); }
+  pre.ex .n { color: var(--orange); }
+  .sortie { font-family: "IBM Plex Mono", monospace; font-size: 8.2pt; background: var(--deep); color: #dfe6f5; border-radius: 6px; padding: 5px 10px; margin: 3px 0 0; white-space: pre; }
+  .note { font-size: 8.8pt; color: var(--ink-soft); margin: 3px 0 0; }
+
+  .pieges td:first-child { width: 17%; } .pieges td:nth-child(2) { width: 20%; }
+  ul.bilan { list-style: none; padding: 0; margin: 2px 0; columns: 2; column-gap: 16px; }
+  ul.bilan li { padding: 1.5px 0 1.5px 17px; position: relative; break-inside: avoid; }
+  ul.bilan li::before { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border: 1.4px solid var(--ink-soft); border-radius: 2px; }
+  .lignes { border-bottom: 1px dotted var(--ink-faint); height: 16px; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 7.2pt; color: var(--ink-faint); display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+
+<!-- ============================ PAGE 1 ============================ -->
+<section class="feuille">
+  <div class="hero">
+    <p class="kicker">&gt;&gt;&gt; python · niveau 1 · terminale spé PC · mémo</p>
+    <h1>La boîte à outils de l'ECE</h1>
+    <p class="sous">calculs · variables · numpy · listes · pyplot · erreurs</p>
+  </div>
+
+  <div class="grille">
+    <div>
+      <div class="bloc">
+        <p class="lab">Calculer</p>
+        <table>
+          <tr><td>opérations</td><td><code>+ - * /</code>, puissance <code>**</code></td></tr>
+          <tr><td>décimal</td><td><code>0.68</code> (point, jamais virgule)</td></tr>
+          <tr><td>3,00 × 10⁸</td><td><code>3.00e8</code></td></tr>
+          <tr><td>1,0 × 10⁻¹²</td><td><code>1.0e-12</code></td></tr>
+          <tr><td>ordre des calculs</td><td><code>(2 + 3) * 4</code> → 20</td></tr>
+        </table>
+      </div>
+      <div class="bloc b-vert">
+        <p class="lab">Ranger, afficher</p>
+        <table>
+          <tr><td>ranger une valeur</td><td><code>c = 340</code></td></tr>
+          <tr><td>modifier</td><td><code>f = f * 2</code></td></tr>
+          <tr><td>commentaire</td><td><code># en m/s</code></td></tr>
+          <tr><td>afficher</td><td><code>print('c =', c, 'm/s')</code></td></tr>
+          <tr><td>arrondir</td><td><code>round(x, 2)</code></td></tr>
+          <tr><td>type</td><td><code>int</code> · <code>float</code> · <code>str</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-violet">
+        <p class="lab">numpy</p>
+        <table>
+          <tr><td>charger</td><td><code>import numpy as np</code></td></tr>
+          <tr><td>log décimal</td><td><code>np.log10(x)</code></td></tr>
+          <tr><td>racine, π</td><td><code>np.sqrt(x)</code> · <code>np.pi</code></td></tr>
+          <tr><td>10 puissance x</td><td><code>10 ** (-pH)</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="bloc b-orange">
+        <p class="lab">Listes et tableaux</p>
+        <table>
+          <tr><td>liste</td><td><code>pH = [2.4, 2.5, 2.9]</code></td></tr>
+          <tr><td>nombre d'éléments</td><td><code>len(pH)</code></td></tr>
+          <tr><td>1<sup>er</sup>, 3<sup>e</sup> élément</td><td><code>pH[0]</code> · <code>pH[2]</code></td></tr>
+          <tr><td>calculer sur tout</td><td><code>pH = np.array(pH)</code></td></tr>
+          <tr><td>100 valeurs de 0 à 11</td><td><code>np.linspace(0, 11, 100)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-cyan">
+        <p class="lab">Statistiques</p>
+        <table>
+          <tr><td>moyenne</td><td><code>np.mean(x)</code></td></tr>
+          <tr><td>écart-type</td><td><code>np.std(x, ddof=1)</code></td></tr>
+          <tr><td>incertitude-type</td><td><code>s / np.sqrt(len(x))</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-rouge">
+        <p class="lab">Tracer avec pyplot</p>
+        <table>
+          <tr><td>charger</td><td><code>import matplotlib.pyplot as plt</code></td></tr>
+          <tr><td>points</td><td><code>plt.plot(x, y, 'b+')</code></td></tr>
+          <tr><td>courbe</td><td><code>plt.plot(x, y, 'r-')</code></td></tr>
+          <tr><td>nommer la série</td><td><code>label='mesures'</code> + <code>plt.legend()</code></td></tr>
+          <tr><td>légender</td><td><code>plt.xlabel</code> · <code>plt.ylabel</code> · <code>plt.title</code></td></tr>
+          <tr><td>histogramme</td><td><code>plt.hist(x, bins=5)</code></td></tr>
+          <tr><td>afficher</td><td><code>plt.grid()</code> · <code>plt.show()</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="bloc b-orange" style="margin-top:9px">
+    <p class="lab">Exemple commenté 1 · une courbe d'étalonnage, comme à l'ECE</p>
+<pre class="ex" style="--a:var(--orange)"><span class="k">import</span> numpy <span class="k">as</span> np                       <span class="c"># 1. charger les bibliothèques, toujours en premier</span>
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+<span class="c"># 2. saisir les mesures : listes entre crochets, POINT décimal, même longueur</span>
+c = np.array([<span class="n">1.0</span>, <span class="n">2.5</span>, <span class="n">5.0</span>, <span class="n">8.0</span>, <span class="n">10.0</span>])               <span class="c"># en mmol/L</span>
+sigma = np.array([<span class="n">0.162</span>, <span class="n">0.330</span>, <span class="n">0.605</span>, <span class="n">0.925</span>, <span class="n">1.158</span>])  <span class="c"># en mS/cm</span>
+
+<span class="c"># 3. le modèle : on calcule sur 100 valeurs d'un coup (tableau numpy)</span>
+k = <span class="n">0.1172</span>
+c_mod = np.linspace(<span class="n">0</span>, <span class="n">11</span>, <span class="n">100</span>)        <span class="c"># 100 concentrations de 0 à 11</span>
+sigma_mod = k * c_mod                   <span class="c"># loi de Kohlrausch, sur les 100 valeurs</span>
+
+<span class="c"># 4. exploiter : une concentration inconnue, affichée avec son unité</span>
+c_serum = <span class="n">0.869</span> / k
+print(<span class="s">'c du sérum ='</span>, round(c_serum, <span class="n">2</span>), <span class="s">'mmol/L'</span>)
+
+<span class="c"># 5. tracer : mesures en points, modèle en ligne, axes TOUJOURS légendés</span>
+plt.plot(c, sigma, <span class="s">'b+'</span>, label=<span class="s">'mesures'</span>)
+plt.plot(c_mod, sigma_mod, <span class="s">'r-'</span>, label=<span class="s">'modèle'</span>)    <span class="c"># c_mod avec sigma_mod : même longueur</span>
+plt.xlabel(<span class="s">'c (mmol/L)'</span>)
+plt.ylabel(<span class="s">'σ (mS/cm)'</span>)
+plt.legend()
+plt.show()                              <span class="c"># 6. afficher, en dernier</span></pre>
+    <p class="sortie">c du sérum = 7.41 mmol/L</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 1 · Résonance</span><span>1 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 2 ============================ -->
+<section class="feuille">
+  <div class="bloc b-cyan">
+    <p class="lab">Exemple commenté 2 · une série de mesures et son incertitude</p>
+<pre class="ex" style="--a:var(--cyan)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+<span class="c"># 15 pesées du même cylindre d'aluminium, en g ; la liste continue sur deux lignes</span>
+m = np.array([<span class="n">55.47</span>, <span class="n">55.43</span>, <span class="n">55.45</span>, <span class="n">55.44</span>, <span class="n">55.48</span>, <span class="n">55.42</span>, <span class="n">55.46</span>, <span class="n">55.45</span>,
+              <span class="n">55.43</span>, <span class="n">55.47</span>, <span class="n">55.44</span>, <span class="n">55.46</span>, <span class="n">55.42</span>, <span class="n">55.45</span>, <span class="n">55.46</span>])
+
+n = len(m)                       <span class="c"># nombre de mesures : 15</span>
+m_moy = np.mean(m)               <span class="c"># moyenne : meilleure estimation de la masse</span>
+s = np.std(m, ddof=<span class="n">1</span>)            <span class="c"># écart-type EXPÉRIMENTAL (divise par n - 1) : ddof=1 obligatoire</span>
+u = s / np.sqrt(n)               <span class="c"># incertitude-type de la moyenne (type A)</span>
+
+print(<span class="s">'n ='</span>, n)
+print(<span class="s">'moyenne ='</span>, round(m_moy, <span class="n">3</span>), <span class="s">'g'</span>)
+print(<span class="s">'u ='</span>, round(u, <span class="n">4</span>), <span class="s">'g'</span>)    <span class="c"># on écrira u à 1 chiffre significatif, arrondi à l'excès</span>
+
+plt.hist(m, bins=<span class="n">5</span>, edgecolor=<span class="s">'black'</span>)    <span class="c"># répartition des mesures en 5 classes</span>
+plt.xlabel(<span class="s">'masse (g)'</span>)
+plt.ylabel(<span class="s">'effectif'</span>)
+plt.show()</pre>
+    <p class="sortie">n = 15
+moyenne = 55.449 g
+u = 0.0048 g</p>
+    <p class="note">Résultat : <i>m</i> = (55,449 ± 0,005) g. L'histogramme montre les mesures regroupées autour de la moyenne.</p>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">Exemple commenté 3 · des variables, numpy et un affichage soigné</p>
+<pre class="ex" style="--a:var(--violet)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="c"># effet Doppler : émetteur de 40 kHz qui s'approche à 2,0 m/s</span>
+f_E = <span class="n">40000</span>                     <span class="c"># Hz ; pas d'espace dans un nombre</span>
+v = <span class="n">2.0</span>                         <span class="c"># m/s</span>
+c = <span class="n">340</span>                         <span class="c"># m/s</span>
+lam = c / f_E                   <span class="c"># « lambda » est un mot réservé : on écrit lam</span>
+
+f_R = f_E * c / (c - v)         <span class="c"># expression exacte ; les parenthèses fixent l'ordre</span>
+delta_f = f_R - f_E
+delta_f_approx = f_E * v / c    <span class="c"># expression approchée (v faible devant c)</span>
+
+print(<span class="s">'lambda ='</span>, lam, <span class="s">'m'</span>)              <span class="c"># dans un texte, « lambda » est permis</span>
+print(<span class="s">'Δf exact ='</span>, round(delta_f, <span class="n">1</span>), <span class="s">'Hz'</span>)
+print(<span class="s">'Δf approché ='</span>, round(delta_f_approx, <span class="n">1</span>), <span class="s">'Hz'</span>)
+print(<span class="s">'L ='</span>, <span class="n">10</span> * np.log10(<span class="n">1.0e-5</span> / <span class="n">1.0e-12</span>), <span class="s">'dB'</span>)   <span class="c"># log10, pas log</span></pre>
+    <p class="sortie">lambda = 0.0085 m
+Δf exact = 236.7 Hz
+Δf approché = 235.3 Hz
+L = 70.0 dB</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 1 · Résonance</span><span>2 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 3 ============================ -->
+<section class="feuille">
+  <div class="bloc b-rouge">
+    <p class="lab">Les pièges</p>
+    <table class="pieges">
+      <tr><td>0,124</td><td><code>0.124</code></td><td>Avec une virgule, <code>0,124</code> devient une paire de deux nombres : 0 et 124.</td></tr>
+      <tr><td>10⁻¹²</td><td><code>1e-12</code></td><td><code>10e-12</code> vaut 10 × 10⁻¹², dix fois trop. <code>^</code> n'est pas une puissance : <code>10^-2</code> vaut −12, sans message d'erreur.</td></tr>
+      <tr><td>log(x)</td><td><code>np.log10(x)</code></td><td><code>np.log(x)</code> calcule ln(x), le logarithme népérien.</td></tr>
+      <tr><td>2D, 2θ</td><td><code>2 * D</code></td><td>Le signe de la multiplication est obligatoire.</td></tr>
+      <tr><td>λ</td><td><code>lam</code></td><td><code>lambda</code>, <code>if</code>, <code>in</code>, <code>def</code>… sont des mots réservés : interdits comme noms.</td></tr>
+      <tr><td>un texte</td><td><code>'Hz'</code></td><td>Entre guillemets, sinon Python cherche une variable de ce nom.</td></tr>
+      <tr><td>c et C</td><td>deux variables</td><td>Python distingue majuscules et minuscules.</td></tr>
+      <tr><td>1<sup>re</sup> valeur</td><td><code>x[0]</code></td><td>Python compte à partir de 0 ; <code>x[5]</code> n'existe pas dans une liste de 5 valeurs.</td></tr>
+      <tr><td>écart-type</td><td><code>ddof=1</code></td><td>Sans lui, numpy divise par <i>n</i> au lieu de <i>n</i> − 1.</td></tr>
+      <tr><td>nm, µm, m</td><td>tout en m</td><td>Des unités mélangées donnent un résultat faux, sans message d'erreur.</td></tr>
+      <tr><td>‘ ’ (iPad)</td><td><code>'</code></td><td>Le clavier remplace parfois ' par ’ : Python ne comprend que le guillemet droit.</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">Lire un message d'erreur</p>
+    <p style="margin:0 0 3px">Regarder la <b>dernière ligne</b> (le type d'erreur) et le <b>numéro de ligne</b>. Si la ligne paraît juste, remonter d'une ligne.</p>
+    <table>
+      <tr><td><code>SyntaxError</code></td><td>la ligne n'est pas du Python : parenthèse ou guillemet non fermé, virgule décimale, mot réservé</td></tr>
+      <tr><td><code>NameError</code></td><td>nom inconnu : majuscule, faute de frappe, variable pas encore définie, texte sans guillemets</td></tr>
+      <tr><td><code>TypeError</code></td><td>opération impossible : texte + nombre, calcul sur une liste au lieu d'un <code>np.array</code></td></tr>
+      <tr><td><code>IndexError</code></td><td>élément qui n'existe pas : <code>x[5]</code> dans une liste de 5 valeurs</td></tr>
+      <tr><td><code>ValueError</code></td><td>dans <code>plt.plot</code> : <code>x and y must have same first dimension</code>, listes de longueurs différentes</td></tr>
+      <tr><td>aucun message</td><td>résultat faux : vérifier l'ordre de grandeur, les unités, <code>log</code> ou <code>log10</code>, <code>^</code> ou <code>**</code></td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Ce que je sais faire</p>
+    <ul class="bilan">
+      <li>Calculer dans la console, avec le point décimal et la notation <code>e</code>.</li>
+      <li>Ranger des valeurs dans des variables, sans mot réservé.</li>
+      <li>Distinguer nombre et texte ; afficher valeur arrondie et unité.</li>
+      <li>Utiliser <code>np.log10</code> et <code>np.sqrt</code>, sans confondre avec <code>np.log</code>.</li>
+      <li>Saisir des mesures dans une liste et calculer sur tout le tableau.</li>
+      <li>Calculer moyenne, écart-type et incertitude-type.</li>
+      <li>Tracer points, modèle et histogramme, axes légendés.</li>
+      <li>Lire un message d'erreur ; douter d'un résultat aberrant.</li>
+    </ul>
+    <p style="margin:7px 0 2px"><b>Point à revoir :</b></p>
+    <div class="lignes"></div><div class="lignes"></div>
+  </div>
+  <footer><span>© 2026 Loïc Van Hoorde — mise en forme réalisée avec l'aide de Claude (Anthropic)</span><span>3 / 3</span></footer>
+</section>
+</body>
+</html>

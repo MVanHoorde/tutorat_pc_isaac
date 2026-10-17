@@ -1,0 +1,2 @@
+# Le .gitignore racine exclut *.json (donnees d eleves) : ce fichier-ci doit etre publie.
+!pyodide-lock.json

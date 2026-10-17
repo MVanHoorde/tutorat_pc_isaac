@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mémo Python — Niveau 3</title>
+<link rel="stylesheet" href="../polices/polices.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg:#e9edf4; --ink:#161f33; --ink-soft:#4a566e; --ink-faint:#8b97ad; --line:#d3dae7; --surface-2:#f4f6fb;
+    --bleu:#2445c7; --bleu-w:#e7ebfb; --vert:#12805c; --vert-w:#e0f2ea; --violet:#6b4a9a; --violet-w:#efe9f7;
+    --orange:#c26a12; --orange-w:#faeede; --rouge:#c33a2f; --rouge-w:#fbe6e3; --cyan:#0f6d63; --cyan-w:#e0f1ef;
+    --deep:#131A2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 9.6pt; line-height: 1.36; }
+  .feuille { width: 210mm; height: 297mm; padding: 11mm 13mm 10mm; overflow: hidden; page-break-after: always; position: relative; }
+  .feuille:last-child { page-break-after: auto; }
+  code, pre, .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+  code { font-size: 8.8pt; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; white-space: nowrap; }
+
+  .hero { background: linear-gradient(135deg, #f4f6fb 0%, #e7ebfb 100%); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px 10px; margin-bottom: 8px; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--bleu); margin: 0; }
+  .hero h1 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; font-weight: 800; font-size: 25pt; letter-spacing: -.02em; line-height: 1.05; margin: 2px 0 1px; }
+  .hero .sous { font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-size: 10.5pt; margin: 0; }
+
+  .bloc { --a: var(--bleu); --w: var(--bleu-w); border-left: 4px solid var(--a); padding: 0 0 0 9px; margin: 7px 0 0; }
+  .bloc > .lab { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase; color: var(--a); font-weight: 500; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  .bloc > .lab::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .bloc h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 12.5pt; margin: 0 0 3px; }
+  .b-vert { --a: var(--vert); --w: var(--vert-w); } .b-violet { --a: var(--violet); --w: var(--violet-w); }
+  .b-orange { --a: var(--orange); --w: var(--orange-w); } .b-rouge { --a: var(--rouge); --w: var(--rouge-w); } .b-cyan { --a: var(--cyan); --w: var(--cyan-w); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border-bottom: 1px solid var(--line); padding: 2.4px 5px; vertical-align: top; }
+  td:first-child { width: 33%; color: var(--ink-soft); }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+  pre.ex { background: #fbfcfe; border: 1px solid var(--line); border-left: 4px solid var(--a, var(--bleu)); border-radius: 6px; padding: 7px 10px; margin: 4px 0 0; font-size: 8.3pt; line-height: 1.42; white-space: pre; }
+  pre.ex .c { color: #6b7a90; font-style: italic; }
+  pre.ex .k { color: var(--violet); font-weight: 500; }
+  pre.ex .s { color: var(--vert); }
+  pre.ex .n { color: var(--orange); }
+  .sortie { font-family: "IBM Plex Mono", monospace; font-size: 8.2pt; background: var(--deep); color: #dfe6f5; border-radius: 6px; padding: 5px 10px; margin: 3px 0 0; white-space: pre; }
+  .note { font-size: 8.8pt; color: var(--ink-soft); margin: 3px 0 0; }
+
+  .pieges td:first-child { width: 17%; } .pieges td:nth-child(2) { width: 20%; }
+  ul.bilan { list-style: none; padding: 0; margin: 2px 0; columns: 2; column-gap: 16px; }
+  ul.bilan li { padding: 1.5px 0 1.5px 17px; position: relative; break-inside: avoid; }
+  ul.bilan li::before { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border: 1.4px solid var(--ink-soft); border-radius: 2px; }
+  .lignes { border-bottom: 1px dotted var(--ink-faint); height: 16px; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 7.2pt; color: var(--ink-faint); display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+
+
+<section class="feuille">
+  <div class="hero">
+    <p class="kicker">&gt;&gt;&gt; python · niveau 3 · terminale spé PC · mémo</p>
+    <h1>Vers l'autonomie</h1>
+    <p class="sous">fonctions · while · fichiers · dérivée · polyfit · Euler · dichotomie</p>
+  </div>
+
+  <div class="grille">
+    <div>
+      <div class="bloc">
+        <p class="lab">Écrire une fonction</p>
+        <table>
+          <tr><td>définir</td><td><code>def f(x, y):</code> + bloc décalé</td></tr>
+          <tr><td>renvoyer</td><td><code>return x * y</code></td></tr>
+          <tr><td>appeler</td><td><code>E = f(2.0, 3.0)</code></td></tr>
+          <tr><td>sans <code>return</code></td><td>la fonction renvoie <code>None</code></td></tr>
+          <tr><td>afficher ≠ renvoyer</td><td><code>print</code> montre, <code>return</code> rend</td></tr>
+          <tr><td>fonction en paramètre</td><td><code>dichotomie(f, 0, 1, 1e-6)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-vert">
+        <p class="lab">Répéter</p>
+        <table>
+          <tr><td>tant que</td><td><code>while A &gt; 0.01 * A0:</code></td></tr>
+          <tr><td>n fois</td><td><code>for i in range(n):</code></td></tr>
+          <tr><td>ajouter à une liste</td><td><code>L.append(x)</code></td></tr>
+          <tr><td>exponentielle</td><td><code>np.exp(x)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-violet">
+        <p class="lab">Lire un fichier CSV</p>
+        <table>
+          <tr><td>lire</td><td><code>t, y = np.loadtxt('chute.csv',</code><br><code>delimiter=';', skiprows=1, unpack=True)</code></td></tr>
+          <tr><td>séparateur</td><td><code>delimiter=';'</code></td></tr>
+          <tr><td>sauter l'en-tête</td><td><code>skiprows=1</code></td></tr>
+          <tr><td>séparer les colonnes</td><td><code>unpack=True</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="bloc b-orange">
+        <p class="lab">Dériver des mesures</p>
+        <table>
+          <tr><td>vitesse centrée</td><td><code>(x[2:] - x[:-2]) / (t[2:] - t[:-2])</code></td></tr>
+          <tr><td>ses dates</td><td><code>t[1:-1]</code> (deux valeurs de moins)</td></tr>
+          <tr><td>dernière valeur</td><td><code>x[-1]</code></td></tr>
+          <tr><td>flèches</td><td><code>plt.quiver(x, y, ax, ay, …)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-cyan">
+        <p class="lab">Modéliser par une droite</p>
+        <table>
+          <tr><td>y = a x + b</td><td><code>a, b = np.polyfit(x, y, 1)</code></td></tr>
+          <tr><td>tracer le modèle</td><td><code>plt.plot(x, a * x + b, 'r-')</code></td></tr>
+          <tr><td>proportionnalité</td><td>points alignés et <i>b</i> ≈ 0</td></tr>
+          <tr><td>exponentielle</td><td>tracer <code>np.log(y)</code> : pente −λ</td></tr>
+        </table>
+      </div>
+      <div class="bloc b-rouge">
+        <p class="lab">Euler et dichotomie</p>
+        <table>
+          <tr><td>y′ = a y + b</td><td><code>y = y + (a * y + b) * dt</code></td></tr>
+          <tr><td>pas</td><td>dt au moins dix fois plus petit que τ</td></tr>
+          <tr><td>milieu</td><td><code>m = (a + b) / 2</code></td></tr>
+          <tr><td>garder la bonne moitié</td><td><code>if f(a) * f(m) &lt;= 0: b = m</code><br><code>else: a = m</code></td></tr>
+          <tr><td>précision</td><td><code>while b - a &gt; 1e-6:</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="bloc b-cyan" style="margin-top:9px">
+    <p class="lab">Exemple commenté 1 · du fichier de mesures au modèle</p>
+<pre class="ex" style="--a:var(--cyan)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+<span class="c"># 1. lire le fichier : séparateur ; et une ligne d'en-tête « t (s);y (m) » à sauter</span>
+t, y = np.loadtxt(<span class="s">'chute.csv'</span>, delimiter=<span class="s">';'</span>, skiprows=<span class="n">1</span>, unpack=<span class="k">True</span>)
+
+<span class="c"># 2. dériver : vitesse centrée, 2 valeurs de moins que les positions</span>
+vy = (y[<span class="n">2</span>:] - y[:<span class="n">-2</span>]) / (t[<span class="n">2</span>:] - t[:<span class="n">-2</span>])
+tv = t[<span class="n">1</span>:<span class="n">-1</span>]                        <span class="c"># les dates des vitesses</span>
+print(len(t), <span class="s">'positions,'</span>, len(vy), <span class="s">'vitesses'</span>)
+
+<span class="c"># 3. modéliser : droite vy = a × t + b ; les abscisses d'abord ; ici a ≈ -g et b ≈ 0</span>
+a, b = np.polyfit(tv, vy, <span class="n">1</span>)
+print(<span class="s">'a ='</span>, round(a, <span class="n">2</span>), <span class="s">'m/s²   b ='</span>, round(b, <span class="n">3</span>), <span class="s">'m/s'</span>)
+
+<span class="c"># 4. tracer mesures et modèle, avec des tableaux de même longueur</span>
+plt.plot(tv, vy, <span class="s">'b+'</span>, label=<span class="s">'mesures'</span>)
+plt.plot(tv, a * tv + b, <span class="s">'r-'</span>, label=<span class="s">'modèle'</span>)
+plt.xlabel(<span class="s">'t (s)'</span>)
+plt.ylabel(<span class="s">'vy (m/s)'</span>)
+plt.legend()
+plt.show()</pre>
+    <p class="sortie">14 positions, 12 vitesses
+a = -9.79 m/s²   b = -0.005 m/s</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 3 · Résonance</span><span>1 / 3</span></footer>
+</section>
+
+<section class="feuille">
+  <div class="bloc b-rouge">
+    <p class="lab">Exemple commenté 2 · la méthode d'Euler, rangée dans une fonction</p>
+<pre class="ex" style="--a:var(--rouge)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="k">def</span> euler(a, b, y0, dt, n):        <span class="c"># résout y' = a × y + b, en n pas de durée dt</span>
+    y = y0                           <span class="c"># valeur initiale y(0)</span>
+    liste_y = [y]
+    <span class="k">for</span> i <span class="k">in</span> range(n):
+        y = y + (a * y + b) * dt     <span class="c"># un pas : y(t + dt) ≈ y(t) + y'(t) × dt</span>
+        liste_y.append(y)
+    <span class="k">return</span> liste_y                   <span class="c"># renvoyer, pas afficher : on calcule ensuite avec</span>
+
+<span class="c"># charge d'un condensateur : du/dt = (E - u) / tau, soit a = -1/tau et b = E/tau</span>
+E, tau = <span class="n">12.0</span>, <span class="n">22.0</span>                 <span class="c"># en V et en s</span>
+u = euler(<span class="n">-1</span> / tau, E / tau, <span class="n">0</span>, <span class="n">1.0</span>, <span class="n">140</span>)    <span class="c"># pas de 1 s, de 0 à 140 s</span>
+print(len(u), <span class="s">'valeurs ; u(22 s) ='</span>, round(u[<span class="n">22</span>], <span class="n">2</span>), <span class="s">'V'</span>)    <span class="c"># pas de 1 s : u[22] est à t = 22 s</span>
+print(<span class="s">'solution exacte :'</span>, round(E * (<span class="n">1</span> - np.exp(<span class="n">-1</span>)), <span class="n">2</span>), <span class="s">'V'</span>)</pre>
+    <p class="sortie">141 valeurs ; u(22 s) = 7.69 V
+solution exacte : 7.59 V</p>
+    <p class="note">À la date τ, 63 % de <i>E</i>. L'écart avec la solution exacte diminue si l'on réduit le pas. La même fonction résout la décroissance radioactive : <code>euler(-lam, 0, N0, dt, n)</code>.</p>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">Exemple commenté 3 · une dichotomie réutilisable</p>
+<pre class="ex" style="--a:var(--violet)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="k">def</span> dichotomie(f, a, b, precision):   <span class="c"># f(a) et f(b) doivent être de signes contraires</span>
+    <span class="k">while</span> b - a &gt; precision:          <span class="c"># tant que l'encadrement est trop large</span>
+        m = (a + b) / <span class="n">2</span>
+        <span class="k">if</span> f(a) * f(m) &lt;= <span class="n">0</span>:          <span class="c"># le changement de signe est dans [a ; m]</span>
+            b = m
+        <span class="k">else</span>:                         <span class="c"># sinon, il est dans [m ; b]</span>
+            a = m
+    <span class="k">return</span> (a + b) / <span class="n">2</span>
+
+<span class="c"># acide éthanoïque à c = 1,0 × 10⁻² mol/L : x = [H3O+] vérifie x² + Ka x - Ka c = 0</span>
+c = <span class="n">1.0e-2</span>
+Ka = <span class="n">10</span> ** (<span class="n">-4.76</span>)
+
+<span class="k">def</span> f(x):
+    <span class="k">return</span> x ** <span class="n">2</span> + Ka * x - Ka * c
+
+x = dichotomie(f, <span class="n">0</span>, c, <span class="n">1e-9</span>)       <span class="c"># le nom f, sans parenthèses : on donne la fonction</span>
+print(<span class="s">'[H3O+] ='</span>, round(x, <span class="n">6</span>), <span class="s">'mol/L'</span>)
+print(<span class="s">'tau ='</span>, round(x / c, <span class="n">3</span>), <span class="s">'; pH ='</span>, round(-np.log10(x), <span class="n">2</span>))</pre>
+    <p class="sortie">[H3O+] = 0.000408 mol/L
+tau = 0.041 ; pH = 3.39</p>
+    <p class="note">Taux d'avancement final τ ≈ 4 % : la réaction de l'acide sur l'eau est très limitée. Chaque tour divise l'encadrement par deux : 24 tours ici, pour passer de 10⁻² à moins de 10⁻⁹.</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 3 · Résonance</span><span>2 / 3</span></footer>
+</section>
+
+<section class="feuille">
+  <div class="bloc b-rouge">
+    <p class="lab">Les pièges</p>
+    <table class="pieges">
+      <tr><td>renvoyer</td><td><code>return</code></td><td>Une fonction qui fait <code>print</code> au lieu de <code>return</code> renvoie <code>None</code> : <code>TypeError … 'NoneType'</code> au calcul suivant.</td></tr>
+      <tr><td>variable locale</td><td>dans <code>def</code></td><td>Une variable créée dans une fonction n'existe pas en dehors : <code>NameError</code>.</td></tr>
+      <tr><td>boucle infinie</td><td><code>while</code></td><td>Une variable de la condition doit changer dans la boucle, sinon elle ne s'arrête jamais.</td></tr>
+      <tr><td>en-tête</td><td><code>skiprows=1</code></td><td>Sans lui : <code>could not convert string 't (s)' to float</code>.</td></tr>
+      <tr><td>séparateur</td><td><code>delimiter=';'</code></td><td>Celui du fichier : regarder une ligne de données avant d'écrire le programme.</td></tr>
+      <tr><td>0,04</td><td><code>0.04</code></td><td>numpy ne lit pas la virgule décimale : l'exporter avec un point.</td></tr>
+      <tr><td>longueurs</td><td><code>t[1:-1]</code></td><td>Les vitesses ont deux valeurs de moins que les positions : <code>ValueError</code> au tracé avec <code>t</code>.</td></tr>
+      <tr><td>polyfit(x, y)</td><td>abscisses d'abord</td><td><code>np.polyfit(y, x, 1)</code> calcule une autre droite, sans message d'erreur.</td></tr>
+      <tr><td>ln, log</td><td><code>np.log</code></td><td>Pour linéariser une exponentielle, c'est ln : <code>np.log</code>, pas <code>np.log10</code>.</td></tr>
+      <tr><td>pas d'Euler</td><td><code>dt</code> petit</td><td>Un pas plus long que τ donne un résultat faux, parfois absurde.</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">Nouveaux messages d'erreur</p>
+    <table>
+      <tr><td><code>FileNotFoundError</code></td><td>fichier introuvable : nom ou extension mal écrits, fichier dans un autre dossier</td></tr>
+      <tr><td><code>ValueError</code> de <code>loadtxt</code></td><td><code>could not convert string … to float</code> : en-tête non sauté, mauvais séparateur, virgule décimale</td></tr>
+      <tr><td><code>ValueError</code> unpack</td><td><code>not enough values to unpack</code> : plus de variables que de colonnes</td></tr>
+      <tr><td><code>TypeError</code> NoneType</td><td>calcul avec <code>None</code> : une fonction sans <code>return</code></td></tr>
+      <tr><td>boucle trop longue</td><td>arrêt au bout de 5 s : la condition du <code>while</code> reste vraie</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Ce que je sais faire</p>
+    <ul class="bilan">
+      <li>Écrire et appeler une fonction ; distinguer <code>return</code> et <code>print</code>.</li>
+      <li>Répéter tant qu'une condition est vraie, avec <code>while</code>.</li>
+      <li>Lire un fichier de mesures avec <code>np.loadtxt</code>.</li>
+      <li>Calculer vitesse, accélération, vitesse volumique.</li>
+      <li>Modéliser par une droite ; linéariser une exponentielle.</li>
+      <li>Résoudre <i>y</i>′ = <i>ay</i> + <i>b</i> par la méthode d'Euler.</li>
+      <li>Résoudre une équation par dichotomie.</li>
+      <li>Écrire un programme complet, du fichier au modèle.</li>
+    </ul>
+    <p style="margin:7px 0 2px"><b>Point à revoir :</b></p>
+    <div class="lignes"></div><div class="lignes"></div>
+  </div>
+  <footer><span>© 2026 Loïc Van Hoorde — mise en forme réalisée avec l'aide de Claude (Anthropic)</span><span>3 / 3</span></footer>
+</section>
+</body>
+</html>

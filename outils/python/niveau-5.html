@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Niveau 5 — Pour aller plus loin</title>
+<link rel="stylesheet" href="parcours.css">
+</head>
+<body class="pp" data-niveau="5">
+
+<header class="pp-head">
+  <p class="pp-invite">&gt;&gt;&gt; python · niveau 5 · terminale spé PC</p>
+  <h1>Pour aller plus loin</h1>
+  <p class="pp-sous-titre">numériser · échantillonner · spectre · filtrer · diffusion · hasard · Student</p>
+  <p class="pp-chapeau">Ce qu'on fait avec Python en 2e année de classe préparatoire, en BUT et en BTS, à partir des chapitres du cours : le son, le Doppler, l'absorbance, les transferts thermiques.</p>
+  <a class="pp-retour" href="index.html">← Le parcours Python</a>
+</header>
+
+<div class="pp-statut" aria-live="polite"></div>
+<nav class="pp-sommaire" aria-label="Étapes du niveau 5"></nav>
+
+<main>
+
+<section class="seance" id="mode-emploi" data-titre="Mode d'emploi">
+  <h2>Mode d'emploi</h2>
+  <div class="info">
+    <h4>Statut de ce niveau</h4>
+    <p>Ce niveau est en cours d'audit par M. Van Hoorde. Il est utilisable, mais pas encore garanti à 100 %.</p>
+  </div>
+  <p class="intro">Ce niveau suppose acquis les niveaux 1 à 4. Ses sept étapes sont des ouvertures : elles ne seront évaluées ni à l'ECE ni au bac. Chacune porte une <b>étiquette</b> qui indique la formation où cette notion est au programme.</p>
+  <div class="info">
+    <ul>
+      <li>Les étapes se suivent : l'étape 3 réutilise l'étape 2, l'étape 4 l'étape 3, l'étape 6 l'étape 5.</li>
+      <li>Tous les signaux sont fabriqués par le programme, avec numpy : aucun fichier à charger.</li>
+      <li>L'étape 7 utilise la bibliothèque <b>scipy</b>. Elle se télécharge à son premier usage (14 Mo) : comptez quelques dizaines de secondes, une seule fois.</li>
+      <li>Comme aux niveaux précédents : <b>💡 Aide</b> pour un indice, <b>ⓘ Rappel de cours</b> pour la notion du cours, solution après un premier essai.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s1" data-titre="Numériser une tension">
+  <h2>Numériser une tension</h2>
+  <p class="etiquette">BUT Mesures physiques · R2.08</p>
+  <p class="intro">Un capteur délivre une tension. Pour la traiter en Python, une carte d'acquisition la convertit en nombre entier : c'est le rôle du <b>convertisseur analogique-numérique</b> (CAN). Le programme du BUT Mesures physiques demande de « savoir numériser un signal analogique et connaître les caractéristiques métrologiques du signal numérisé ».</p>
+
+  <details class="rappel"><summary>Rappel de cours — Numérisation (enseignement scientifique de 1re)</summary>
+    <p>Une information codée sur <i>n</i> bits peut prendre 2<sup><i>n</i></sup> valeurs. La <b>résolution</b> de la numérisation est le nombre de bits sur lesquels la valeur est codée.</p>
+    <p>L'écart entre deux niveaux voisins s'appelle le <b>pas</b> <i>p</i>. Pour une plage de mesure de 0 à <i>U</i><sub>max</sub> :</p>
+    <p class="formule">p = <span class="frac"><span class="haut">U<sub>max</sub></span><span class="bas">2<sup>n</sup> − 1</span></span></p>
+    <p>L'imprécision due à la numérisation n'excède jamais la moitié du pas.</p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Le CAN remplace la tension <i>u</i> par l'entier le plus proche de <i>u</i> / <i>p</i> : <code>N = np.round(u / p)</code>. La tension restituée vaut <code>N * p</code>.</li>
+      <li><code>np.round(x)</code> arrondit à l'entier le plus proche, même un tableau entier d'un coup.</li>
+      <li><code>np.abs(x)</code> donne la valeur absolue, <code>np.max(x)</code> la plus grande valeur d'un tableau.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-1-1">
+    <h3><span class="num">1.1</span> La carte micro:bit de l'ECE</h3>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 62. Une carte micro:bit mesure la tension aux bornes d'un condensateur. Son CAN code la tension sur 10 bits, pour une plage de 0 à 3,3 V. La carte renvoie un entier ; le programme du sujet le convertit en volts.</p>
+    <div class="qcm" data-bonne="e">
+      <p class="qcm-q">Combien de valeurs entières différentes ce CAN peut-il renvoyer ?</p>
+      <button class="opt" data-v="a"><code>10</code></button>
+      <button class="opt" data-v="b"><code>20</code></button>
+      <button class="opt" data-v="c"><code>100</code></button>
+      <button class="opt" data-v="d"><code>1023</code></button>
+      <button class="opt" data-v="e"><code>1024</code></button>
+      <button class="opt" data-v="f"><code>2048</code></button>
+      <div class="qcm-expl" hidden>Sur 10 bits, 2¹⁰ = 1024 valeurs : les entiers de 0 à 1023. Il y a donc 1023 intervalles entre la plus petite et la plus grande, d'où le 1023 du sujet.</div>
+    </div>
+    <ol class="questions">
+      <li>Compléter la ligne <code>p = ……</code> qui calcule le pas de ce CAN.</li>
+      <li>La carte renvoie l'entier 512. Compléter la ligne qui calcule la tension correspondante.</li>
+      <li>Quelle est la plus petite variation de tension que la carte peut détecter ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">n = 10           # nombre de bits du CAN
+U_max = 3.3      # plage de mesure : de 0 à 3,3 V
+
+p = ……           # pas, en V
+print('p =', p, 'V')
+
+N = 512          # entier renvoyé par la carte
+u = ……           # tension correspondante, en V
+print('u =', round(u, 3), 'V')</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+bon_p = 3.3 / 1023
+if 'p' in g and isinstance(p, (int, float)):
+    if abs(p - bon_p) < 1e-9:
+        ok("Question 1 — p = 3,3 / 1023 ≈ 3,2 mV.")
+    elif abs(p - 3.3 / 1024) < 1e-9:
+        indice("Question 1 : 1024 valeurs, mais seulement 1023 intervalles entre 0 et 3,3 V. Relisez la formule du pas.")
+    else:
+        indice("Question 1 : le pas se calcule avec U_max et 2 ** n, comme dans le rappel de cours.")
+if 'u' in g and isinstance(u, (int, float)) and 'N' in g:
+    if abs(u - 512 * bon_p) < 1e-6:
+        ok("Question 2 — u = 512 × p ≈ 1,652 V, à peu près le milieu de la plage.")
+    elif 'p' in g and abs(u - N * p) > 1e-9:
+        indice("Question 2 : la tension restituée vaut N multiplié par le pas.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">p = U_max / (2 ** n - 1)
+u = N * p</pre>
+      <p><i>p</i> ≈ 0,003 23 V, soit 3,2 mV : c'est la plus petite variation détectable. L'entier 512 correspond à <i>u</i> ≈ 1,652 V. C'est exactement la ligne du sujet : <code>Uc = Uc_NUM * 3.3 / 1023</code>.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-2">
+    <h3><span class="num">1.2</span> Un son en escalier</h3>
+    <p class="contexte">Un microphone délivre une tension sinusoïdale de fréquence 440 Hz, comprise entre 0,15 et 3,15 V. On la numérise d'abord avec un CAN de 3 bits seulement.</p>
+    <ol class="questions">
+      <li>Compléter les lignes <code>N = ……</code> et <code>u_num = ……</code>, puis exécuter.</li>
+      <li>Compléter la ligne <code>erreur = ……</code> : le plus grand écart, en valeur absolue, entre <code>u_num</code> et <code>u</code>. Le comparer à la moitié du pas.</li>
+      <li>Passer à 10 bits. Que deviennent l'escalier et l'erreur ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Toutes les lignes s'écrivent avec les fonctions de l'encadré À retenir.</li>
+      <li>L'écart entre les deux tableaux est <code>u_num - u</code> ; on en prend la valeur absolue, puis la plus grande valeur.</li>
+      <li>Les fonctions s'emboîtent : <code>np.max(np.abs(……))</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+n = 3                                # nombre de bits du CAN
+U_max = 3.3                          # plage : de 0 à 3,3 V
+p = U_max / (2 ** n - 1)             # pas, en V
+
+t = np.linspace(0, 0.005, 500)                  # 5 ms, en s
+u = 1.65 + 1.5 * np.sin(2 * np.pi * 440 * t)    # tension du micro, en V
+
+N = ……           # entiers renvoyés par le CAN
+u_num = ……       # tensions restituées, en V
+erreur = ……      # plus grand écart entre u_num et u, en V
+
+print('pas :', round(p, 4), 'V')
+print('erreur maximale :', round(erreur, 4), 'V')
+
+plt.plot(t * 1000, u, 'b-', label='signal analogique')
+plt.plot(t * 1000, u_num, 'r-', label='signal numérisé')
+plt.xlabel('t (ms)')
+plt.ylabel('u (V)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if all(k_ in g for k_ in ('u', 'p', 'N', 'u_num')):
+    ref_N = _np.round(u / p)
+    if _np.shape(N) == _np.shape(u) and _np.allclose(N, ref_N) and _np.allclose(u_num, ref_N * p):
+        ok("Question 1 — Le signal est numérisé : un escalier de 2ⁿ marches au plus.")
+        if 'erreur' in g and isinstance(erreur, (int, float)) and abs(erreur - _np.max(_np.abs(ref_N * p - u))) < 1e-9:
+            ok("Question 2 — L'erreur maximale ne dépasse pas p / 2.")
+            if n >= 8:
+                ok("Question 3 — Avec " + str(n) + " bits, l'escalier se confond avec le signal : erreur de l'ordre du millivolt.")
+            else:
+                indice("Question 3 : remplacez n = 3 par n = 10.")
+        elif 'erreur' in g:
+            indice("Question 2 : il faut la plus grande valeur de l'écart, pris en valeur absolue.")
+    elif _np.shape(N) == _np.shape(u) and _np.allclose(N, u / p):
+        indice("N doit être un entier : arrondissez avec np.round.")
+    else:
+        indice("Question 1 : N = np.round(u / p), puis u_num = N * p.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">N = np.round(u / p)
+u_num = N * p
+erreur = np.max(np.abs(u_num - u))</pre>
+      <p>Sur 3 bits, le pas vaut 0,47 V : l'escalier n'a que 8 marches et l'erreur atteint 0,236 V, la moitié du pas. Sur 10 bits, le pas tombe à 3,2 mV et l'erreur à 1,6 mV : la courbe rouge se confond avec la bleue. En contrepartie, chaque mesure occupe plus de place en mémoire.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s2" data-titre="Échantillonner">
+  <h2>Échantillonner un signal</h2>
+  <p class="etiquette">attendu de PC · MP · PSI · BUT Mesures physiques (R2.08)</p>
+  <p class="intro">Numériser, c'est aussi choisir <b>quand</b> mesurer. Mesurer trop rarement ne fait pas seulement perdre des détails : cela peut faire apparaître une fréquence qui n'existe pas. Le programme de PC (2e année) demande de « mettre en évidence le phénomène de repliement du spectre provoqué par l'échantillonnage » et d'« utiliser la condition de Nyquist-Shannon ».</p>
+
+  <details class="rappel"><summary>Rappel de cours — Échantillonnage (enseignement scientifique de 1re)</summary>
+    <p>La carte d'acquisition mesure le signal à intervalles de temps réguliers : la <b>période d'échantillonnage</b> <i>T</i><sub>e</sub>. Le nombre de mesures par seconde est la <b>fréquence d'échantillonnage</b> <i>f</i><sub>e</sub>.</p>
+    <p class="formule">f<sub>e</sub> = <span class="frac"><span class="haut">1</span><span class="bas">T<sub>e</sub></span></span></p>
+    <p>Le format CD : <i>f</i><sub>e</sub> = 44,1 kHz, sur 16 bits.</p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>np.arange(0, duree, Te)</code> crée les valeurs 0, <i>T</i><sub>e</sub>, 2<i>T</i><sub>e</sub>… jusqu'à <code>duree</code> exclue : ce sont les instants des mesures.</li>
+      <li><em class="cle">Condition de Nyquist-Shannon</em> : pour reproduire fidèlement un signal, il faut <i>f</i><sub>e</sub> &gt; 2 × <i>f</i><sub>max</sub>, où <i>f</i><sub>max</sub> est la plus grande fréquence qu'il contient.</li>
+      <li>Sinon, il y a <em class="cle">repliement de spectre</em> : une sinusoïde de fréquence <i>f</i> comprise entre <i>f</i><sub>e</sub> / 2 et <i>f</i><sub>e</sub> est vue à la fréquence <i>f</i><sub>e</sub> − <i>f</i>.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-2-1">
+    <h3><span class="num">2.1</span> Un La mal échantillonné</h3>
+    <p class="contexte">Le programme trace un La de 440 Hz avec 20 000 points : c'est le signal « analogique ». On l'échantillonne ensuite à la fréquence <code>fe</code>.</p>
+    <ol class="questions">
+      <li>Compléter les lignes <code>t_ech = ……</code> et <code>u_ech = ……</code>, puis exécuter avec <i>f</i><sub>e</sub> = 8 000 Hz.</li>
+      <li>Remplacer <i>f</i><sub>e</sub> par 500 Hz. Les points rouges dessinent-ils encore le La ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+f = 440            # fréquence du La, en Hz
+duree = 0.05       # durée observée, en s
+
+t = np.linspace(0, duree, 20000)      # signal « analogique » : presque continu
+u = np.sin(2 * np.pi * f * t)
+
+fe = 8000          # fréquence d'échantillonnage, en Hz
+t_ech = ……         # instants des mesures
+u_ech = ……         # valeurs mesurées
+
+plt.plot(t * 1000, u, 'b-', linewidth=0.8, label='signal')
+plt.plot(t_ech * 1000, u_ech, 'ro-', label='échantillons')
+plt.xlabel('t (ms)')
+plt.ylabel('u')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if all(k_ in g for k_ in ('t_ech', 'u_ech', 'fe', 'f', 'duree')):
+    ref = _np.arange(0, duree, 1 / fe)
+    if _np.shape(t_ech) == _np.shape(ref) and _np.allclose(t_ech, ref) and _np.shape(u_ech) == _np.shape(ref) and _np.allclose(u_ech, _np.sin(2 * _np.pi * f * ref)):
+        if fe > 2 * f:
+            ok("Question 1 — Avec fe = " + str(fe) + " Hz, les échantillons suivent le La.")
+        if fe == 500:
+            ok("Question 2 — Avec fe = 500 Hz, les points rouges dessinent une sinusoïde lente : ce n'est plus le La.")
+        elif fe > 2 * f:
+            indice("Question 2 : remplacez fe = 8000 par fe = 500.")
+    elif _np.shape(t_ech) == _np.shape(ref) and _np.allclose(t_ech, ref):
+        indice("Les instants sont justes. u_ech s'obtient comme u, mais avec t_ech.")
+    else:
+        indice("Les instants des mesures : np.arange(0, duree, Te), avec Te = 1 / fe.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Avec fe = 500 Hz</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">À quelle fréquence la courbe rouge semble-t-elle osciller ?</p>
+        <button class="opt" data-v="a">440 Hz</button>
+        <button class="opt" data-v="b">500 Hz</button>
+        <button class="opt" data-v="c">60 Hz</button>
+        <button class="opt" data-v="d">940 Hz</button>
+        <button class="opt" data-v="e">220 Hz</button>
+        <button class="opt" data-v="f">250 Hz</button>
+        <div class="qcm-expl" hidden>440 Hz est compris entre <i>f</i><sub>e</sub> / 2 = 250 Hz et <i>f</i><sub>e</sub> = 500 Hz : il y a repliement, et le La apparaît à 500 − 440 = 60 Hz. Sur le graphique, une période dure 1 / 60 s ≈ 17 ms : moins de trois oscillations en 50 ms.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">t_ech = np.arange(0, duree, 1 / fe)
+u_ech = np.sin(2 * np.pi * f * t_ech)</pre>
+      <p>À 8 000 Hz, on mesure environ 18 fois par période : les points suivent le signal. À 500 Hz, on mesure un peu plus d'une fois par période seulement : les points rouges dessinent une sinusoïde de 60 Hz qui n'existe pas. La condition de Nyquist-Shannon n'est pas respectée : 500 Hz &lt; 2 × 440 Hz.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-2-2">
+    <h3><span class="num">2.2</span> Le format CD et les ultrasons du TP5</h3>
+    <p class="contexte">Une oreille humaine jeune entend des sons de 20 Hz à 20 kHz. Utiliser la console pour les calculs si besoin.</p>
+    <div class="py" data-mode="console"></div>
+    <div class="quiz">
+      <h4>Nyquist-Shannon et repliement</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Pour enregistrer fidèlement tous les sons audibles, la fréquence d'échantillonnage doit être…</p>
+        <button class="opt" data-v="a">supérieure à 10 kHz</button>
+        <button class="opt" data-v="b">supérieure à 20 kHz</button>
+        <button class="opt" data-v="c">supérieure à 40 kHz</button>
+        <button class="opt" data-v="d">supérieure à 60 kHz</button>
+        <button class="opt" data-v="e">supérieure à 80 kHz</button>
+        <div class="qcm-expl" hidden><i>f</i><sub>max</sub> = 20 kHz, donc <i>f</i><sub>e</sub> &gt; 2 × 20 = 40 kHz. Le format CD a choisi 44,1 kHz, avec une petite marge.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">Au format CD, quelle est la plus haute fréquence enregistrée sans repliement ?</p>
+        <button class="opt" data-v="a">88,2 kHz</button>
+        <button class="opt" data-v="b">44,1 kHz</button>
+        <button class="opt" data-v="c">20,0 kHz</button>
+        <button class="opt" data-v="d">22,05 kHz</button>
+        <button class="opt" data-v="e">11,025 kHz</button>
+        <div class="qcm-expl" hidden>Il faut <i>f</i> &lt; <i>f</i><sub>e</sub> / 2 = 44,1 / 2 = 22,05 kHz.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">L'émetteur d'ultrasons du TP5 (40 kHz) est enregistré à 44,1 kHz, sans filtre. À quelle fréquence apparaît-il ?</p>
+        <button class="opt" data-v="a">40,0 kHz</button>
+        <button class="opt" data-v="b">4,1 kHz</button>
+        <button class="opt" data-v="c">84,1 kHz</button>
+        <button class="opt" data-v="d">22,05 kHz</button>
+        <button class="opt" data-v="e">18,0 kHz</button>
+        <button class="opt" data-v="f">44,1 kHz</button>
+        <div class="qcm-expl" hidden>40 kHz est compris entre 22,05 et 44,1 kHz : il est replié à 44,1 − 40 = 4,1 kHz, en plein dans le domaine audible. C'est pourquoi une carte son place un <em>filtre anti-repliement</em> avant le CAN : il coupe les fréquences supérieures à <i>f</i><sub>e</sub> / 2.</div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s3" data-titre="Le spectre d'un son">
+  <h2>Le spectre d'un son</h2>
+  <p class="etiquette">attendu de PSI · en PC, Fourier « non exigible »</p>
+  <p class="intro">En 1re, un logiciel traçait le spectre d'un son. On le calcule maintenant soi-même avec la <b>transformée de Fourier discrète</b>. Seul le programme de PSI l'exige : « calculer la transformée de Fourier discrète d'un signal à valeurs réelles en utilisant la fonction rfft de la bibliothèque numpy.fft ». En PC, il précise que « la transformée de Fourier n'est pas exigible ».</p>
+
+  <details class="rappel"><summary>Rappel de cours — Spectre d'un son (enseignement scientifique de 1re)</summary>
+    <p>Un signal périodique de fréquence <i>f</i><sub>1</sub> peut être décomposé en une somme de signaux sinusoïdaux : un de fréquence <i>f</i><sub>1</sub>, la <b>fréquence fondamentale</b>, et d'autres de fréquences <i>f</i><sub><i>n</i></sub> = <i>n</i> × <i>f</i><sub>1</sub>, les <b>harmoniques</b>.</p>
+    <p>L'ensemble de ces fréquences constitue le <b>spectre</b> du son. Un son pur, sinusoïdal, n'a qu'un pic. La hauteur d'un son est sa fréquence fondamentale ; les harmoniques font le timbre.</p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>X = np.fft.rfft(x)</code> calcule la transformée de Fourier discrète du signal échantillonné <code>x</code> : un tableau de nombres complexes.</li>
+      <li><code>A = np.abs(X) * 2 / N</code>, avec <code>N = len(x)</code>, donne l'amplitude de chaque composante sinusoïdale.</li>
+      <li><code>freq = np.fft.rfftfreq(N, 1 / fe)</code> donne les fréquences correspondantes, de 0 à <i>f</i><sub>e</sub> / 2. Le second paramètre est la période d'échantillonnage <i>T</i><sub>e</sub>.</li>
+      <li>Deux fréquences voisines du spectre sont séparées de <i>f</i><sub>e</sub> / <i>N</i> = 1 / durée : un enregistrement d'une seconde donne un spectre précis au hertz.</li>
+      <li><code>np.argmax(A)</code> donne le rang de la plus grande valeur de <code>A</code> ; <code>freq[np.argmax(A)]</code> est donc la fréquence du pic le plus haut.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-3-1">
+    <h3><span class="num">3.1</span> Le spectre du diapason</h3>
+    <p class="contexte">Un diapason émet un son pur de 440 Hz. On simule une seconde d'enregistrement, échantillonnée à 8 000 Hz.</p>
+    <ol class="questions">
+      <li>Compléter les lignes <code>X = ……</code> et <code>A = ……</code>.</li>
+      <li>Compléter la ligne <code>freq = ……</code>, puis exécuter. Relever la fréquence et l'amplitude du pic.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+fe = 8000                                # fréquence d'échantillonnage, en Hz
+t = np.arange(0, 1.0, 1 / fe)            # une seconde de mesures
+x = 0.8 * np.sin(2 * np.pi * 440 * t)    # le son du diapason
+
+N = len(x)
+X = ……             # transformée de Fourier discrète
+A = ……             # amplitudes
+freq = ……          # fréquences, en Hz
+
+print('fréquence du pic :', freq[np.argmax(A)], 'Hz')
+plt.plot(freq, A, 'b-')
+plt.xlim(0, 2000)                        # on n'affiche que de 0 à 2 000 Hz
+plt.xlabel('f (Hz)')
+plt.ylabel('amplitude')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'x' in g and 'A' in g:
+    ref = _np.abs(_np.fft.rfft(x)) * 2 / len(x)
+    if _np.shape(A) == _np.shape(ref) and _np.allclose(A, ref):
+        ok("Question 1 — Les amplitudes sont calculées : le pic vaut 0,8, l'amplitude du signal.")
+    elif _np.shape(A) == _np.shape(ref) and _np.allclose(A, ref * len(x) / 2):
+        indice("Question 1 : le pic vaut 3 200 au lieu de 0,8. Multipliez par 2 / N.")
+    else:
+        indice("Question 1 : relisez l'encadré À retenir, pour X puis pour A.")
+if 'freq' in g and 'x' in g and 'fe' in g:
+    ref_f = _np.fft.rfftfreq(len(x), 1 / fe)
+    if _np.shape(freq) == _np.shape(ref_f) and _np.allclose(freq, ref_f):
+        ok("Question 2 — Le pic est à 440 Hz : la note du diapason.")
+    elif _np.shape(freq) == _np.shape(ref_f):
+        indice("Question 2 : le second paramètre de rfftfreq est la période d'échantillonnage, 1 / fe.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">X = np.fft.rfft(x)
+A = np.abs(X) * 2 / N
+freq = np.fft.rfftfreq(N, 1 / fe)</pre>
+      <p>Un seul pic, à 440 Hz, d'amplitude 0,8 : un son pur. Le spectre compte 4 001 valeurs, de 0 à 4 000 Hz par pas de 1 Hz.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>Toutes les fonctions de <code>numpy.fft</code>, avec leur spécification : <a href="https://numpy.org/doc/stable/reference/routines.fft.html" target="_blank" rel="noopener">numpy.org — Discrete Fourier Transform</a> (en anglais).</p>
+    </aside>
+  </article>
+
+  <article class="exo" id="ex-3-2">
+    <h3><span class="num">3.2</span> Une note et ses harmoniques</h3>
+    <p class="contexte">On fabrique une note de fondamentale 220 Hz en additionnant ses six premières composantes. Leurs amplitudes sont rangées dans la liste <code>a</code> (valeurs construites pour l'exercice) : <code>a[0]</code> pour le rang 1, <code>a[1]</code> pour le rang 2…</p>
+    <ol class="questions">
+      <li>Compléter la ligne de la boucle qui ajoute au signal l'harmonique de rang <code>n</code>.</li>
+      <li>Exécuter : le signal est-il sinusoïdal ? Lire le spectre.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>L'harmonique de rang <i>n</i> est une sinusoïde de fréquence <i>n</i> × <i>f</i><sub>1</sub>.</li>
+      <li>Son amplitude est rangée dans <code>a[n - 1]</code>, puisqu'une liste commence au rang 0.</li>
+      <li>La ligne a la forme <code>x = x + amplitude * np.sin(2 * np.pi * fréquence * t)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="1">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+fe = 8000
+t = np.arange(0, 1.0, 1 / fe)
+f1 = 220                                 # fréquence fondamentale, en Hz
+a = [1.0, 0.5, 0.0, 0.25, 0.0, 0.12]     # amplitudes des rangs 1 à 6
+
+x = np.zeros(len(t))                     # on part d'un signal nul
+for n in range(1, 7):                    # n prend les valeurs 1, 2… 6
+    x = ……
+
+plt.plot(t[:160] * 1000, x[:160], 'b-')  # les 20 premières millisecondes
+plt.xlabel('t (ms)')
+plt.ylabel('signal')
+plt.show()
+
+N = len(x)
+A = np.abs(np.fft.rfft(x)) * 2 / N
+freq = np.fft.rfftfreq(N, 1 / fe)
+plt.plot(freq, A, 'r-')
+plt.xlim(0, 2000)
+plt.xlabel('f (Hz)')
+plt.ylabel('amplitude')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'x' in g and 't' in g:
+    ref = _np.zeros(len(t))
+    for _n in range(1, 7):
+        ref = ref + [1.0, 0.5, 0.0, 0.25, 0.0, 0.12][_n - 1] * _np.sin(2 * _np.pi * _n * 220 * t)
+    if _np.shape(x) == _np.shape(ref) and _np.allclose(x, ref):
+        ok("Question 1 — La note est construite : périodique, mais pas sinusoïdale.")
+    elif _np.shape(x) == _np.shape(ref) and _np.allclose(x, 0):
+        indice("Le signal est nul : la ligne de la boucle doit ajouter quelque chose à x.")
+    else:
+        indice("Vérifiez la fréquence (n * f1) et l'amplitude (a[n - 1]) de l'harmonique.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Lire le spectre</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Quelle est la hauteur de cette note ?</p>
+        <button class="opt" data-v="a">110 Hz</button>
+        <button class="opt" data-v="b">220 Hz</button>
+        <button class="opt" data-v="c">440 Hz</button>
+        <button class="opt" data-v="d">880 Hz</button>
+        <button class="opt" data-v="e">1 320 Hz</button>
+        <div class="qcm-expl" hidden>La hauteur est la fréquence fondamentale, celle du premier pic : 220 Hz, un La de 2ᵉ octave.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">Quelles harmoniques sont absentes du spectre, parmi les six premières ?</p>
+        <button class="opt" data-v="a">440 Hz et 880 Hz</button>
+        <button class="opt" data-v="b">330 Hz et 550 Hz</button>
+        <button class="opt" data-v="c">880 Hz et 1 320 Hz</button>
+        <button class="opt" data-v="d">660 Hz et 1 100 Hz</button>
+        <button class="opt" data-v="e">660 Hz et 1 320 Hz</button>
+        <button class="opt" data-v="f">1 540 Hz et 1 760 Hz</button>
+        <div class="qcm-expl" hidden>Les rangs 3 et 5 ont une amplitude nulle : 3 × 220 = 660 Hz et 5 × 220 = 1 100 Hz manquent. On voit des pics à 220, 440, 880 et 1 320 Hz.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">for n in range(1, 7):
+    x = x + a[n - 1] * np.sin(2 * np.pi * n * f1 * t)</pre>
+      <p>Le signal se répète toutes les 4,5 ms (1 / 220 s), mais il n'est pas sinusoïdal : c'est un son complexe. Le spectre retrouve exactement les amplitudes de la liste : la transformée de Fourier défait l'addition faite par la boucle.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-3">
+    <h3><span class="num">3.3</span> Un spectre trompeur</h3>
+    <p class="contexte">Une note de fondamentale 1 500 Hz possède des harmoniques jusqu'au rang 4. On l'enregistre à 8 000 Hz.</p>
+    <ol class="questions">
+      <li>Exécuter. Quelles fréquences attendait-on ? Lesquelles s'affichent ?</li>
+      <li>Expliquer l'origine des pics intrus.</li>
+      <li>Modifier la fréquence d'échantillonnage pour obtenir le bon spectre.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="1">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+fe = 8000
+t = np.arange(0, 1.0, 1 / fe)
+f1 = 1500
+a = [1.0, 0.6, 0.4, 0.3]                 # amplitudes des rangs 1 à 4
+
+x = np.zeros(len(t))
+for n in range(1, 5):
+    x = x + a[n - 1] * np.sin(2 * np.pi * n * f1 * t)
+
+N = len(x)
+A = np.abs(np.fft.rfft(x)) * 2 / N
+freq = np.fft.rfftfreq(N, 1 / fe)
+print('pics à', freq[A > 0.1], 'Hz')    # les fréquences où l'amplitude dépasse 0,1
+
+plt.plot(freq, A, 'b-')
+plt.xlabel('f (Hz)')
+plt.ylabel('amplitude')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+if 'fe' in g and isinstance(fe, (int, float)) and fe != 8000:
+    if fe > 12000 and '4500' in _sortie and '6000' in _sortie:
+        ok("Question 3 — Avec fe = " + str(fe) + " Hz > 2 × 6 000 Hz, les quatre pics sont à leur place.")
+    elif fe <= 12000:
+        indice("Le rang 4 est à 6 000 Hz : il faut fe > 2 × 6 000 Hz.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Le pic à 2 000 Hz</h4>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q">D'où vient le pic à 2 000 Hz, avec <i>f</i><sub>e</sub> = 8 000 Hz ?</p>
+        <button class="opt" data-v="a">de l'harmonique de rang 4, repliée</button>
+        <button class="opt" data-v="b">de l'harmonique de rang 3, repliée</button>
+        <button class="opt" data-v="c">de la fondamentale, comptée deux fois</button>
+        <button class="opt" data-v="d">d'un défaut de calcul de rfft</button>
+        <button class="opt" data-v="e">d'une harmonique de rang 4/3</button>
+        <div class="qcm-expl" hidden>Le rang 4 est à 6 000 Hz, entre <i>f</i><sub>e</sub> / 2 = 4 000 Hz et <i>f</i><sub>e</sub> = 8 000 Hz : il apparaît à 8 000 − 6 000 = 2 000 Hz. Le rang 3, à 4 500 Hz, apparaît à 3 500 Hz : c'est l'autre pic intrus.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p>On attendait 1 500, 3 000, 4 500 et 6 000 Hz. On lit 1 500, 2 000, 3 000 et 3 500 Hz : les rangs 3 et 4 dépassent <i>f</i><sub>e</sub> / 2 et sont repliés. Rien ne les distingue de vraies composantes : un spectre ne se lit qu'en connaissant la fréquence d'échantillonnage.</p>
+      <pre class="code">fe = 16000</pre>
+      <p>Toute valeur supérieure à 12 000 Hz convient. Le spectre s'étend alors jusqu'à 8 000 Hz et montre les quatre pics attendus.</p>
+    </details>
+  </article>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p>Calculer directement la transformée de Fourier de <i>N</i> valeurs demande de l'ordre de <i>N</i>² multiplications : 64 millions pour une seconde à 8 000 Hz. En 1965, James Cooley et John Tukey publient une méthode qui n'en demande que de l'ordre de <i>N</i> × log₂ <i>N</i>, environ 100 000 ici : la <em class="cle">transformée de Fourier rapide</em>, FFT en anglais. C'est le « fft » de <code>np.fft</code>. On a découvert plus tard que Carl Friedrich Gauss avait trouvé la même astuce vers 1805, sans la publier. La FFT tourne aujourd'hui dans chaque téléphone, dans les formats MP3 et JPEG, et dans les accordeurs de guitare.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s4" data-titre="Filtrer un signal">
+  <h2>Filtrer un signal bruité</h2>
+  <p class="etiquette">attendu de MP · TSI2</p>
+  <p class="intro">Une mesure réelle est toujours bruitée. Un <b>filtre numérique</b> la nettoie par le calcul, après l'acquisition. Le programme de MP demande de « simuler un filtrage numérique et visualiser son action sur un signal périodique » ; celui de TSI2, de « réaliser […] un filtrage numérique passe-bas d'un signal issu d'une acquisition ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><em class="cle">Moyenne glissante</em> : on remplace chaque valeur par la moyenne des 2<i>k</i> + 1 valeurs qui l'entourent. Les <i>k</i> premières et les <i>k</i> dernières sont perdues.</li>
+      <li><code>T[i - k : i + k + 1]</code> contient les valeurs de rang <code>i - k</code> à <code>i + k</code> : une tranche s'arrête juste <b>avant</b> son second indice.</li>
+      <li><code>liste.append(v)</code> ajoute la valeur <code>v</code> au bout d'une liste.</li>
+      <li><em class="cle">Filtre passe-bas du premier ordre</em> : il laisse passer les fréquences basses et atténue les fréquences élevées. Sa version numérique est une récurrence : chaque valeur filtrée se calcule à partir de la précédente.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-4-1">
+    <h3><span class="num">4.1</span> Lisser une courbe de refroidissement</h3>
+    <details class="rappel"><summary>Rappel de cours — Refroidissement d'un système</summary>
+      <p>Un système de température initiale <i>T</i><sub>0</sub>, placé dans l'air de température <i>T</i><sub>ext</sub>, se refroidit. Selon la loi de Newton, sa température évolue selon :</p>
+      <p class="formule">T(t) = T<sub>ext</sub> + (T<sub>0</sub> − T<sub>ext</sub>) × e<sup>−t / τ</sup></p>
+      <p>τ est le temps caractéristique du refroidissement.</p>
+    </details>
+    <p class="contexte">Un thermomètre numérique relève chaque seconde, pendant 10 min, la température d'une eau chaude qui refroidit de 80 °C vers 20 °C. Le capteur est bruité. Les mesures sont simulées : le modèle de Newton, plus un bruit tiré au hasard.</p>
+    <ol class="questions">
+      <li>Compléter la ligne de la boucle, puis exécuter.</li>
+      <li>Passer à <code>k = 50</code>. Qu'y gagne-t-on ? Qu'y perd-on ?</li>
+    </ol>
+    <div class="info">
+      <p><code>np.random.seed(2)</code> fixe le point de départ du hasard : les « mesures » sont les mêmes à chaque exécution, ce qui permet de comparer deux réglages.</p>
+    </div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(2)
+t = np.arange(0, 601, 1.0)                    # une mesure par seconde, en s
+T = 20 + 60 * np.exp(-t / 300) + np.random.normal(0, 0.4, len(t))   # en °C
+
+k = 10                                        # demi-largeur de la fenêtre
+T_liss = []
+for i in range(k, len(T) - k):
+    T_liss.append(……)                         # moyenne des 2k + 1 valeurs autour de i
+t_liss = t[k : len(T) - k]                    # les instants correspondants
+
+plt.plot(t, T, 'b.', markersize=2, label='mesures')
+plt.plot(t_liss, T_liss, 'r-', label='moyenne glissante')
+plt.xlabel('t (s)')
+plt.ylabel('T (°C)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if all(k_ in g for k_ in ('T', 'k', 'T_liss')):
+    ref = [_np.mean(T[i - k : i + k + 1]) for i in range(k, len(T) - k)]
+    faux = [_np.mean(T[i - k : i + k]) for i in range(k, len(T) - k)]
+    if _np.shape(T_liss) == _np.shape(ref) and _np.allclose(T_liss, ref):
+        ok("Question 1 — Courbe lissée : le bruit a presque disparu.")
+        if k >= 40:
+            ok("Question 2 — Avec k = " + str(k) + ", la courbe est encore plus lisse, mais " + str(k) + " instants sont perdus à chaque bout.")
+        else:
+            indice("Question 2 : remplacez k = 10 par k = 50.")
+    elif _np.shape(T_liss) == _np.shape(faux) and _np.allclose(T_liss, faux):
+        indice("Il manque une valeur : la tranche s'arrête avant son second indice, il faut i + k + 1.")
+    else:
+        indice("Dans la boucle : la moyenne (np.mean) de la tranche de T qui va de i - k à i + k.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    T_liss.append(np.mean(T[i - k : i + k + 1]))</pre>
+      <p>Avec <i>k</i> = 10, chaque point est la moyenne de 21 mesures : le bruit est divisé par environ √21 ≈ 4,6. Avec <i>k</i> = 50, la courbe est plus lisse encore, mais on perd 50 s au début, là où la température varie le plus vite, et 50 s à la fin. Lisser, c'est toujours choisir entre le bruit et la perte d'information.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-2">
+    <h3><span class="num">4.2</span> Un filtre passe-bas, comme un circuit RC</h3>
+    <details class="rappel"><summary>Rappel de cours — Circuit RC</summary>
+      <p>Lors de la charge d'un condensateur de capacité <i>C</i> à travers un conducteur ohmique de résistance <i>R</i>, sous une tension <i>E</i>, la tension <i>u</i><sub>C</sub> vérifie :</p>
+      <p class="formule">RC × <span class="frac"><span class="haut">du<sub>C</sub></span><span class="bas">dt</span></span> + u<sub>C</sub> = E</p>
+      <p>τ = <i>RC</i> est le temps caractéristique du circuit.</p>
+    </details>
+    <p class="contexte">Un circuit RC alimenté par un signal <i>x</i>(<i>t</i>) quelconque vérifie τ × d<i>y</i>/d<i>t</i> + <i>y</i> = <i>x</i>, où <i>y</i> est la tension aux bornes du condensateur. La méthode d'Euler, vue au niveau 3, donne la récurrence :</p>
+    <p class="formule">y<sub>i</sub> = y<sub>i−1</sub> + <span class="frac"><span class="haut">T<sub>e</sub></span><span class="bas">τ</span></span> × (x<sub>i−1</sub> − y<sub>i−1</sub>)</p>
+    <p class="contexte">On l'applique à un son de 200 Hz mêlé d'un sifflement de 5 000 Hz (valeurs construites pour l'exercice). Le temps caractéristique est choisi pour couper vers 1 000 Hz.</p>
+    <ol class="questions">
+      <li>Compléter la ligne de la boucle avec la récurrence, puis exécuter.</li>
+      <li>Comparer les deux spectres : que devient chaque composante ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="1">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+fe = 50000                                 # fréquence d'échantillonnage, en Hz
+Te = 1 / fe
+t = np.arange(0, 0.04, Te)
+x = np.sin(2 * np.pi * 200 * t) + 0.5 * np.sin(2 * np.pi * 5000 * t)   # son + sifflement
+
+tau = 1 / (2 * np.pi * 1000)               # temps caractéristique, en s
+y = np.zeros(len(x))                       # signal filtré, nul au départ
+for i in range(1, len(x)):
+    y[i] = ……
+
+plt.plot(t[:500] * 1000, x[:500], 'b-', label='avant')
+plt.plot(t[:500] * 1000, y[:500], 'r-', label='après')
+plt.xlabel('t (ms)')
+plt.legend()
+plt.show()
+
+freq = np.fft.rfftfreq(len(x), Te)
+Ax = np.abs(np.fft.rfft(x)) * 2 / len(x)
+Ay = np.abs(np.fft.rfft(y)) * 2 / len(y)
+plt.plot(freq, Ax, 'b-', label='avant')
+plt.plot(freq, Ay, 'r-', label='après')
+plt.xlim(0, 6000)
+plt.xlabel('f (Hz)')
+plt.ylabel('amplitude')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if all(k_ in g for k_ in ('x', 'y', 'Te', 'tau')):
+    r1 = _np.zeros(len(x))
+    r2 = _np.zeros(len(x))
+    for _i in range(1, len(x)):
+        r1[_i] = r1[_i - 1] + Te / tau * (x[_i - 1] - r1[_i - 1])
+        r2[_i] = r2[_i - 1] + Te / tau * (x[_i] - r2[_i - 1])
+    if _np.shape(y) == _np.shape(r1) and (_np.allclose(y, r1) or _np.allclose(y, r2)):
+        ok("Question 1 — Le filtre fonctionne : le sifflement est fortement atténué, le son de 200 Hz presque intact.")
+    elif _np.shape(y) == _np.shape(r1) and _np.allclose(y, 0):
+        indice("y est resté nul : la ligne de la boucle doit calculer y[i] à partir de y[i - 1].")
+    else:
+        indice("Recopiez la récurrence : y[i] = y[i - 1] + Te / tau * (x[i - 1] - y[i - 1]).")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Lire les spectres</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Par combien le filtre divise-t-il, à peu près, l'amplitude du sifflement ?</p>
+        <button class="opt" data-v="a">par 1 : il ne change rien</button>
+        <button class="opt" data-v="b">par 2 environ</button>
+        <button class="opt" data-v="c">par 5 environ</button>
+        <button class="opt" data-v="d">par 25 environ</button>
+        <button class="opt" data-v="e">par 100 environ</button>
+        <div class="qcm-expl" hidden>Le pic de 5 000 Hz passe de 0,50 à environ 0,11 : il est divisé par un peu moins de 5. Celui de 200 Hz passe de 1,00 à 0,98 : presque intact. Un filtre du premier ordre atténue progressivement, sans couper net.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    y[i] = y[i - 1] + Te / tau * (x[i - 1] - y[i - 1])</pre>
+      <p>Le signal filtré est presque une sinusoïde de 200 Hz, légèrement retardée. Ce calcul est exactement la méthode d'Euler appliquée au circuit RC : un filtre numérique imite un circuit électrique. Pour qu'il reste fidèle, il faut <i>T</i><sub>e</sub> petit devant τ, ici 8 fois plus petit : c'est la limite introduite par l'échantillonnage dont parle le programme de TSI2.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s5" data-titre="Diffusion thermique">
+  <h2>La diffusion thermique : un tableau à deux dimensions</h2>
+  <p class="etiquette">attendu de PC · MP · TSI2</p>
+  <p class="intro">Comment le froid de l'hiver traverse-t-il un mur ? La température dépend de deux variables : la position dans le mur et le temps. On la range dans un <b>tableau à deux dimensions</b>. Le programme de PC demande de « résoudre l'équation de la diffusion thermique à une dimension par une méthode des différences finies dérivée de la méthode d'Euler explicite ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>T = np.zeros((3, 5))</code> crée un tableau de 3 lignes et 5 colonnes rempli de zéros. <code>T.shape</code> vaut <code>(3, 5)</code>.</li>
+      <li><code>T[j, i]</code> est l'élément de la ligne <code>j</code>, colonne <code>i</code>, en comptant à partir de 0.</li>
+      <li><code>T[j, :]</code> est toute la ligne <code>j</code> ; <code>T[:, i]</code> toute la colonne <code>i</code>.</li>
+      <li>L'indice <code>-1</code> désigne le dernier élément. <code>T[j, 1:-1]</code> est la ligne <code>j</code> sans son premier ni son dernier élément.</li>
+      <li>Une ligne entière s'affecte d'un coup : <code>T[0, :] = 20</code> met 20 dans toute la ligne 0.</li>
+    </ul>
+    <pre class="code">M = np.array([[1, 2, 3],
+              [4, 5, 6]])     # 2 lignes, 3 colonnes
+print(M[1, 0])                # affiche 4
+print(M[:, 2])                # affiche [3 6]</pre>
+  </div>
+
+  <article class="exo" id="ex-5-1">
+    <h3><span class="num">5.1</span> Se repérer dans un tableau</h3>
+    <p class="contexte">Dans la console, taper <code>import numpy as np</code>, puis :</p>
+    <pre class="code">M = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])</pre>
+    <p class="contexte">Prédire chaque résultat, puis le vérifier dans la console.</p>
+    <div class="py" data-mode="console"></div>
+    <div class="quiz">
+      <h4>Que vaut…</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>M.shape</code></p>
+        <button class="opt" data-v="a"><code>(4, 3)</code></button>
+        <button class="opt" data-v="b"><code>(3, 4)</code></button>
+        <button class="opt" data-v="c"><code>12</code></button>
+        <button class="opt" data-v="d"><code>(12,)</code></button>
+        <button class="opt" data-v="e"><code>(3, 3)</code></button>
+        <div class="qcm-expl" hidden>Trois listes de quatre nombres : 3 lignes, 4 colonnes. Le nombre de lignes vient en premier.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>M[1, 2]</code></p>
+        <button class="opt" data-v="a"><code>2</code></button>
+        <button class="opt" data-v="b"><code>10</code></button>
+        <button class="opt" data-v="c"><code>7</code></button>
+        <button class="opt" data-v="d"><code>6</code></button>
+        <button class="opt" data-v="e"><code>3</code></button>
+        <button class="opt" data-v="f"><code>11</code></button>
+        <div class="qcm-expl" hidden>Ligne de rang 1 (la deuxième : 5, 6, 7, 8), colonne de rang 2 (la troisième) : 7.</div>
+      </div>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q"><code>M[:, 0]</code></p>
+        <button class="opt" data-v="a"><code>array([1, 5, 9])</code></button>
+        <button class="opt" data-v="b"><code>array([1, 2, 3, 4])</code></button>
+        <button class="opt" data-v="c"><code>array([4, 8, 12])</code></button>
+        <button class="opt" data-v="d"><code>array([9, 10, 11, 12])</code></button>
+        <button class="opt" data-v="e"><code>1</code></button>
+        <div class="qcm-expl" hidden>Toutes les lignes, colonne 0 : la première colonne.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q"><code>M[0, 1:-1]</code></p>
+        <button class="opt" data-v="a"><code>array([1, 2, 3])</code></button>
+        <button class="opt" data-v="b"><code>array([2, 3, 4])</code></button>
+        <button class="opt" data-v="c"><code>array([1, 4])</code></button>
+        <button class="opt" data-v="d"><code>array([2, 3])</code></button>
+        <button class="opt" data-v="e"><code>array([5, 6, 7])</code></button>
+        <div class="qcm-expl" hidden>Ligne 0, sans son premier ni son dernier élément : 2 et 3. C'est la syntaxe qui servira pour les points intérieurs du mur.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q"><code>M[-1, -1]</code></p>
+        <button class="opt" data-v="a"><code>1</code></button>
+        <button class="opt" data-v="b"><code>4</code></button>
+        <button class="opt" data-v="c"><code>9</code></button>
+        <button class="opt" data-v="d"><code>11</code></button>
+        <button class="opt" data-v="e"><code>12</code></button>
+        <div class="qcm-expl" hidden>Dernière ligne, dernière colonne : 12.</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-5-2">
+    <h3><span class="num">5.2</span> Un mur en hiver</h3>
+    <details class="rappel"><summary>Rappel de cours — Transfert thermique par conduction</summary>
+      <p>Un transfert thermique se fait spontanément du corps le plus chaud vers le corps le plus froid. Dans un solide, il se fait par <b>conduction</b>, de proche en proche, sans déplacement de matière.</p>
+      <p>À travers une paroi de résistance thermique <i>R</i><sub>th</sub>, dont les faces sont aux températures <i>T</i><sub>1</sub> et <i>T</i><sub>2</sub>, le flux thermique vaut, en régime permanent :</p>
+      <p class="formule">Φ = <span class="frac"><span class="haut">T<sub>1</sub> − T<sub>2</sub></span><span class="bas">R<sub>th</sub></span></span></p>
+    </details>
+    <p class="contexte">Un mur de béton de 20 cm d'épaisseur est à 20 °C. Brusquement, l'air extérieur passe à 0 °C ; à l'intérieur, le chauffage maintient 20 °C. On découpe l'épaisseur en points espacés de Δ<i>x</i>, le temps en pas Δ<i>t</i>, et on range dans <code>T[j, i]</code> la température du point <code>i</code> à l'instant <code>j</code>. En 2e année, on montre que chaque point intérieur évolue selon :</p>
+    <p class="formule">T[j+1, i] = T[j, i] + r × (T[j, i+1] − 2 T[j, i] + T[j, i−1])   avec   r = <span class="frac"><span class="haut">D × Δt</span><span class="bas">Δx²</span></span></p>
+    <p class="contexte"><i>D</i> est la diffusivité thermique du matériau, en m²·s⁻¹ ; pour le béton, de l'ordre de 8 × 10⁻⁷ m²·s⁻¹. Chaque point se rapproche de la moyenne de ses deux voisins. Pour calculer tous les points intérieurs d'un coup, <code>T[j, 2:]</code> contient les voisins de droite et <code>T[j, :-2]</code> les voisins de gauche.</p>
+    <ol class="questions">
+      <li>Compléter les trois lignes qui fixent la température initiale et celle des deux faces.</li>
+      <li>Compléter la ligne de la boucle, puis exécuter.</li>
+      <li>Décrire l'évolution du profil de température.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>À l'instant 0, c'est la ligne 0 qui vaut 20 : <code>T[0, :] = 20</code>.</li>
+      <li>La face extérieure est la colonne 0, à tous les instants ; la face intérieure est la dernière colonne.</li>
+      <li>Dans la boucle, chaque <code>T[j, i]</code> de la formule devient <code>T[j, 1:-1]</code>, chaque <code>T[j, i+1]</code> devient <code>T[j, 2:]</code>, chaque <code>T[j, i-1]</code> devient <code>T[j, :-2]</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+L = 0.20                   # épaisseur du mur, en m
+nx = 41                    # nombre de points dans l'épaisseur
+dx = L / (nx - 1)          # pas d'espace : 5 mm
+D = 8e-7                   # diffusivité thermique du béton, en m²/s
+dt = 12.5                  # pas de temps, en s
+r = D * dt / dx ** 2
+nt = int(12 * 3600 / dt)   # nombre de pas pour 12 h
+
+T = np.zeros((nt + 1, nx))     # T[j, i] : point i, instant j
+……                             # à l'instant 0, tout le mur est à 20 °C
+……                             # face extérieure (colonne 0) : 0 °C à tout instant
+……                             # face intérieure (dernière colonne) : 20 °C à tout instant
+
+for j in range(nt):
+    T[j + 1, 1:-1] = ……
+
+x = np.linspace(0, L, nx)
+for h in [0, 0.25, 1, 3, 6]:
+    j = int(h * 3600 / dt)                    # rang de l'instant h heures
+    plt.plot(x * 100, T[j, :], label=str(h) + ' h')
+plt.xlabel('position dans le mur (cm)')
+plt.ylabel('T (°C)')
+plt.legend()
+plt.show()
+print('milieu du mur après 1 h :', round(T[288, 20], 1), '°C')</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'T' in g and 'nt' in g and 'nx' in g and _np.shape(T) == (nt + 1, nx):
+    bords = _np.allclose(T[0, 1:-1], 20) and _np.allclose(T[1:, 0], 0) and _np.allclose(T[:, -1], 20)
+    if bords:
+        ok("Question 1 — Conditions initiale et aux limites en place.")
+        ref = _np.zeros((nt + 1, nx))
+        ref[0, :] = T[0, :]            # T[0, 0] vaut 0 ou 20 selon l'ordre des lignes : les deux conviennent
+        ref[1:, 0] = 0
+        ref[:, -1] = 20
+        for _j in range(nt):
+            ref[_j + 1, 1:-1] = ref[_j, 1:-1] + r * (ref[_j, 2:] - 2 * ref[_j, 1:-1] + ref[_j, :-2])
+        if _np.allclose(T, ref):
+            ok("Question 2 — Le froid pénètre dans le mur ; au bout de quelques heures, le profil devient une droite.")
+        elif _np.allclose(T[1:, 1:-1], 0):
+            indice("Question 2 : la ligne de la boucle n'a rien calculé. Traduisez la formule avec les tranches.")
+        else:
+            indice("Question 2 : vérifiez chaque terme : T[j, 1:-1], T[j, 2:] et T[j, :-2], et le coefficient r.")
+    elif _np.allclose(T[0, :], 0):
+        indice("Question 1 : la ligne 0 doit valoir 20 °C partout.")
+    elif not _np.allclose(T[1:-1, 0], 0):
+        indice("Question 1 : la face extérieure est la colonne 0, à tous les instants : T[:, 0].")
+    else:
+        indice("Question 1 : la face intérieure est la dernière colonne, à tous les instants : T[:, -1].")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Lire le graphique</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Au bout de 6 h, le profil de température dans le mur est…</p>
+        <button class="opt" data-v="a">uniforme, à 20 °C</button>
+        <button class="opt" data-v="b">uniforme, à 10 °C</button>
+        <button class="opt" data-v="c">une droite, de 0 à 20 °C</button>
+        <button class="opt" data-v="d">une courbe en cloche</button>
+        <button class="opt" data-v="e">une sinusoïde amortie</button>
+        <div class="qcm-expl" hidden>Le profil n'évolue presque plus : c'est le régime permanent. La température varie alors linéairement d'une face à l'autre, et le flux thermique est le même en tout point du mur, celui du rappel de cours.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">T[0, :] = 20
+T[:, 0] = 0
+T[:, -1] = 20
+
+for j in range(nt):
+    T[j + 1, 1:-1] = T[j, 1:-1] + r * (T[j, 2:] - 2 * T[j, 1:-1] + T[j, :-2])</pre>
+      <p>Au début, seuls les premiers centimètres se refroidissent. Au bout d'une heure, le milieu du mur est à 16,2 °C ; au bout de quelques heures, le profil devient une droite de 0 à 20 °C : le régime permanent. Le tableau <code>T</code> compte 3 457 lignes et 41 colonnes : toute l'histoire du mur.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-3">
+    <h3><span class="num">5.3</span> Quand le calcul explose</h3>
+    <p class="contexte">On reprend le mur, en cherchant à calculer plus vite avec un pas de temps plus grand.</p>
+    <ol class="questions">
+      <li>Exécuter avec <code>dt = 12.5</code>, puis avec <code>dt = 16</code>. Observer la valeur de <code>r</code> et le graphique.</li>
+      <li>Trouver le plus grand pas de temps utilisable.</li>
+    </ol>
+    <div class="info">
+      <p>Le schéma explicite n'est <b>stable</b> que si <i>r</i> ≤ 0,5. Au-delà, les petites erreurs d'arrondi sont amplifiées à chaque pas.</p>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+L, nx, D = 0.20, 41, 8e-7
+dx = L / (nx - 1)
+dt = 12.5                  # pas de temps, en s
+r = D * dt / dx ** 2
+print('r =', round(r, 3))
+nt = int(12 * 3600 / dt)
+
+T = np.zeros((nt + 1, nx))
+T[0, :] = 20
+T[:, 0] = 0
+T[:, -1] = 20
+for j in range(nt):
+    T[j + 1, 1:-1] = T[j, 1:-1] + r * (T[j, 2:] - 2 * T[j, 1:-1] + T[j, :-2])
+
+x = np.linspace(0, L, nx)
+for h in [1, 3, 6, 12]:
+    plt.plot(x * 100, T[int(h * 3600 / dt), :], label=str(h) + ' h')
+plt.xlabel('position dans le mur (cm)')
+plt.ylabel('T (°C)')
+plt.legend()
+plt.show()</textarea>
+    </div>
+    <div class="quiz">
+      <h4>Stabilité</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Avec <code>dt = 16</code>, que se passe-t-il ?</p>
+        <button class="opt" data-v="a">le calcul est juste, deux fois plus rapide</button>
+        <button class="opt" data-v="b">les températures oscillent et deviennent énormes</button>
+        <button class="opt" data-v="c">le mur se refroidit un peu plus lentement</button>
+        <button class="opt" data-v="d">Python affiche un message d'erreur</button>
+        <button class="opt" data-v="e">le mur reste partout à 20 °C</button>
+        <div class="qcm-expl" hidden><i>r</i> = 0,512 dépasse 0,5 : les températures alternent d'un point à l'autre et atteignent des valeurs absurdes, de l'ordre de 10⁴⁹ °C. Python ne signale rien : c'est une erreur silencieuse, que seul un regard critique révèle.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Quel est le plus grand pas de temps utilisable ?</p>
+        <button class="opt" data-v="a">environ 6,3 s</button>
+        <button class="opt" data-v="b">environ 12,5 s</button>
+        <button class="opt" data-v="c">environ 15,6 s</button>
+        <button class="opt" data-v="d">environ 25,0 s</button>
+        <button class="opt" data-v="e">environ 31,3 s</button>
+        <div class="qcm-expl" hidden><i>r</i> ≤ 0,5 donne Δ<i>t</i> ≤ 0,5 × Δ<i>x</i>² / <i>D</i> = 0,5 × (5 × 10⁻³)² / (8 × 10⁻⁷) ≈ 15,6 s. Diviser Δ<i>x</i> par deux, pour plus de précision, impose de diviser Δ<i>t</i> par quatre.</div>
+      </div>
+    </div>
+  </article>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p>C'est pour résoudre cette équation de la chaleur que Joseph Fourier, préfet de l'Isère, invente en 1807 la décomposition d'une fonction en somme de sinusoïdes : celle de l'étape 3. Son mémoire est d'abord jugé peu rigoureux par l'Académie des sciences ; il ne paraît sous sa forme définitive qu'en 1822, dans la <i>Théorie analytique de la chaleur</i>. Deux siècles plus tard, les séries de Fourier servent partout où il y a des ondes, du son à l'imagerie médicale.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s6" data-titre="Marche aléatoire">
+  <h2>La marche aléatoire</h2>
+  <p class="etiquette">attendu de PC</p>
+  <p class="intro">Une goutte de sirop de menthe déposée dans de l'eau immobile finit par la colorer entièrement, sans qu'on remue. Chaque molécule de colorant est bousculée au hasard par les molécules d'eau. Le programme de PC demande de « simuler la marche au hasard d'un grand nombre de particules à partir d'un centre et caractériser l'étalement spatial ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Modèle à une dimension : à chaque pas, une particule avance ou recule d'une longueur <i>a</i>, au hasard, avec la même probabilité.</li>
+      <li><code>np.random.choice([-1, 1], size=(n, p))</code> crée un tableau de <code>n</code> lignes et <code>p</code> colonnes, rempli au hasard de −1 et de +1 : une ligne par particule, une colonne par pas.</li>
+      <li><code>np.sum(M, axis=1)</code> fait la somme de chaque ligne de <code>M</code> ; <code>axis=0</code> ferait la somme de chaque colonne.</li>
+      <li>L'étalement du nuage de particules se mesure par l'<b>écart-type</b> de leurs positions.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-6-1">
+    <h3><span class="num">6.1</span> Une goutte de colorant</h3>
+    <p class="contexte">2 000 molécules de colorant partent toutes de la position 0 et font 100 pas de longueur <i>a</i> = 1 (en unité arbitraire).</p>
+    <ol class="questions">
+      <li>Compléter les lignes <code>pas = ……</code> et <code>x = ……</code>, puis exécuter.</li>
+      <li>Quelle est la forme de l'histogramme ? Combien vaut l'écart-type ?</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(3)
+n_part = 2000          # nombre de particules
+n_pas = 100            # nombre de pas
+
+pas = ……               # tableau n_part × n_pas de −1 et de +1
+x = ……                 # position finale de chaque particule
+
+print('écart-type des positions :', round(np.std(x, ddof=1), 1))
+plt.hist(x, bins=30, edgecolor='black')
+plt.xlabel('position finale')
+plt.ylabel('nombre de particules')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'x' in g and 'n_part' in g and 'n_pas' in g:
+    if _np.shape(x) == (n_part,) and _np.all((_np.asarray(x) + n_pas) % 2 == 0):
+        s_ = _np.std(x, ddof=1)
+        if 0.85 * n_pas ** 0.5 < s_ < 1.15 * n_pas ** 0.5:
+            ok("Une courbe en cloche, d'écart-type voisin de 10 = √100.")
+        else:
+            indice("L'écart-type paraît anormal : vérifiez le tableau des pas.")
+    elif _np.shape(x) == (n_pas,):
+        indice("x contient " + str(n_pas) + " valeurs au lieu de " + str(n_part) + " : il faut la somme de chaque LIGNE, axis=1.")
+    else:
+        indice("x doit contenir une position par particule : np.sum(pas, axis=1).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">pas = np.random.choice([-1, 1], size=(n_part, n_pas))
+x = np.sum(pas, axis=1)</pre>
+      <p>L'histogramme a la forme d'une cloche centrée sur 0, celle de la loi normale du niveau 4. L'écart-type vaut environ 10 : après 100 pas, les molécules se sont étalées de 10 pas en moyenne, et non de 100. Elles vont et viennent.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-6-2">
+    <h3><span class="num">6.2</span> L'étalement grandit comme √t</h3>
+    <p class="contexte">On recommence pour 25, 100, 400 et 1 600 pas, et on range les écarts-types obtenus dans la liste <code>ecarts</code>.</p>
+    <ol class="questions">
+      <li>Compléter les deux lignes de la boucle, puis exécuter.</li>
+      <li>Que montre le graphique ? Combien de fois plus de temps faut-il pour s'étaler deux fois plus ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Pour chaque valeur de <code>n_pas</code>, refaire la simulation de l'exercice 6.1.</li>
+      <li>La position finale peut s'écrire en une ligne : <code>x = np.sum(np.random.choice(……), axis=1)</code>.</li>
+      <li>Ajouter ensuite l'écart-type de <code>x</code> à la liste : <code>ecarts.append(……)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(4)
+n_part = 2000
+liste_pas = [25, 100, 400, 1600]
+ecarts = []
+for n_pas in liste_pas:
+    x = ……                      # positions finales après n_pas pas
+    ecarts.append(……)           # écart-type de ces positions
+
+print(np.round(ecarts, 1))
+plt.plot(np.sqrt(liste_pas), ecarts, 'bo')
+plt.xlabel('racine du nombre de pas')
+plt.ylabel('écart-type des positions')
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'ecarts' in g and 'liste_pas' in g:
+    if len(ecarts) == len(liste_pas) and all(0.85 * p_ ** 0.5 < e_ < 1.15 * p_ ** 0.5 for p_, e_ in zip(liste_pas, ecarts)):
+        ok("Les points sont alignés : l'écart-type est proportionnel à √(nombre de pas), donc à √t.")
+    elif len(ecarts) != len(liste_pas):
+        indice("La liste ecarts doit contenir une valeur par nombre de pas : un append dans la boucle.")
+    else:
+        indice("Vérifiez la simulation : les écarts-types devraient valoir environ 5, 10, 20 et 40.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    x = np.sum(np.random.choice([-1, 1], size=(n_part, n_pas)), axis=1)
+    ecarts.append(np.std(x, ddof=1))</pre>
+      <p>Les écarts-types valent environ 5, 10, 20 et 40 : les points sont alignés sur une droite passant par l'origine. L'étalement est proportionnel à la racine du temps : pour s'étaler deux fois plus loin, il faut quatre fois plus de temps. C'est la signature de toute diffusion, celle du mur de l'étape 5 comprise.</p>
+    </details>
+  </article>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p>En 1905, Albert Einstein explique ainsi le mouvement désordonné de minuscules particules en suspension dans l'eau, observé au microscope par le botaniste Robert Brown en 1827 sur des particules issues de grains de pollen : elles sont bousculées par des molécules, invisibles. Son calcul prévoit un étalement en √<i>t</i>. Jean Perrin le vérifie expérimentalement en 1908 et en déduit une valeur de la constante d'Avogadro. Ces mesures achèvent de convaincre les derniers sceptiques que les atomes existent ; Perrin reçoit le prix Nobel de physique en 1926.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s7" data-titre="Student et détection">
+  <h2>Loi de Student et limite de détection</h2>
+  <p class="etiquette">BUT Chimie · R3.08</p>
+  <p class="intro">Au laboratoire d'analyse, on répète rarement une mesure plus de cinq fois. Avec si peu de valeurs, l'intervalle de confiance de la loi normale est trop optimiste. Et quelle est la plus petite concentration qu'une méthode peut détecter ? Le programme du BUT Chimie cite la « loi de Student » et les « notions de limites de détection et de quantification ».</p>
+
+  <details class="rappel"><summary>Rappel de cours — Incertitude de type A</summary>
+    <p>Pour <i>n</i> mesures répétées, de moyenne x̄ et d'écart-type expérimental <i>s</i>(<i>x</i>) :</p>
+    <p class="formule">u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Avec <i>n</i> mesures, l'intervalle de confiance à 95 % s'écrit x̄ ± <i>t</i> × <i>u</i>(x̄). Le <em class="cle">coefficient de Student</em> <i>t</i> dépend de <i>n</i> − 1, le nombre de degrés de liberté. Il vaut 4,30 pour 3 mesures, 2,78 pour 5, 2,26 pour 10, et tend vers 1,96 ≈ 2, la valeur de la loi normale, quand <i>n</i> devient grand.</li>
+      <li><code>from scipy import stats</code>, puis <code>stats.t.ppf(0.975, n - 1)</code> donne <i>t</i> pour 95 % : on laisse 2,5 % de chaque côté de l'intervalle.</li>
+      <li>On mesure plusieurs fois un <b>blanc</b>, solution sans l'espèce dosée ; <i>s</i><sub>blanc</sub> est l'écart-type de ces mesures et <i>k</i> la pente de la droite d'étalonnage. Selon la convention la plus courante, la <em class="cle">limite de détection</em> vaut LD = 3 <i>s</i><sub>blanc</sub> / <i>k</i> et la <em class="cle">limite de quantification</em> LQ = 10 <i>s</i><sub>blanc</sub> / <i>k</i>.</li>
+      <li>Sous LD, on ne peut pas affirmer que l'espèce est présente. Entre LD et LQ, elle est détectée, mais sa concentration n'est pas fiable.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-7-1">
+    <h3><span class="num">7.1</span> Cinq mesures seulement</h3>
+    <p class="contexte">On mesure cinq fois l'absorbance du même sirop de menthe dilué, comme au TP3 (valeurs construites pour l'exercice).</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>t = ……</code> : le coefficient de Student à 95 %.</li>
+      <li>Compléter la ligne <code>demi = ……</code> : la demi-largeur de l'intervalle de confiance. La comparer à 2<i>u</i>.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+from scipy import stats
+
+A = np.array([0.471, 0.468, 0.475, 0.466, 0.472])   # absorbances
+n = len(A)
+A_moy = np.mean(A)
+u = np.std(A, ddof=1) / np.sqrt(n)
+
+t = ……             # coefficient de Student à 95 %
+demi = ……          # demi-largeur de l'intervalle de confiance
+
+print('A =', round(A_moy, 4), '±', round(demi, 4), '(Student, 95 %)')
+print('avec 2u :', round(2 * u, 4))</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+if 't' in g and isinstance(t, float) and 'n' in g:
+    if abs(t - 2.7764) < 1e-3:
+        ok("Question 1 — t = 2,78 pour 5 mesures, soit 4 degrés de liberté.")
+    elif abs(t - 2.5706) < 1e-3:
+        indice("Question 1 : le nombre de degrés de liberté est n − 1, pas n.")
+    elif abs(t - 2.1318) < 1e-3:
+        indice("Question 1 : pour 95 %, on laisse 2,5 % de chaque côté : 0.975.")
+    else:
+        indice("Question 1 : stats.t.ppf(0.975, n - 1).")
+if 'demi' in g and isinstance(demi, float) and 'u' in g:
+    if abs(demi - 2.7764 * u) < 1e-5:
+        ok("Question 2 — Demi-largeur 0,0044, contre 0,0031 avec 2u : près d'une fois et demie plus large.")
+    else:
+        indice("Question 2 : la demi-largeur vaut t × u.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">t = stats.t.ppf(0.975, n - 1)
+demi = t * u</pre>
+      <p><i>A</i> = 0,4704 ± 0,0044 avec Student, contre ± 0,0031 avec 2<i>u</i>. Avec cinq mesures seulement, l'écart-type est lui-même mal connu : Student élargit l'intervalle pour en tenir compte. Avec 30 mesures, <i>t</i> = 2,05 et la différence devient négligeable.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>La loi de Student dans scipy, avec ses paramètres : <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.t.html" target="_blank" rel="noopener">docs.scipy.org — scipy.stats.t</a> (en anglais). Elle porte le pseudonyme de William Gosset, chimiste de la brasserie Guinness, qui la publia en 1908 sous le nom de « Student ».</p>
+    </aside>
+  </article>
+
+  <article class="exo" id="ex-7-2">
+    <h3><span class="num">7.2</span> Jusqu'où peut-on doser ?</h3>
+    <details class="rappel"><summary>Rappel de cours — Loi de Beer-Lambert</summary>
+      <p>L'absorbance <i>A</i> d'une solution est proportionnelle à la concentration <i>c</i> de l'espèce absorbante : <i>A</i> = <i>k</i> × <i>c</i>. Une concentration inconnue se lit sur la droite d'étalonnage.</p>
+    </details>
+    <p class="contexte">On dose le colorant bleu d'un sirop de menthe. Le programme contient la gamme étalon et dix mesures du blanc (valeurs construites pour l'exercice). <code>np.polyfit</code>, vu au niveau 3, donne la pente <code>k</code> et l'ordonnée à l'origine <code>b</code> de la droite d'étalonnage.</p>
+    <ol class="questions">
+      <li>Compléter les lignes <code>s_blanc</code>, <code>LD</code> et <code>LQ</code>, puis exécuter.</li>
+      <li>Un échantillon très dilué a une absorbance de 0,012. Conclure.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+c = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])                # en mg/L
+A = np.array([0.001, 0.126, 0.247, 0.373, 0.495, 0.621])    # absorbances
+k, b = np.polyfit(c, A, 1)                                  # droite d'étalonnage
+
+blanc = np.array([0.002, -0.001, 0.003, 0.000, 0.001,
+                  -0.002, 0.002, 0.001, -0.001, 0.000])     # 10 mesures du blanc
+
+s_blanc = ……       # écart-type expérimental du blanc
+LD = ……            # limite de détection, en mg/L
+LQ = ……            # limite de quantification, en mg/L
+
+A_ech = 0.012
+c_ech = (A_ech - b) / k
+print('k =', round(k, 4), 'L/mg')
+print('LD =', round(LD, 3), 'mg/L   LQ =', round(LQ, 3), 'mg/L')
+print('échantillon :', round(c_ech, 3), 'mg/L')</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if all(k_ in g for k_ in ('blanc', 'k', 's_blanc')):
+    sb = _np.std(blanc, ddof=1)
+    if isinstance(s_blanc, float) and abs(s_blanc - sb) < 1e-9:
+        ok("Question 1 — s_blanc ≈ 0,0016.")
+        if 'LD' in g and 'LQ' in g and isinstance(LD, float) and isinstance(LQ, float) and abs(LD - 3 * sb / k) < 1e-9 and abs(LQ - 10 * sb / k) < 1e-9:
+            ok("Question 1 — LD ≈ 0,038 mg/L et LQ ≈ 0,128 mg/L.")
+        elif 'LD' in g and isinstance(LD, float) and abs(LD - 3 * sb * k) < 1e-9:
+            indice("On divise par la pente k : une absorbance divisée par k donne une concentration.")
+        else:
+            indice("LD = 3 × s_blanc / k et LQ = 10 × s_blanc / k.")
+    elif isinstance(s_blanc, float) and abs(s_blanc - _np.std(blanc)) < 1e-9:
+        indice("L'écart-type expérimental : n'oubliez pas ddof=1.")
+    else:
+        indice("s_blanc est l'écart-type expérimental du tableau blanc.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Conclure</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">L'échantillon, à environ 0,09 mg/L, est…</p>
+        <button class="opt" data-v="a">détecté, et sa concentration est fiable</button>
+        <button class="opt" data-v="b">détecté, mais sa concentration n'est pas fiable</button>
+        <button class="opt" data-v="c">non détecté, car sous la limite de détection</button>
+        <button class="opt" data-v="d">non détecté, car son absorbance est trop faible</button>
+        <button class="opt" data-v="e">au-dessus de la limite de quantification</button>
+        <div class="qcm-expl" hidden>0,089 mg/L est compris entre LD ≈ 0,038 mg/L et LQ ≈ 0,128 mg/L : on peut affirmer que le colorant est présent, mais pas donner sa concentration avec confiance. Il faudrait une méthode plus sensible, ou un échantillon moins dilué.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">s_blanc = np.std(blanc, ddof=1)
+LD = 3 * s_blanc / k
+LQ = 10 * s_blanc / k</pre>
+      <p><i>k</i> ≈ 0,124 L·mg⁻¹, <i>s</i><sub>blanc</sub> ≈ 0,0016, LD ≈ 0,038 mg·L⁻¹ et LQ ≈ 0,128 mg·L⁻¹. L'échantillon, à 0,089 mg·L⁻¹, est détecté mais non quantifiable. Valider une méthode d'analyse, c'est justement établir ces limites avant de rendre le moindre résultat.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="bilan" data-titre="Bilan">
+  <h2>Bilan du niveau 5</h2>
+  <div class="retenir">
+    <h4>Ce que je sais faire</h4>
+    <ul class="bilan">
+      <li>Calculer le pas d'un CAN et numériser une tension, en connaissant l'erreur commise.</li>
+      <li>Choisir une fréquence d'échantillonnage avec la condition de Nyquist-Shannon, et reconnaître un repliement.</li>
+      <li>Calculer et lire le spectre d'un son avec <code>np.fft.rfft</code> et <code>np.fft.rfftfreq</code>.</li>
+      <li>Lisser une mesure par moyenne glissante et programmer un filtre passe-bas par récurrence.</li>
+      <li>Ranger une grandeur dans un tableau à deux dimensions et résoudre l'équation de la diffusion par différences finies, en respectant la condition de stabilité.</li>
+      <li>Simuler une marche aléatoire et montrer que l'étalement croît comme √<i>t</i>.</li>
+      <li>Écrire un intervalle de confiance avec le coefficient de Student, et calculer les limites de détection et de quantification d'un dosage.</li>
+    </ul>
+  </div>
+  <p>Ces outils sont ceux de la 2e année de classe préparatoire et des formations de techniciens supérieurs. Vous les retrouverez avec leur documentation, comme ici : un bon programmeur ne retient pas tout, il sait où chercher.</p>
+</section>
+
+<footer class="pp-pied">
+  <p><a class="doc" href="fiches/niveau-5-memo.pdf" download>Mémo du niveau 5 — à imprimer</a></p>
+  <p>© 2026 Loïc Van Hoorde — Choix pédagogiques, conception des activités, relecture : L. Van Hoorde. Mise en forme réalisée avec l'aide de Claude (Anthropic).</p>
+</footer>
+</main>
+
+<script src="parcours.js" type="module"></script>
+<script src="progression-resonance.js" type="module"></script>
+</body>
+</html>

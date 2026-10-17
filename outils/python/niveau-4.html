@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Niveau 4 — Ouverture vers le supérieur</title>
+<link rel="stylesheet" href="parcours.css">
+</head>
+<body class="pp" data-niveau="4">
+
+<header class="pp-head">
+  <p class="pp-invite">&gt;&gt;&gt; python · niveau 4 · terminale spé PC</p>
+  <h1>Ouverture vers le supérieur</h1>
+  <p class="pp-sous-titre">loi normale · régression · Monte-Carlo · scipy · tests · documentation</p>
+  <p class="pp-chapeau">Ce que les classes préparatoires, les BUT et les BTS attendent dès la première année, appris sur des situations de votre cours de terminale. Chaque notion indique la formation qui l'attend.</p>
+  <a class="pp-retour" href="index.html">← Le parcours Python</a>
+</header>
+
+<div class="pp-statut" aria-live="polite"></div>
+<nav class="pp-sommaire" aria-label="Étapes du niveau 4"></nav>
+
+<main>
+
+<section class="seance" id="mode-emploi" data-titre="Mode d'emploi">
+  <h2>Mode d'emploi</h2>
+  <div class="info">
+    <h4>Statut de ce niveau</h4>
+    <p>Ce niveau est en cours d'audit par M. Van Hoorde. Il est utilisable, mais pas encore garanti à 100 %.</p>
+  </div>
+  <p class="intro">Ce niveau suppose acquis les niveaux 1 à 3 : tableaux numpy, tracés, <code>if</code> et <code>for</code>, tirages aléatoires, fonctions <code>def</code>, <code>np.polyfit</code>, méthode d'Euler et dichotomie. Il ne prépare pas l'ECE : il vous montre ce qui vous attend après le bac.</p>
+  <div class="info">
+    <ul>
+      <li>Chaque étape porte une <b>étiquette</b> : la formation dont le programme officiel demande la notion (« attendu de PCSI », « BUT Mesures physiques »…). Les phrases entre guillemets sont recopiées de ces programmes.</li>
+      <li>Les étapes 5 et 6 utilisent la bibliothèque <b>scipy</b>. Elle se télécharge à la première exécution qui contient <code>import scipy</code> ou <code>from scipy…</code> : 14 Mo, comptez une dizaine de secondes, puis elle reste chargée tant que la page est ouverte.</li>
+      <li>Les tirages aléatoires changent à chaque exécution : vos nombres ne seront jamais exactement ceux des solutions, seulement très proches.</li>
+      <li>Comme aux niveaux précédents : <b>💡 Aide</b> donne un indice à la fois, la solution s'ouvre après un premier essai, <b>ⓘ Rappel de cours</b> rappelle la notion de physique-chimie.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s1" data-titre="La loi normale">
+  <h2>La loi normale et l'intervalle de confiance</h2>
+  <p class="etiquette">attendu de PCSI · et de toutes les CPGE de 1re année</p>
+  <p class="intro">En terminale, l'incertitude-type <i>u</i> indique un intervalle « dans lequel on peut raisonnablement penser » que se trouve la valeur. En classe préparatoire, on dit avec quelle probabilité. Le programme de PCSI demande d'« associer un intervalle de confiance à l'écart-type dans l'hypothèse d'une distribution suivant la loi normale », et, dans ses outils numériques, d'« utiliser la fonction random.normal de la bibliothèque numpy ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>np.random.normal(m, s, N)</code> tire au hasard <i>N</i> valeurs qui suivent une <em class="cle">loi normale</em> (ou loi gaussienne) de moyenne <i>m</i> et d'écart-type <i>s</i>. C'est le modèle des mesures répétées soumises à de petites causes de dispersion indépendantes.</li>
+      <li>Pour une loi normale, environ <b>68 %</b> des valeurs tombent entre <i>m</i> − <i>s</i> et <i>m</i> + <i>s</i>, et environ <b>95 %</b> entre <i>m</i> − 2<i>s</i> et <i>m</i> + 2<i>s</i> : c'est l'<em class="cle">intervalle de confiance à 95 %</em>.</li>
+      <li>Une comparaison appliquée à un tableau numpy donne un tableau de <code>True</code> et de <code>False</code>. <code>np.mean</code> de ce tableau donne la <b>proportion</b> de <code>True</code>, car <code>True</code> compte pour 1 et <code>False</code> pour 0.</li>
+      <li><code>np.exp(x)</code> calcule l'exponentielle e<sup><i>x</i></sup>, sur un nombre ou sur tout un tableau.</li>
+    </ul>
+    <pre class="code">x = np.array([55.47, 55.43, 55.45])
+print(x &gt; 55.44)             # [ True False  True]
+print(np.mean(x &gt; 55.44))    # 0.6666666666666666 : deux valeurs sur trois</pre>
+  </div>
+
+  <article class="exo" id="ex-1-1">
+    <h3><span class="num">1.1</span> Dix mille pesées simulées</h3>
+    <details class="rappel"><summary>Rappel de cours — Moyenne, écart-type, incertitude-type</summary>
+      <p>La moyenne <i>x̄</i> est la meilleure estimation de la grandeur mesurée. L'écart-type expérimental <i>s</i>(<i>x</i>) caractérise la dispersion des mesures autour de la moyenne.</p>
+      <p class="formule">u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
+      <p>Un résultat s'écrit par exemple <i>T</i> = (22,3 ± 0,5) °C, soit 21,8 °C ≤ <i>T</i> ≤ 22,8 °C.</p>
+    </details>
+    <p class="contexte">Les 15 pesées du cylindre d'aluminium (niveau 1) ont une moyenne de 55,449 g et un écart-type <i>s</i> = 0,018 g. On simule 10 000 pesées qui suivent une loi normale de mêmes moyenne et écart-type.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>p1 = ……</code> : la proportion des tirages <code>x</code> situés à moins de <i>s</i> de la moyenne.</li>
+      <li>Compléter la ligne <code>p2 = ……</code> : la proportion des tirages situés à moins de 2<i>s</i> de la moyenne. Comparer à l'encadré.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>« À moins de <i>s</i> de la moyenne » : l'écart entre la valeur et <code>m</code>, pris en valeur absolue, est inférieur à <code>s</code>.</li>
+      <li>La valeur absolue s'écrit <code>abs(...)</code>, et elle s'applique à tout un tableau : <code>abs(x - m)</code>.</li>
+      <li><code>abs(x - m) &lt; s</code> est un tableau de <code>True</code> et de <code>False</code> : il reste à en prendre la moyenne avec <code>np.mean</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+m = 55.449      # moyenne des 15 pesées, en g
+s = 0.018       # écart-type expérimental, en g
+N = 10000       # nombre de pesées simulées
+
+x = np.random.normal(m, s, N)     # 10 000 masses tirées au hasard
+print('moyenne des tirages :', np.mean(x), 'g')
+print('écart-type des tirages :', np.std(x, ddof=1), 'g')
+
+p1 = ……       # proportion des tirages entre m - s et m + s
+p2 = ……       # proportion des tirages entre m - 2s et m + 2s
+print('p1 =', p1)
+print('p2 =', p2)</textarea>
+      <script type="text/x-python" class="py-check">
+vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, float) and not isinstance(v, bool)]
+if any(0.66 < v < 0.705 for v in vals):
+    ok("Question 1 — Environ 68 % des tirages à moins d'un écart-type de la moyenne.")
+if any(0.94 < v < 0.97 for v in vals):
+    ok("Question 2 — Environ 95 % à moins de deux écarts-types : l'intervalle de confiance à 95 %.")
+import numpy as _np
+entiers = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, (int, _np.integer)) and not isinstance(v, bool) and 5000 < v < 9900]
+if any(0.82 < v < 0.86 or 0.97 < v < 0.985 for v in vals):
+    indice("Vous comptez aussi toutes les valeurs très inférieures à m : prenez la valeur absolue de l'écart, abs(x - m).")
+elif entiers:
+    indice("np.sum compte les True ; pour une proportion, utilisez np.mean.")
+elif not any(0.66 < v < 0.705 for v in vals):
+    indice("p1 se calcule avec np.mean appliqué à la comparaison abs(x - m) < s.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">p1 = np.mean(abs(x - m) &lt; s)
+p2 = np.mean(abs(x - m) &lt; 2 * s)</pre>
+      <p>On obtient <i>p</i><sub>1</sub> ≈ 0,68 et <i>p</i><sub>2</sub> ≈ 0,95, à quelques millièmes près selon le tirage. Si les mesures suivent une loi normale, une nouvelle pesée a donc 95 chances sur 100 de tomber entre <i>m</i> − 2<i>s</i> et <i>m</i> + 2<i>s</i>. Le même raisonnement, appliqué à la moyenne et à son incertitude-type <i>u</i>, donne l'intervalle de confiance à 95 % d'un résultat : [<i>x̄</i> − 2<i>u</i> ; <i>x̄</i> + 2<i>u</i>].</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-2">
+    <h3><span class="num">1.2</span> La courbe de Gauss sur l'histogramme</h3>
+    <details class="rappel"><summary>Rappel — La courbe de Gauss</summary>
+      <p>La loi normale de moyenne <i>m</i> et d'écart-type <i>s</i> a pour densité de probabilité :</p>
+      <p class="formule">f(x) = <span class="frac"><span class="haut">1</span><span class="bas">s √(2π)</span></span> × exp<span class="par">(</span>− <span class="frac"><span class="haut">(x − m)²</span><span class="bas">2 s²</span></span><span class="par">)</span></p>
+      <p>L'aire totale sous la courbe vaut 1 : c'est une <b>densité</b>, pas un effectif.</p>
+    </details>
+    <p class="contexte">On veut superposer à l'histogramme des 10 000 tirages la courbe de Gauss qui leur correspond. Le programme ci-dessous calcule la courbe, mais la figure obtenue n'est pas exploitable.</p>
+    <ol class="questions">
+      <li>Exécuter. Pourquoi la courbe rouge paraît-elle écrasée au bas du graphique ?</li>
+      <li>La fonction <code>plt.hist</code> possède un paramètre qui transforme les effectifs en densité, pour que l'aire totale des barres vaille 1. Le trouver dans sa documentation, l'ajouter, et vérifier que la courbe épouse l'histogramme.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Ouvrez la page <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html" target="_blank" rel="noopener">matplotlib.pyplot.hist</a> et lisez la liste <b>Parameters</b>, de haut en bas.</li>
+      <li>Le mot anglais recherché est le même qu'en français, à une lettre près : « densité ».</li>
+      <li>Les paramètres se notent comme <code>bins=40</code> : un nom, le signe <code>=</code>, une valeur. Celui-ci attend <code>True</code> ou <code>False</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+m = 55.449
+s = 0.018
+x = np.random.normal(m, s, 10000)
+
+x_mod = np.linspace(m - 4 * s, m + 4 * s, 200)
+gauss = 1 / (s * np.sqrt(2 * np.pi)) * np.exp(-(x_mod - m) ** 2 / (2 * s ** 2))
+
+plt.hist(x, bins=40, edgecolor='black')
+plt.plot(x_mod, gauss, 'r-', label='loi normale')
+plt.xlabel('masse (g)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+try:
+    ax = _figure.axes[0]
+    aire = sum(p.get_height() * p.get_width() for p in ax.patches)
+    courbes = len(ax.get_lines())
+except Exception:
+    aire, courbes = 0, 0
+if courbes and 0.9 < aire < 1.1:
+    ok("Avec density=True, l'aire des barres vaut 1 : l'histogramme et la courbe de Gauss se superposent.")
+elif aire > 2:
+    indice("Les barres comptent encore des effectifs (des centaines) alors que la courbe culmine vers 22 : cherchez le paramètre de densité dans la page de plt.hist.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.hist(x, bins=40, density=True, edgecolor='black')</pre>
+      <p>Sans ce paramètre, les barres montent à plusieurs centaines (des effectifs), alors que la courbe de Gauss culmine vers 22 g⁻¹ (une densité) : elle paraît plate. Avec <code>density=True</code>, la hauteur de chaque barre est divisée par l'effectif total et par la largeur de la classe : les deux se comparent enfin. L'histogramme des tirages a bien la forme d'une cloche.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-3">
+    <h3><span class="num">1.3</span> Prédire</h3>
+    <p class="contexte">Répondre, puis vérifier dans la console si besoin (commencer par <code>import numpy as np</code>).</p>
+    <div class="py" data-mode="console"></div>
+    <div class="quiz">
+      <h4>Loi normale et proportions</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Des mesures de la célérité du son suivent une loi normale de moyenne 340 m·s⁻¹ et d'écart-type 2 m·s⁻¹. Quelle proportion des mesures attend-on entre 336 et 344 m·s⁻¹ ?</p>
+        <button class="opt" data-v="a">environ 68 %</button>
+        <button class="opt" data-v="b">environ 95 %</button>
+        <button class="opt" data-v="c">environ 99,7 %</button>
+        <button class="opt" data-v="d">environ 50 %</button>
+        <button class="opt" data-v="e">environ 34 %</button>
+        <button class="opt" data-v="f">environ 90 %</button>
+        <div class="qcm-expl" hidden>336 et 344 m·s⁻¹, c'est 340 ± 4, soit <i>m</i> ± 2<i>s</i> : environ 95 % des mesures.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>np.mean(np.array([1.2, 3.5, 0.4]) &gt; 1)</code></p>
+        <button class="opt" data-v="a"><code>2</code></button>
+        <button class="opt" data-v="b"><code>1.7</code></button>
+        <button class="opt" data-v="c"><code>0.6666666666666666</code></button>
+        <button class="opt" data-v="d"><code>0.3333333333333333</code></button>
+        <button class="opt" data-v="e"><code>True</code></button>
+        <button class="opt" data-v="f"><code>array([ True,  True, False])</code></button>
+        <div class="qcm-expl" hidden>La comparaison donne <code>[True, True, False]</code> ; sa moyenne vaut (1 + 1 + 0) / 3, soit deux tiers. <code>1.7</code> serait la moyenne des valeurs elles-mêmes.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">Un résultat s'écrit <i>m</i> = 55,449 g avec <i>u</i> = 0,005 g. Quel est son intervalle de confiance à 95 % ?</p>
+        <button class="opt" data-v="a">[55,444 g ; 55,454 g]</button>
+        <button class="opt" data-v="b">[55,447 g ; 55,451 g]</button>
+        <button class="opt" data-v="c">[55,434 g ; 55,464 g]</button>
+        <button class="opt" data-v="d">[55,439 g ; 55,459 g]</button>
+        <button class="opt" data-v="e">[55,399 g ; 55,499 g]</button>
+        <div class="qcm-expl" hidden>À 95 %, on prend deux incertitudes-types de part et d'autre : 55,449 ± 0,010 g. L'intervalle [55,444 ; 55,454] ne correspond qu'à une incertitude-type, soit environ 68 %.</div>
+      </div>
+    </div>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p class="etiquette">BTS Métiers de la chimie</p>
+      <p>Dans l'industrie, on publie souvent l'<b>incertitude élargie</b> <i>U</i> = 2<i>u</i>, associée au niveau de confiance de 95 %. Le référentiel du BTS Métiers de la chimie demande d'« associer l'incertitude élargie à un intervalle de confiance associé à un niveau de confiance » et d'« écrire l'incertitude élargie de la grandeur mesurée avec deux chiffres significatifs ».</p>
+    </aside>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s2" data-titre="L'écart normalisé">
+  <h2>Comparer deux mesures : l'écart normalisé</h2>
+  <p class="etiquette">attendu de PCSI · MPSI · MP2I · BCPST · TSI</p>
+  <p class="intro">Le z-score compare une mesure à une valeur de référence, supposée exacte. Mais comment comparer deux mesures, qui ont chacune leur incertitude ? Le bloc « Mesures et incertitudes », commun à toutes les classes préparatoires scientifiques, demande de « comparer deux valeurs dont les incertitudes-types sont connues à l'aide de leur écart normalisé ».</p>
+
+  <details class="rappel"><summary>Rappel de cours — Le z-score</summary>
+    <p class="formule">z = <span class="frac"><span class="haut">|x<sub>exp</sub> − x<sub>réf</sub>|</span><span class="bas">u(x)</span></span></p>
+    <p><i>z</i> &lt; 1 : valeurs très compatibles ; 1 ≤ <i>z</i> ≤ 2 : valeurs compatibles ; <i>z</i> ≥ 2 : valeurs non compatibles (seuil retenu en terminale).</p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <p>Deux valeurs <i>x</i><sub>1</sub> et <i>x</i><sub>2</sub> d'une même grandeur, d'incertitudes-types <i>u</i><sub>1</sub> et <i>u</i><sub>2</sub>, se comparent par leur <em class="cle">écart normalisé</em> :</p>
+    <p class="formule">E<sub>N</sub> = <span class="frac"><span class="haut">|x<sub>1</sub> − x<sub>2</sub>|</span><span class="bas">√(u<sub>1</sub>² + u<sub>2</sub>²)</span></span></p>
+    <p>On l'interprète avec les mêmes seuils que le z-score. Si la seconde valeur est une référence sans incertitude (<i>u</i><sub>2</sub> = 0), on retrouve exactement le z-score.</p>
+  </div>
+
+  <article class="exo" id="ex-2-1">
+    <h3><span class="num">2.1</span> Une longueur d'onde, deux méthodes</h3>
+    <details class="rappel"><summary>Rappel de cours — Diffraction et interférences</summary>
+      <p>Diffraction par une fente de largeur <i>a</i> : <i>L</i> = <span class="frac"><span class="haut">2 λ D</span><span class="bas">a</span></span>. Interférences par deux fentes distantes de <i>b</i> : <i>i</i> = <span class="frac"><span class="haut">λ D</span><span class="bas">b</span></span>.</p>
+    </details>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 78. On mesure la longueur d'onde d'un laser rouge par diffraction, puis par interférences. Résultats : λ<sub>diff</sub> = 641 nm avec <i>u</i> = 9 nm ; λ<sub>inter</sub> = 628 nm avec <i>u</i> = 7 nm. Le fabricant annonce 633 nm (valeurs construites pour l'exercice).</p>
+    <ol class="questions">
+      <li>Compléter la fonction <code>ecart_normalise</code>, puis exécuter. Les deux méthodes donnent-elles des résultats compatibles ?</li>
+      <li>Avec la même fonction, comparer chacune des deux mesures à la valeur du fabricant, considérée comme exacte. Afficher les deux résultats.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>La racine carrée s'écrit <code>np.sqrt</code>, la valeur absolue <code>abs</code>.</li>
+      <li>Attention aux parenthèses : tout le dénominateur est sous la racine, <code>np.sqrt(u1**2 + u2**2)</code>.</li>
+      <li>Pour la question 2, la valeur du fabricant a une incertitude nulle : <code>ecart_normalise(lam_diff, u_diff, lam_ref, 0)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+def ecart_normalise(x1, u1, x2, u2):
+    return ……
+
+lam_diff = 641      # en nm, par diffraction
+u_diff = 9          # en nm
+lam_inter = 628     # en nm, par interférences
+u_inter = 7         # en nm
+lam_ref = 633       # en nm, valeur du fabricant
+
+E = ecart_normalise(lam_diff, u_diff, lam_inter, u_inter)
+print('écart normalisé entre les deux méthodes :', round(E, 2))
+</textarea>
+      <script type="text/x-python" class="py-check">
+import re as _re
+g = globals()
+f = g.get('ecart_normalise')
+if callable(f):
+    try:
+        _r1, _r2, _r3 = f(641, 9, 628, 7), f(10, 3, 6, 4), f(6, 4, 10, 3)
+    except Exception:
+        _r1 = _r2 = _r3 = None
+    if _r1 is not None and abs(_r1 - 1.1402) < 1e-3 and abs(_r3 - 0.8) < 1e-9:
+        ok("Question 1 — E_N ≈ 1,14 : entre 1 et 2, les deux méthodes sont compatibles.")
+    elif _r3 is not None and abs(_r3 + 0.8) < 1e-9:
+        indice("Le résultat peut être négatif : il manque la valeur absolue au numérateur.")
+    elif _r2 is not None and abs(_r2 - 4 / 7) < 1e-9:
+        indice("Les incertitudes ne s'ajoutent pas : on prend la racine de la somme de leurs carrés.")
+    else:
+        indice("Relisez la formule de l'encadré À retenir, en particulier les parenthèses.")
+nombres = [float(x) for x in _re.findall(r'\d+\.\d+', _sortie)]
+nombres += [v for k, v in g.items() if not k.startswith('_') and isinstance(v, float)]
+if any(abs(v - 0.889) < 0.01 for v in nombres) and any(abs(v - 0.714) < 0.01 for v in nombres):
+    ok("Question 2 — z ≈ 0,89 et z ≈ 0,71 : chaque mesure est très compatible avec la valeur du fabricant.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def ecart_normalise(x1, u1, x2, u2):
+    return abs(x1 - x2) / np.sqrt(u1**2 + u2**2)
+
+print('diffraction / fabricant :', round(ecart_normalise(lam_diff, u_diff, lam_ref, 0), 2))
+print('interférences / fabricant :', round(ecart_normalise(lam_inter, u_inter, lam_ref, 0), 2))</pre>
+      <p><i>E</i><sub>N</sub> ≈ 1,14 : les deux méthodes sont compatibles. Face au fabricant : 0,89 et 0,71, très compatibles. Les 13 nm d'écart entre les deux méthodes semblent grands, mais chacune a sa propre incertitude : le dénominateur les compose, comme pour une différence (√(9² + 7²) ≈ 11,4 nm).</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-2-2">
+    <h3><span class="num">2.2</span> Même écart, conclusion différente</h3>
+    <p class="contexte">Deux groupes mesurent l'intensité de la pesanteur. Groupe A : 9,72 m·s⁻² ; groupe B : 9,86 m·s⁻². Calculer dans la console, puis répondre.</p>
+    <div class="py" data-mode="console"></div>
+    <div class="quiz">
+      <h4>Écarts normalisés</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Chaque groupe annonce une incertitude-type de 0,05 m·s⁻². Que vaut l'écart normalisé ?</p>
+        <button class="opt" data-v="a">environ 1,4</button>
+        <button class="opt" data-v="b">environ 2,0</button>
+        <button class="opt" data-v="c">environ 2,8</button>
+        <button class="opt" data-v="d">environ 0,14</button>
+        <button class="opt" data-v="e">environ 1,0</button>
+        <button class="opt" data-v="f">environ 0,07</button>
+        <div class="qcm-expl" hidden>0,14 / √(0,05² + 0,05²) = 0,14 / 0,0707 ≈ 1,98 : à la limite de la compatibilité. 1,4 correspondrait à des incertitudes simplement additionnées (0,14 / 0,10).</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q">Les deux groupes refont leurs mesures avec plus de soin : mêmes valeurs, mais une incertitude-type de 0,02 m·s⁻² chacun. L'écart normalisé vaut alors…</p>
+        <button class="opt" data-v="a">environ 2,0, comme avant</button>
+        <button class="opt" data-v="b">environ 0,8 : plus compatibles</button>
+        <button class="opt" data-v="c">environ 3,5 : non compatibles</button>
+        <button class="opt" data-v="d">environ 7,0 : non compatibles</button>
+        <button class="opt" data-v="e">environ 4,9 : non compatibles</button>
+        <button class="opt" data-v="f">environ 1,4 : compatibles</button>
+        <div class="qcm-expl" hidden>0,14 / √(0,02² + 0,02²) ≈ 4,9. Des mesures plus précises révèlent un écart qui était masqué par les incertitudes : l'un des deux groupes a une erreur systématique à chercher.</div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s3" data-titre="Régression raisonnée">
+  <h2>Une régression linéaire raisonnée</h2>
+  <p class="etiquette">attendu de PCSI · MPSI · MP2I · BCPST · TSI</p>
+  <p class="intro">Au lycée, une droite qui « passe près des points » suffit souvent. Les programmes de CPGE précisent que l'analyse d'une régression linéaire « ne saurait s'appuyer sur l'exploitation non raisonnée du coefficient de corrélation (R2) ». Il faut « analyser les résultats obtenus à l'aide d'une procédure de validation : analyse graphique intégrant les barres d'incertitude ou analyse des écarts normalisés ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>a, b = np.polyfit(x, y, 1)</code> donne la pente <i>a</i> et l'ordonnée à l'origine <i>b</i> de la droite la plus proche des points (niveau 3).</li>
+      <li><code>plt.errorbar(x, y, yerr=u_y, fmt='o')</code> trace les points avec leurs <em class="cle">barres d'incertitude</em> verticales. <code>u_y</code> est l'incertitude-type sur <i>y</i> : un seul nombre, ou un tableau d'une valeur par point. <code>fmt</code> choisit le marqueur, comme <code>'b+'</code> dans <code>plt.plot</code>.</li>
+      <li>L'<em class="cle">écart normalisé</em> d'un point au modèle vaut <i>E<sub>i</sub></i> = (<i>y<sub>i</sub></i> − (<i>a x<sub>i</sub></i> + <i>b</i>)) / <i>u</i>(<i>y<sub>i</sub></i>). Le modèle est validé si tous les |<i>E<sub>i</sub></i>| restent inférieurs à 2 <b>et</b> si leurs signes se répartissent au hasard.</li>
+      <li>Un R² proche de 1 dit seulement que les points sont presque alignés. Il ne dit pas si les écarts sont compatibles avec les incertitudes.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-3-1">
+    <h3><span class="num">3.1</span> La droite d'étalonnage du TP4, validée</h3>
+    <details class="rappel"><summary>Rappel de cours — Loi de Kohlrausch</summary>
+      <p>Pour une solution diluée ne contenant qu'un seul soluté ionique, la conductivité σ est proportionnelle à la concentration <i>c</i> : σ = <i>k</i> × <i>c</i>.</p>
+    </details>
+    <p class="contexte">On reprend la gamme étalon de chlorure de sodium du TP4 (niveau 1). On estime l'incertitude-type sur chaque conductivité à 0,015 mS·cm⁻¹ (valeur construite pour l'exercice).</p>
+    <ol class="questions">
+      <li>Remplacer la ligne <code>……</code> du bloc 1 par le tracé des mesures avec leurs barres d'incertitude.</li>
+      <li>Compléter <code>E = ……</code> : le tableau des écarts normalisés des cinq points au modèle affine. Le modèle est-il validé ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])               # en mmol/L
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])  # en mS/cm
+u_sigma = 0.015                                        # incertitude-type sur chaque σ, en mS/cm
+
+# 1. les mesures, avec leurs barres d'incertitude
+……
+
+# 2. la régression linéaire
+a, b = np.polyfit(c, sigma, 1)
+print('a =', a, ' b =', b)
+c_mod = np.linspace(0, 11, 100)
+plt.plot(c_mod, a * c_mod + b, 'r-', label='modèle affine')
+
+# 3. les écarts normalisés
+E = ……
+print('écarts normalisés :', E)
+
+plt.xlabel('c (mmol/L)')
+plt.ylabel('σ (mS/cm)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+try:
+    ax = _figure.axes[0]
+    barres = any(type(k).__name__ == 'ErrorbarContainer' for k in ax.containers)
+except Exception:
+    barres = False
+if barres:
+    ok("Question 1 — Les mesures sont tracées avec leurs barres d'incertitude.")
+else:
+    indice("Question 1 : plt.errorbar(c, sigma, yerr=u_sigma, fmt='o'), avant plt.show().")
+if 'c' in g and 'sigma' in g:
+    a_, b_ = _np.polyfit(c, sigma, 1)
+    _ref = (sigma - (a_ * c + b_)) / 0.015
+    tabs = [v for k, v in g.items() if not k.startswith('_') and isinstance(v, _np.ndarray) and v.shape == (5,)]
+    if any(_np.allclose(v, _ref, atol=1e-6) or _np.allclose(v, -_ref, atol=1e-6) for v in tabs):
+        ok("Question 2 — Tous les |E| sont inférieurs à 0,6, de signes mêlés : le modèle affine est validé.")
+    elif any(_np.allclose(v, _ref * 0.015, atol=1e-9) or _np.allclose(v, -_ref * 0.015, atol=1e-9) for v in tabs):
+        indice("Question 2 : ce sont les écarts bruts ; il reste à les diviser par l'incertitude-type u_sigma.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.errorbar(c, sigma, yerr=u_sigma, fmt='o', label='mesures')
+E = (sigma - (a * c + b)) / u_sigma</pre>
+      <p>Les écarts normalisés valent environ −0,07 ; 0,13 ; 0,13 ; −0,53 ; 0,33 : tous inférieurs à 2 en valeur absolue, de signes mêlés. La droite passe dans toutes les barres d'incertitude : le modèle affine est validé sur cette gamme de concentrations.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-2">
+    <h3><span class="num">3.2</span> Quand R² ne suffit pas</h3>
+    <p class="contexte">On prolonge la gamme étalon jusqu'à 100 mmol·L⁻¹. L'incertitude-type sur σ vaut maintenant 1 % de la mesure plus 0,002 mS·cm⁻¹ (valeurs construites pour l'exercice, d'ordre de grandeur réaliste).</p>
+    <ol class="questions">
+      <li>Exécuter : que vaut R² ? Que conclurait-on en ne regardant que lui ?</li>
+      <li>Compléter <code>E = ……</code>, exécuter, et répondre au quiz.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([5, 10, 20, 35, 50, 70, 100])                            # en mmol/L
+sigma = np.array([0.603, 1.184, 2.314, 3.967, 5.550, 7.650, 10.669])  # en mS/cm
+u_sigma = np.array([0.008, 0.014, 0.025, 0.042, 0.058, 0.078, 0.109]) # en mS/cm
+
+a, b = np.polyfit(c, sigma, 1)
+R2 = np.corrcoef(c, sigma)[0, 1] ** 2      # coefficient R², comme au tableur
+print('R² =', R2)
+
+E = ……
+print('écarts normalisés :', E)
+
+plt.plot(c, E, 'o')
+plt.axhline(2, color='red', linestyle='--')      # seuils ±2
+plt.axhline(-2, color='red', linestyle='--')
+plt.xlabel('c (mmol/L)')
+plt.ylabel('écart normalisé')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'c' in g and 'sigma' in g and 'u_sigma' in g and _np.shape(u_sigma) == (7,):
+    a_, b_ = _np.polyfit(c, sigma, 1)
+    _ref = (sigma - (a_ * c + b_)) / u_sigma
+    tabs = [v for k, v in g.items() if not k.startswith('_') and isinstance(v, _np.ndarray) and v.shape == (7,)]
+    if any(_np.allclose(v, _ref, atol=1e-6) or _np.allclose(v, -_ref, atol=1e-6) for v in tabs):
+        ok("Écarts normalisés calculés : de −12 à +2,1, en forme d'arche.")
+    else:
+        indice("Même formule qu'à l'exercice 3.1 ; u_sigma est ici un tableau, le calcul se fait point par point.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Que conclure ?</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">R² vaut 0,9995. Les écarts normalisés valent environ −12 ; −3,2 ; 1,0 ; 2,1 ; 1,4 ; 0,7 ; −1,0.</p>
+        <button class="opt" data-v="a">Le modèle affine est validé, car R² dépasse 0,99.</button>
+        <button class="opt" data-v="b">Le modèle est validé, seul le premier point est aberrant.</button>
+        <button class="opt" data-v="c">Le modèle est rejeté : des écarts dépassent 2 et forment une arche.</button>
+        <button class="opt" data-v="d">Le modèle est rejeté, car l'ordonnée à l'origine est positive.</button>
+        <button class="opt" data-v="e">On ne peut rien conclure sans connaître la valeur de b.</button>
+        <div class="qcm-expl" hidden>Trois écarts dépassent 2 en valeur absolue, et ils ne se répartissent pas au hasard : négatifs aux extrémités, positifs au milieu. Les points dessinent une courbe, pas une droite. La loi de Kohlrausch ne vaut que pour les solutions diluées : au-delà de quelques dizaines de mmol·L⁻¹, σ croît moins vite que <i>c</i>. R² n'a rien vu.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">E = (sigma - (a * c + b)) / u_sigma</pre>
+      <p>R² ≈ 0,9995 : un tableur afficherait une droite « parfaite ». Pourtant le graphique des écarts normalisés dessine une arche, avec un point à −12. Le modèle affine est rejeté sur cette gamme : il faut se limiter aux solutions diluées, ou changer de modèle.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p class="etiquette">BUT Chimie</p>
+      <p>Le programme du BUT Chimie (ressource R1.07) prévoit des « notions de statistiques descriptives (moyenne, variance, écart type, régression linéaire) : utilisation des éléments dans le cadre des TP de chimie ». Les droites d'étalonnage y sont quotidiennes.</p>
+    </aside>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s4" data-titre="Monte-Carlo sur une régression">
+  <h2>Monte-Carlo sur une régression</h2>
+  <p class="etiquette">attendu de PCSI · MPSI · BCPST · TSI</p>
+  <p class="intro"><code>np.polyfit</code> donne une pente, mais avec quelle incertitude ? Les classes préparatoires demandent de « simuler, à l'aide d'un langage de programmation ou d'un tableur, un processus aléatoire de variation des valeurs expérimentales de l'une des grandeurs – simulation Monte-Carlo – pour évaluer l'incertitude sur les paramètres du modèle ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>La méthode : on fait varier au hasard chaque mesure selon son incertitude-type, on refait la régression, et on recommence un grand nombre de fois. L'écart-type des pentes obtenues est l'incertitude-type sur la pente.</li>
+      <li><code>y + np.random.normal(0, u_y, len(y))</code> décale chaque valeur de <code>y</code> d'une quantité tirée au hasard, différente pour chaque point.</li>
+      <li><code>pentes = []</code> crée une liste vide ; <code>pentes.append(a)</code> ajoute <code>a</code> à la fin de la liste.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-4-1">
+    <h3><span class="num">4.1</span> L'incertitude sur la pente</h3>
+    <p class="contexte">Mêmes mesures qu'à l'exercice 3.1 : cinq conductivités, chacune avec une incertitude-type de 0,015 mS·cm⁻¹.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>sigma_sim = ……</code>, dans la boucle, puis exécuter.</li>
+      <li>Écrire la pente avec son incertitude-type, avec le bon nombre de chiffres significatifs.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>À chaque tour, <code>sigma_sim</code> est une nouvelle version des cinq mesures, légèrement modifiées au hasard.</li>
+      <li>Le décalage de chaque point se tire avec <code>np.random.normal(0, u_sigma, 5)</code> : moyenne nulle, écart-type <code>u_sigma</code>, cinq valeurs.</li>
+      <li>Il reste à ajouter ce décalage aux mesures <code>sigma</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])               # en mmol/L
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])  # en mS/cm
+u_sigma = 0.015                                        # en mS/cm
+N = 1000                                               # nombre de simulations
+
+pentes = []
+ordonnees = []
+for i in range(N):
+    sigma_sim = ……          # chaque mesure varie au hasard autour de sa valeur
+    a, b = np.polyfit(c, sigma_sim, 1)
+    pentes.append(a)
+    ordonnees.append(b)
+
+pentes = np.array(pentes)
+print('a =', np.mean(pentes), ' u(a) =', np.std(pentes, ddof=1))
+
+plt.hist(pentes, bins=30, edgecolor='black')
+plt.xlabel('pente a (mS/cm par mmol/L)')
+plt.ylabel('effectif')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+cand = [_np.asarray(v, dtype=float) for k, v in globals().items() if not k.startswith('_') and isinstance(v, (list, _np.ndarray)) and _np.size(v) >= 200 and _np.ndim(v) == 1]
+bon = [v for v in cand if abs(_np.mean(v) - 0.110) < 0.002 and 0.0013 < _np.std(v, ddof=1) < 0.0026]
+if bon:
+    ok("u(a) ≈ 0,002 : a = (0,110 ± 0,002) mS·cm⁻¹ par mmol·L⁻¹.")
+elif any(abs(_np.mean(v) - 0.110) < 0.002 and _np.std(v) < 1e-9 for v in cand):
+    indice("Toutes les pentes sont identiques : sigma_sim doit contenir un tirage au hasard.")
+elif any(abs(_np.mean(v)) < 0.02 for v in cand):
+    indice("Les pentes sont presque nulles : on régresse le bruit seul. Ajoutez le tirage aux mesures sigma.")
+else:
+    indice("sigma_sim = les mesures sigma, plus un décalage tiré avec np.random.normal.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    sigma_sim = sigma + np.random.normal(0, u_sigma, 5)</pre>
+      <p>On obtient <i>u</i>(<i>a</i>) ≈ 0,0019, arrondi à l'excès : 0,002. La pente s'écrit <i>a</i> = (0,110 ± 0,002) mS·cm⁻¹ par mmol·L⁻¹. L'histogramme des 1 000 pentes a la forme d'une cloche. Le même calcul sur les ordonnées donne <i>b</i> = (0,05 ± 0,02) mS·cm⁻¹ : une ordonnée à l'origine non compatible avec 0, alors que la loi de Kohlrausch prévoit une droite passant par l'origine. Le modèle affine en tient compte.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-2">
+    <h3><span class="num">4.2</span> La concentration du sérum, avec son incertitude</h3>
+    <p class="contexte">Le sérum physiologique dilué du TP4 a une conductivité σ = 0,869 mS·cm⁻¹. Sa concentration vaut <i>c</i> = <span class="frac"><span class="haut">σ − b</span><span class="bas">a</span></span>. Chaque couple (<i>a</i>, <i>b</i>) simulé donne une valeur de <i>c</i>.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>c_sim = ……</code> : les 1 000 concentrations calculées avec les 1 000 couples (<i>a</i>, <i>b</i>).</li>
+      <li>Afficher la concentration et son incertitude-type ; tracer l'histogramme de <code>c_sim</code>.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li><code>pentes</code> et <code>ordonnees</code> sont deux tableaux de 1 000 valeurs : un seul calcul les traite toutes d'un coup.</li>
+      <li><code>c_sim = (sigma_serum - ordonnees) / pentes</code>.</li>
+      <li>La moyenne et l'écart-type de <code>c_sim</code> se calculent comme à l'exercice 4.1.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])
+u_sigma = 0.015
+N = 1000
+
+pentes = []
+ordonnees = []
+for i in range(N):
+    sigma_sim = sigma + np.random.normal(0, u_sigma, 5)
+    a, b = np.polyfit(c, sigma_sim, 1)
+    pentes.append(a)
+    ordonnees.append(b)
+pentes = np.array(pentes)
+ordonnees = np.array(ordonnees)
+
+sigma_serum = 0.869          # en mS/cm
+c_sim = ……
+</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+cand = [_np.asarray(v, dtype=float) for k, v in globals().items() if not k.startswith('_') and isinstance(v, (list, _np.ndarray)) and _np.size(v) >= 200 and _np.ndim(v) == 1]
+bon = [v for v in cand if abs(_np.mean(v) - 7.418) < 0.05 and 0.045 < _np.std(v, ddof=1) < 0.10]
+if bon:
+    ok("Question 1 — 1 000 concentrations simulées, autour de 7,42 mmol/L.")
+    try:
+        nb = len(_figure.axes[0].patches)
+    except Exception:
+        nb = 0
+    if '7.4' in _sortie and '0.0' in _sortie and nb:
+        ok("Question 2 — c = (7,42 ± 0,08) mmol/L, et l'histogramme est tracé.")
+    else:
+        indice("Question 2 : affichez np.mean(c_sim) et np.std(c_sim, ddof=1), puis tracez plt.hist(c_sim, …).")
+elif any(abs(_np.mean(v) - 7.9) < 0.1 for v in cand):
+    indice("Il faut soustraire l'ordonnée à l'origine b avant de diviser par la pente.")
+else:
+    indice("c_sim se calcule d'un coup sur les tableaux pentes et ordonnees.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">c_sim = (sigma_serum - ordonnees) / pentes
+print('c =', np.mean(c_sim), 'mmol/L')
+print('u(c) =', np.std(c_sim, ddof=1), 'mmol/L')
+plt.hist(c_sim, bins=30, edgecolor='black')
+plt.xlabel('c (mmol/L)')
+plt.ylabel('effectif')
+plt.show()</pre>
+      <p><i>u</i>(<i>c</i>) ≈ 0,072 mmol·L⁻¹, arrondi à l'excès : 0,08. Résultat : <i>c</i> = (7,42 ± 0,08) mmol·L⁻¹. Au niveau 1, on lisait 7,41 sur la droite sans aucune incertitude. On pourrait aussi faire varier σ<sub>sérum</sub>, mesurée elle aussi avec une incertitude : il suffit d'un tirage de plus par tour.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s5" data-titre="Résoudre une équation">
+  <h2>Résoudre une équation : bisect et Newton</h2>
+  <p class="etiquette">attendu de PCSI · méthode de Newton : PCSI chimie</p>
+  <p class="intro">Au niveau 3, vous avez écrit une dichotomie. En classe préparatoire, on utilise aussi celle de la bibliothèque scipy. Le programme de PCSI demande de « déterminer, en s'appuyant sur une représentation graphique, un intervalle adapté à la recherche numérique d'une racine » et d'« utiliser la fonction bisect de la bibliothèque scipy.optimize (sa spécification étant fournie) ». Celui de chimie ajoute la « méthode de Newton ».</p>
+
+  <div class="info">
+    <h4>Bon à savoir</h4>
+    <p>Le premier programme de cette étape qui importe scipy la télécharge : 14 Mo, une dizaine de secondes. Ensuite, elle reste chargée.</p>
+  </div>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>from scipy.optimize import bisect</code> charge la fonction <code>bisect</code>.</li>
+      <li><b>Spécification</b> : <code>bisect(f, a, b)</code> renvoie une valeur approchée d'une racine de la fonction <code>f</code> située entre <code>a</code> et <code>b</code>. Condition : <code>f(a)</code> et <code>f(b)</code> doivent être de signes contraires, sinon <code>bisect</code> s'arrête sur une <code>ValueError</code>.</li>
+      <li>On passe la fonction elle-même, <b>sans parenthèses</b> : <code>bisect(f, 0, 1)</code>, et non <code>bisect(f(x), 0, 1)</code>.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-5-1">
+    <h3><span class="num">5.1</span> L'acide éthanoïque dans l'eau</h3>
+    <details class="rappel"><summary>Rappel de cours — Acide faible et taux d'avancement</summary>
+      <p>Un acide faible AH réagit avec l'eau selon une transformation limitée : AH(aq) + H<sub>2</sub>O(l) ⇌ A<sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq). Sa constante d'acidité vaut :</p>
+      <p class="formule">K<sub>a</sub> = <span class="frac"><span class="haut">[A<sup>−</sup>]<sub>éq</sub> × [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub></span><span class="bas">[AH]<sub>éq</sub> × c<sup>0</sup></span></span>      τ = <span class="frac"><span class="haut">x<sub>f</sub></span><span class="bas">x<sub>max</sub></span></span></p>
+      <p>Pour une concentration apportée <i>C</i>, en notant <i>x</i> = [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub> = [A<sup>−</sup>]<sub>éq</sub>, on a [AH]<sub>éq</sub> = <i>C</i> − <i>x</i>, d'où l'équation à résoudre : <span class="frac"><span class="haut">x²</span><span class="bas">C − x</span></span> = <i>K</i><sub>a</sub>. Le taux d'avancement final vaut τ = <span class="frac"><span class="haut">x</span><span class="bas">C</span></span>.</p>
+    </details>
+    <p class="contexte">On dissout de l'acide éthanoïque (p<i>K</i><sub>a</sub> = 4,8) dans l'eau, à la concentration <i>C</i> = 1,0 × 10⁻² mol·L⁻¹. On cherche la racine de <i>f</i>(<i>x</i>) = <span class="frac"><span class="haut">x²</span><span class="bas">C − x</span></span> − <i>K</i><sub>a</sub>.</p>
+    <ol class="questions">
+      <li>Exécuter : le graphique montre <i>f</i>. Lire un intervalle [<i>a</i> ; <i>b</i>] dans lequel <i>f</i> change de signe, et compléter la ligne <code>x_f = bisect(f, ……, ……)</code>.</li>
+      <li>Calculer le taux d'avancement final τ.</li>
+      <li>Calculer le pH de la solution.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>La courbe coupe l'axe horizontal un peu avant 0,0005 : l'intervalle [0 ; 0,001] convient, par exemple.</li>
+      <li>Choisir <code>b = C</code> serait une erreur : <i>C</i> − <i>x</i> s'annule, et Python refuse de diviser par zéro.</li>
+      <li>τ = x_f / C, et pH = −log [H<sub>3</sub>O<sup>+</sup>], soit <code>-np.log10(x_f)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import bisect
+
+Ka = 10 ** (-4.8)     # constante d'acidité de l'acide éthanoïque
+C = 1.0e-2            # concentration apportée, en mol/L
+
+def f(x):
+    return x**2 / (C - x) - Ka
+
+# 1. repérer graphiquement le changement de signe
+x = np.linspace(0, 0.002, 200)
+plt.plot(x, f(x))
+plt.axhline(0, color='black')
+plt.xlabel('x (mol/L)')
+plt.ylabel('f(x)')
+plt.show()
+
+# 2. résoudre
+x_f = bisect(f, ……, ……)
+print('[H3O+] final =', x_f, 'mol/L')
+</textarea>
+      <script type="text/x-python" class="py-check">
+vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, float) and not isinstance(v, bool)]
+racine = 3.9026156645e-4
+if any(abs(v - racine) < 1e-9 for v in vals):
+    ok("Question 1 — [H3O+] ≈ 3,9 × 10⁻⁴ mol/L.")
+else:
+    indice("Question 1 : choisissez a et b de part et d'autre du point où la courbe coupe l'axe.")
+if any(abs(v - racine / 1e-2) < 1e-6 or abs(v - 100 * racine / 1e-2) < 1e-4 for v in vals):
+    ok("Question 2 — τ ≈ 0,039 : moins de 4 % des molécules d'acide ont réagi.")
+if any(abs(v - 3.4086) < 1e-3 for v in vals):
+    ok("Question 3 — pH ≈ 3,41.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">x_f = bisect(f, 0, 0.001)
+tau = x_f / C
+pH = -np.log10(x_f)
+print('tau =', tau, ' pH =', pH)</pre>
+      <p>[H<sub>3</sub>O<sup>+</sup>] ≈ 3,9 × 10⁻⁴ mol·L⁻¹, τ ≈ 0,039 et pH ≈ 3,4. En terminale, on obtient le même résultat en résolvant l'équation du second degré <i>x</i>² + <i>K</i><sub>a</sub> <i>x</i> − <i>K</i><sub>a</sub> <i>C</i> = 0. La méthode numérique, elle, s'applique aussi aux équations qu'on ne sait pas résoudre à la main.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-2">
+    <h3><span class="num">5.2</span> La méthode de Newton</h3>
+    <div class="retenir">
+      <h4>À retenir</h4>
+      <p>Pour résoudre <i>g</i>(<i>x</i>) = 0, la <em class="cle">méthode de Newton</em> part d'une valeur <i>x</i><sub>0</sub>, remplace la courbe par sa tangente en ce point, et prend pour nouvelle valeur l'abscisse où cette tangente coupe l'axe :</p>
+      <p class="formule">x<sub>n+1</sub> = x<sub>n</sub> − <span class="frac"><span class="haut">g(x<sub>n</sub>)</span><span class="bas">g′(x<sub>n</sub>)</span></span></p>
+      <p><code>scipy.optimize.newton(g, x0, fprime=g_prime)</code> fait ce calcul jusqu'à ce que la valeur ne bouge plus.</p>
+    </div>
+    <p class="contexte">Même solution d'acide éthanoïque. On résout cette fois <i>g</i>(<i>x</i>) = <i>x</i>² + <i>K</i><sub>a</sub> <i>x</i> − <i>K</i><sub>a</sub> <i>C</i> = 0, de dérivée <i>g</i>′(<i>x</i>) = 2<i>x</i> + <i>K</i><sub>a</sub>, en partant de <i>x</i><sub>0</sub> = <i>C</i>.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>x = ……</code> pour qu'elle effectue une itération de Newton. Exécuter.</li>
+      <li>À partir de quelle itération les quatre premiers chiffres significatifs ne changent-ils plus ? Comparer avec le résultat de scipy.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">from scipy.optimize import newton
+
+Ka = 10 ** (-4.8)
+C = 1.0e-2
+
+def g(x):
+    return x**2 + Ka * x - Ka * C
+
+def g_prime(x):
+    return 2 * x + Ka
+
+x = C                    # point de départ : x ne peut pas dépasser C
+for n in range(8):
+    x = ……               # une itération de Newton
+    print(n + 1, x)
+
+print('scipy :', newton(g, C, fprime=g_prime))</textarea>
+      <script type="text/x-python" class="py-check">
+g_ = globals()
+lignes = [l for l in _sortie.splitlines() if l.strip()]
+if 'x' in g_ and isinstance(x, float) and abs(x - 3.9026156645e-4) < 1e-10 and len(lignes) >= 8:
+    ok("Huit itérations : 5,0 × 10⁻³, 2,5 × 10⁻³… puis 3,903 × 10⁻⁴ dès la 7ᵉ.")
+elif 'x' in g_ and isinstance(x, float) and abs(x - 1e-2) < 1e-12:
+    indice("x ne bouge pas : la ligne doit utiliser l'ancienne valeur de x, g(x) et g_prime(x).")
+else:
+    indice("Recopiez la relation de l'encadré : x - g(x) / g_prime(x).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    x = x - g(x) / g_prime(x)</pre>
+      <p>Les valeurs successives : 5,00 × 10⁻³ ; 2,51 × 10⁻³ ; 1,28 × 10⁻³ ; 7,0 × 10⁻⁴ ; 4,58 × 10⁻⁴ ; 3,952 × 10⁻⁴ ; 3,9029 × 10⁻⁴ ; 3,902616 × 10⁻⁴. Les quatre premiers chiffres sont fixés à la 7ᵉ itération. Ensuite, le nombre de chiffres exacts double à chaque tour : c'est ce qui rend la méthode de Newton si rapide près de la racine. La dichotomie, elle, ne gagne qu'un chiffre tous les trois ou quatre tours.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-3">
+    <h3><span class="num">5.3</span> L'état final d'une estérification</h3>
+    <p class="etiquette">attendu de PCSI chimie · MPSI · TSI1</p>
+    <p>Le programme de chimie de PCSI demande de « déterminer, à l'aide d'un langage de programmation, l'état final d'un système, siège d'une transformation, modélisée par une ou deux réactions à partir des conditions initiales et valeur(s) de la(es) constante(s) thermodynamique(s) d'équilibre ».</p>
+    <details class="rappel"><summary>Rappel de cours — Quotient de réaction et équilibre</summary>
+      <p>Acide carboxylique + alcool ⇌ ester + eau. À l'équilibre, le quotient de réaction est égal à la constante d'équilibre <i>K</i>. Pour cette réaction en solvant organique, le volume se simplifie :</p>
+      <p class="formule">K = <span class="frac"><span class="haut">n<sub>ester</sub> × n<sub>eau</sub></span><span class="bas">n<sub>acide</sub> × n<sub>alcool</sub></span></span> = <span class="frac"><span class="haut">x<sub>f</sub>²</span><span class="bas">(n<sub>A</sub> − x<sub>f</sub>)(n<sub>B</sub> − x<sub>f</sub>)</span></span></p>
+      <p>Mettre un réactif en excès déplace l'équilibre et augmente le rendement.</p>
+    </details>
+    <p class="contexte">On fait réagir <i>n</i><sub>A</sub> mol d'acide éthanoïque avec <i>n</i><sub>B</sub> mol d'éthanol, sans eau ni ester au départ. Constante d'équilibre : <i>K</i> = 4. L'équation se réécrit <i>h</i>(<i>x</i>) = <i>x</i>² − <i>K</i>(<i>n</i><sub>A</sub> − <i>x</i>)(<i>n</i><sub>B</sub> − <i>x</i>) = 0, avec <i>x</i> entre 0 et <i>x</i><sub>max</sub>.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>x_max = ……</code> de la fonction <code>etat_final</code>.</li>
+      <li>Afficher le rendement <span class="frac"><span class="haut">x<sub>f</sub></span><span class="bas">x<sub>max</sub></span></span> pour 1 mol d'acide et 1, 2 puis 5 mol d'éthanol.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li><i>x</i><sub>max</sub> est fixé par le réactif limitant : la plus petite des deux quantités.</li>
+      <li>La fonction intégrée <code>min(a, b)</code> renvoie la plus petite de deux valeurs.</li>
+      <li>Pour la question 2, une boucle <code>for n_B in [1, 2, 5]:</code> évite de recopier trois fois la même ligne.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">from scipy.optimize import bisect
+
+def etat_final(n_A, n_B, K):
+    """Avancement final de acide + alcool = ester + eau.
+    n_A, n_B : quantités initiales d'acide et d'alcool (mol) ; K : constante d'équilibre."""
+    def h(x):
+        return x**2 - K * (n_A - x) * (n_B - x)
+    x_max = ……
+    return bisect(h, 0, x_max)
+
+x_f = etat_final(1, 1, 4)
+print('x_f =', x_f, 'mol')
+</textarea>
+      <script type="text/x-python" class="py-check">
+import re as _re
+fn = globals().get('etat_final')
+if callable(fn):
+    try:
+        r = [fn(1, 1, 4), fn(1, 2, 4), fn(3, 1, 4)]
+    except Exception:
+        r = None
+    if r and abs(r[0] - 2 / 3) < 1e-6 and abs(r[1] - 0.84530) < 1e-4 and abs(r[2] - 0.90277) < 1e-4:
+        ok("Question 1 — x_max = min(n_A, n_B) : la fonction marche quel que soit le réactif limitant.")
+    elif r is None:
+        indice("Question 1 : h ne change pas de signe entre 0 et x_max. C'est le réactif limitant qui fixe x_max.")
+    else:
+        indice("Question 1 : testez etat_final(3, 1, 4) : l'éthanol est alors limitant, x_f vaut 0,90 mol.")
+nombres = [float(t) for t in _re.findall(r'\d+\.\d+', _sortie)]
+cibles = (0.6667, 0.8453, 0.9449)
+if all(any(abs(v - c) < 2e-3 or abs(v - 100 * c) < 0.2 for v in nombres) for c in cibles):
+    ok("Question 2 — Rendements : 67 %, 85 %, 94 % : l'excès d'alcool déplace l'équilibre.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    x_max = min(n_A, n_B)
+
+for n_B in [1, 2, 5]:
+    print(n_B, 'mol d\'éthanol : rendement', etat_final(1, n_B, 4) / 1)</pre>
+      <p>Rendements : 0,67 ; 0,85 ; 0,94. Avec des quantités égales, on retrouve le rendement classique de deux tiers. Un excès d'alcool améliore le rendement, de moins en moins à mesure qu'on en ajoute. Remarquez la ligne entre triples guillemets sous <code>def</code> : c'est la <b>spécification</b> de la fonction, dont l'étape 7 fait une habitude.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s6" data-titre="Équations différentielles">
+  <h2>Équations différentielles avec odeint</h2>
+  <p class="etiquette">attendu de PCSI · MPSI · MP2I · BCPST1</p>
+  <p class="intro">La méthode d'Euler du niveau 3 avance pas à pas. scipy fournit un solveur bien plus précis. Le programme de PCSI demande de « transformer une équation différentielle d'ordre n en un système différentiel de n équations d'ordre 1 » et d'« utiliser la fonction odeint de la bibliothèque scipy.integrate (sa spécification étant fournie) ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>from scipy.integrate import odeint</code> charge le solveur.</li>
+      <li><b>Spécification</b> : <code>sol = odeint(derivee, y0, t)</code> résout <i>dy</i>/<i>dt</i> = <code>derivee(y, t)</code> à partir de la valeur initiale <code>y0</code>, aux instants du tableau <code>t</code>. La fonction <code>derivee</code> reçoit <code>y</code> <b>puis</b> <code>t</code>, dans cet ordre.</li>
+      <li><code>sol</code> est un tableau à deux dimensions : une ligne par instant, une colonne par grandeur. <code>sol[:, 0]</code> est la première colonne, toutes lignes comprises ; <code>sol[:, 1]</code> la deuxième.</li>
+      <li>Une équation d'ordre 2 en θ devient un système d'ordre 1 en posant ω = <i>d</i>θ/<i>dt</i> : <code>y</code> est alors la liste <code>[theta, omega]</code>, et <code>derivee</code> renvoie <code>[dθ/dt, dω/dt]</code>.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-6-1">
+    <h3><span class="num">6.1</span> La charge d'un condensateur</h3>
+    <details class="rappel"><summary>Rappel de cours — Circuit RC</summary>
+      <p>Lors de la charge d'un condensateur de capacité <i>C</i> à travers une résistance <i>R</i>, sous une tension constante <i>E</i>, la tension <i>u<sub>C</sub></i> vérifie :</p>
+      <p class="formule"><span class="frac"><span class="haut">du<sub>C</sub></span><span class="bas">dt</span></span> = <span class="frac"><span class="haut">E − u<sub>C</sub></span><span class="bas">τ</span></span>   avec   τ = R × C</p>
+      <p>Pour un condensateur initialement déchargé : <i>u<sub>C</sub></i>(<i>t</i>) = <i>E</i>(1 − e<sup>−<i>t</i>/τ</sup>).</p>
+    </details>
+    <p class="contexte"><i>E</i> = 5,0 V, <i>R</i> = 10 kΩ, <i>C</i> = 100 µF : τ = 1,0 s.</p>
+    <ol class="questions">
+      <li>Compléter la fonction <code>derivee</code>, puis exécuter.</li>
+      <li>Ajouter au graphique la solution exacte, en pointillés, pour vérifier le résultat de <code>odeint</code>.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+E = 5.0          # tension du générateur, en V
+R = 10e3         # résistance, en ohm
+C = 100e-6       # capacité, en F
+tau = R * C      # constante de temps, en s
+
+def derivee(u, t):
+    return ……            # du/dt, d'après l'équation différentielle
+
+t = np.linspace(0, 5, 200)
+sol = odeint(derivee, 0, t)     # u(0) = 0 : condensateur déchargé
+u = sol[:, 0]
+
+plt.plot(t, u, 'b-', label='odeint')
+
+plt.xlabel('t (s)')
+plt.ylabel('u_C (V)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+fn = globals().get('derivee')
+if callable(fn):
+    try:
+        r = float(fn(2.0, 0.0))
+    except Exception:
+        r = None
+    if r is not None and abs(r - 3.0) < 1e-9:
+        ok("Question 1 — derivee renvoie (E - u) / tau.")
+    elif r is not None and abs(r + 3.0) < 1e-9:
+        indice("Question 1 : le signe est inversé, c'est (E - u) / tau.")
+    else:
+        indice("Question 1 : recopiez le second membre de l'équation différentielle, avec E, u et tau.")
+try:
+    n = len(_figure.axes[0].get_lines())
+except Exception:
+    n = 0
+if n >= 2:
+    ok("Question 2 — Les deux courbes se superposent : odeint est exact à 10⁻⁷ V près.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def derivee(u, t):
+    return (E - u) / tau
+
+plt.plot(t, E * (1 - np.exp(-t / tau)), 'r--', label='solution exacte')</pre>
+      <p>Les deux courbes sont confondues : l'écart maximal est de l'ordre de 10⁻⁷ V. Avec la méthode d'Euler et un pas de 0,025 s, l'écart serait de quelques centièmes de volt.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-6-2">
+    <h3><span class="num">6.2</span> Le pendule simple n'est pas isochrone</h3>
+    <details class="rappel"><summary>Rappel — Le pendule simple</summary>
+      <p>Une masse ponctuelle suspendue à un fil de longueur <i>L</i> oscille dans le champ de pesanteur. En PCSI, on établit l'équation de son mouvement, ici fournie, où θ est l'angle du fil avec la verticale :</p>
+      <p class="formule"><span class="frac"><span class="haut">d²θ</span><span class="bas">dt²</span></span> = − <span class="frac"><span class="haut">g</span><span class="bas">L</span></span> × sin θ</p>
+      <p>Pour de petites oscillations, la période vaut <i>T</i><sub>0</sub> = 2π √(<i>L</i>/<i>g</i>), indépendante de l'amplitude : on dit que les oscillations sont <b>isochrones</b>.</p>
+    </details>
+    <p class="contexte">Le programme de PCSI demande de « mettre en évidence le non isochronisme des oscillations ». Pendule de longueur <i>L</i> = 1,0 m, lâché sans vitesse initiale.</p>
+    <ol class="questions">
+      <li>Compléter la fonction <code>derivee</code> : elle renvoie [<i>d</i>θ/<i>dt</i>, <i>d</i>ω/<i>dt</i>]. Exécuter.</li>
+      <li>Ajouter la courbe d'un lâcher à 90°. Lire les deux périodes sur le graphique et répondre au quiz.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li><i>d</i>θ/<i>dt</i> vaut ω, par définition de ω.</li>
+      <li><i>d</i>ω/<i>dt</i> = <i>d</i>²θ/<i>dt</i>² : c'est le second membre de l'équation, avec <code>np.sin</code>.</li>
+      <li>Pour la seconde courbe, recopiez les trois lignes <code>theta0 = …</code>, <code>sol = …</code>, <code>plt.plot(…)</code> avec 90 au lieu de 10, et un autre <code>label</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+g = 9.81      # intensité de la pesanteur, en m/s²
+L = 1.0       # longueur du fil, en m
+
+def derivee(Y, t):
+    theta, omega = Y
+    return [……, ……]
+
+t = np.linspace(0, 10, 2001)
+
+theta0 = 10 * np.pi / 180                 # lâcher à 10°, converti en rad
+sol = odeint(derivee, [theta0, 0], t)     # θ(0) = theta0 ; ω(0) = 0
+plt.plot(t, sol[:, 0] * 180 / np.pi, label='lâcher à 10°')
+
+print('T0 =', 2 * np.pi * np.sqrt(L / g), 's')
+plt.xlabel('t (s)')
+plt.ylabel('θ (°)')
+plt.grid()
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+fn = globals().get('derivee')
+if callable(fn):
+    try:
+        r = [float(v) for v in fn([0.5, 0.2], 0.0)]
+    except Exception:
+        r = None
+    if r and abs(r[0] - 0.2) < 1e-9 and abs(r[1] + 9.81 * _np.sin(0.5)) < 1e-9:
+        ok("Question 1 — Le système d'ordre 1 est juste.")
+    elif r and abs(r[0] - 0.2) < 1e-9 and abs(r[1] + 9.81 * 0.5) < 1e-9:
+        indice("Question 1 : c'est sin θ, pas θ. L'approximation sin θ ≈ θ ne vaut que pour les petits angles.")
+    elif r and abs(r[1] - 0.2) < 1e-9:
+        indice("Question 1 : l'ordre compte : d'abord dθ/dt = omega, puis dω/dt.")
+    else:
+        indice("Question 1 : relisez l'aide pour chacune des deux dérivées.")
+try:
+    lignes = _figure.axes[0].get_lines()
+    amplitudes = [max(abs(l.get_ydata())) for l in lignes]
+except Exception:
+    amplitudes = []
+if any(abs(a - 90) < 1 for a in amplitudes) and len(amplitudes) >= 2:
+    ok("Question 2 — Deux courbes : la période passe de 2,0 s à 2,4 s.")
+      </script>
+    </div>
+    <div class="quiz">
+      <h4>Lire les périodes</h4>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">Quelle période lit-on pour le lâcher à 90° ?</p>
+        <button class="opt" data-v="a">environ 1,0 s</button>
+        <button class="opt" data-v="b">environ 1,7 s</button>
+        <button class="opt" data-v="c">environ 2,0 s</button>
+        <button class="opt" data-v="d">environ 2,4 s</button>
+        <button class="opt" data-v="e">environ 2,8 s</button>
+        <button class="opt" data-v="f">environ 4,0 s</button>
+        <div class="qcm-expl" hidden>Sur 10 s, la courbe à 90° fait un peu plus de 4 oscillations, contre 5 pour la courbe à 10° : <i>T</i> ≈ 2,37 s, contre <i>T</i><sub>0</sub> ≈ 2,01 s.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Que montre la comparaison des deux courbes ?</p>
+        <button class="opt" data-v="a">La période ne dépend pas de l'amplitude, même à 90°.</button>
+        <button class="opt" data-v="b">La période augmente avec l'amplitude : pas d'isochronisme.</button>
+        <button class="opt" data-v="c">La période diminue quand l'amplitude augmente.</button>
+        <button class="opt" data-v="d">Le pendule s'amortit plus vite quand l'amplitude augmente.</button>
+        <button class="opt" data-v="e">La relation T₀ = 2π √(L/g) reste exacte à toute amplitude.</button>
+        <div class="qcm-expl" hidden>La période passe de 2,01 s à 2,37 s : près de 18 % de plus. L'isochronisme n'est vrai que pour les petites oscillations, là où sin θ ≈ θ. Il n'y a aucun amortissement : l'équation ne contient pas de frottement.</div>
+      </div>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def derivee(Y, t):
+    theta, omega = Y
+    return [omega, -g / L * np.sin(theta)]
+
+theta0 = 90 * np.pi / 180
+sol = odeint(derivee, [theta0, 0], t)
+plt.plot(t, sol[:, 0] * 180 / np.pi, label='lâcher à 90°')</pre>
+      <p>À 10°, la période vaut 2,01 s, comme <i>T</i><sub>0</sub>. À 90°, elle vaut 2,37 s. Essayez 150° : environ 3,5 s.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s7" data-titre="Spécifier, tester">
+  <h2>Programmer comme en CPGE : spécifier, tester</h2>
+  <p class="etiquette">informatique commune de CPGE · BUT Mesures physiques</p>
+  <p class="intro">Toutes les classes préparatoires scientifiques ont un cours d'informatique commune. Son premier semestre veut « mettre en place une discipline de programmation : spécification précise des fonctions et programmes, annotations et commentaires, jeux de tests ». En BUT Mesures physiques, la ressource R1.07 prévoit elle aussi le « test d'un programme ».</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>La <em class="cle">spécification</em> d'une fonction s'écrit entre triples guillemets, juste sous la ligne <code>def</code> : ce que la fonction reçoit (avec les unités et les conditions), ce qu'elle renvoie.</li>
+      <li><code>assert condition</code> ne fait rien si la condition est vraie, et arrête le programme sur une <code>AssertionError</code> si elle est fausse.</li>
+      <li>Un <em class="cle">jeu de tests</em> est une suite d'<code>assert</code> sur des cas dont on connaît la réponse, placés juste après la fonction.</li>
+      <li>On ne compare jamais deux nombres à virgule avec <code>==</code> : on teste que leur écart est minuscule, <code>abs(a - b) &lt; 1e-9</code>.</li>
+    </ul>
+    <pre class="code">def periode(f):
+    """Renvoie la période (en s) d'un signal de fréquence f (en Hz, f &gt; 0)."""
+    return 1 / f
+
+assert abs(periode(500) - 0.002) &lt; 1e-9
+assert abs(periode(1) - 1) &lt; 1e-9</pre>
+  </div>
+
+  <article class="exo" id="ex-7-1">
+    <h3><span class="num">7.1</span> Tester le z-score</h3>
+    <details class="rappel"><summary>Rappel de cours — Le z-score</summary>
+      <p class="formule">z = <span class="frac"><span class="haut">|x<sub>exp</sub> − x<sub>réf</sub>|</span><span class="bas">u(x)</span></span></p>
+      <p>Exemple du cours, titrage des ions chlorure : <i>C</i><sub>exp</sub> = 2,05 × 10⁻² mol·L⁻¹, <i>u</i>(<i>C</i>) = 0,10 × 10⁻² mol·L⁻¹, <i>C</i><sub>réf</sub> = 2,10 × 10⁻² mol·L⁻¹ : <i>z</i> = 0,5.</p>
+    </details>
+    <ol class="questions">
+      <li>Compléter la ligne <code>return ……</code>, puis exécuter. Le test échoue : pourtant la fonction est juste. Afficher <code>z_score(2.05, 2.10, 0.10)</code> pour comprendre.</li>
+      <li>Réécrire ce test correctement, ajouter un test qui vérifie que l'ordre des deux valeurs ne change rien, et terminer le programme par <code>print('Tous les tests passent')</code>.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">def z_score(x_exp, x_ref, u):
+    """Renvoie le z-score |x_exp - x_ref| / u (sans unité).
+    x_exp, x_ref : valeurs dans la même unité ; u > 0 : incertitude-type sur x_exp."""
+    return ……
+
+assert z_score(2.05, 2.10, 0.10) == 0.5      # titrage des ions chlorure (cours)
+</textarea>
+      <script type="text/x-python" class="py-check">
+fn = globals().get('z_score')
+if callable(fn):
+    try:
+        r = [fn(2.05, 2.10, 0.10), fn(2.10, 2.05, 0.10), fn(10, 10, 1)]
+    except Exception:
+        r = None
+    if r and abs(r[0] - 0.5) < 1e-9 and abs(r[1] - 0.5) < 1e-9 and r[2] == 0:
+        ok("Question 1 — La fonction est juste : |x_exp - x_ref| / u.")
+        if 'Tous les tests passent' in _sortie:
+            ok("Question 2 — Des tests avec une tolérance, qui passent tous.")
+        else:
+            indice("Question 2 : terminez par print('Tous les tests passent').")
+    elif r and abs(r[1] + 0.5) < 1e-9:
+        indice("Le z-score est négatif quand on échange les valeurs : il manque la valeur absolue.")
+    else:
+        indice("Relisez la formule du rappel de cours.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    return abs(x_exp - x_ref) / u
+
+assert abs(z_score(2.05, 2.10, 0.10) - 0.5) &lt; 1e-9
+assert abs(z_score(2.10, 2.05, 0.10) - 0.5) &lt; 1e-9
+print('Tous les tests passent')</pre>
+      <p>Python calcule <code>0.5000000000000027</code> : 2,05 et 2,10 ne s'écrivent pas exactement en binaire, et la soustraction garde une trace de cette approximation. Le test avec <code>==</code> échoue alors que la fonction est juste. Le programme d'informatique de CPGE insiste sur ce point : « les limites de précision dans le calcul avec des flottants, en particulier pour les comparaisons ».</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-7-2">
+    <h3><span class="num">7.2</span> Les tests trouvent l'erreur</h3>
+    <p class="contexte">Cette fonction traduit un z-score en conclusion, avec les seuils du cours. Elle contient une erreur de logique : Python ne signale rien tant qu'on ne la teste pas.</p>
+    <ol class="questions">
+      <li>Exécuter : quel test échoue ?</li>
+      <li>Corriger la fonction, sans toucher aux tests.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Le test qui échoue est celui de la ligne signalée par Python.</li>
+      <li>Pour <i>z</i> = 0,5, suivez le programme ligne à ligne : quel <code>return</code> est atteint en premier ?</li>
+      <li>Les conditions sont examinées dans l'ordre : il faut tester le seuil le plus petit d'abord.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">def conclusion(z):
+    """Renvoie la conclusion associée au z-score z (z >= 0), avec les seuils du cours."""
+    if z < 2:
+        return 'compatibles'
+    elif z < 1:
+        return 'très compatibles'
+    else:
+        return 'non compatibles'
+
+assert conclusion(3.0) == 'non compatibles'
+assert conclusion(1.5) == 'compatibles'
+assert conclusion(0.5) == 'très compatibles'
+print('Tous les tests passent')</textarea>
+      <script type="text/x-python" class="py-check">
+fn = globals().get('conclusion')
+if callable(fn):
+    try:
+        r = [fn(0.5), fn(1.5), fn(3.0), fn(0.99)]
+    except Exception:
+        r = None
+    if r == ['très compatibles', 'compatibles', 'non compatibles', 'très compatibles']:
+        ok("Corrigé : le seuil 1 doit être testé avant le seuil 2.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">    if z &lt; 1:
+        return 'très compatibles'
+    elif z &lt; 2:
+        return 'compatibles'
+    else:
+        return 'non compatibles'</pre>
+      <p>Le troisième test échoue : pour <i>z</i> = 0,5, la condition <code>z &lt; 2</code> est vraie, la fonction renvoie « compatibles » et ne regarde jamais la suite. La branche « très compatibles » n'était jamais atteinte. Sans test, l'erreur serait passée inaperçue.</p>
+    </details>
+  </article>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Un <em class="cle">dictionnaire</em> associe des valeurs à des <b>clés</b> : <code>pKa = {'acide méthanoïque': 3.7, 'ion ammonium': 9.2}</code>.</li>
+      <li><code>pKa['ion ammonium']</code> donne la valeur associée à la clé, 9.2. Une clé absente provoque une <code>KeyError</code>.</li>
+      <li><code>pKa['acide éthanoïque'] = 4.8</code> ajoute une clé, ou change sa valeur si elle existe déjà.</li>
+      <li><code>'ion ammonium' in pKa</code> vaut <code>True</code> si la clé existe ; <code>len(pKa)</code> donne le nombre de clés.</li>
+      <li><code>for nom in pKa:</code> parcourt les clés ; <code>for nom, valeur in pKa.items():</code> parcourt les couples clé-valeur.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-7-3">
+    <h3><span class="num">7.3</span> Une table de pKa</h3>
+    <details class="rappel"><summary>Rappel de cours — pKa et force d'un acide</summary>
+      <p class="formule">pK<sub>a</sub> = −log K<sub>a</sub>      K<sub>a</sub> = 10<sup>−pK<sub>a</sub></sup></p>
+      <p>Plus la constante d'acidité <i>K</i><sub>a</sub> d'un couple est grande, donc plus son p<i>K</i><sub>a</sub> est petit, plus l'acide est fort.</p>
+    </details>
+    <p class="contexte">Valeurs des tables, arrondies au dixième.</p>
+    <ol class="questions">
+      <li>Ajouter au dictionnaire l'acide benzoïque, de p<i>K</i><sub>a</sub> 4,2.</li>
+      <li>Compléter la première boucle pour qu'elle affiche, pour chaque acide, son nom et son <i>K</i><sub>a</sub>.</li>
+      <li>Compléter la condition de la seconde boucle pour trouver l'acide le plus fort de la table.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">pKa = {'acide éthanoïque': 4.8,
+       'acide méthanoïque': 3.7,
+       'ion ammonium': 9.2}
+
+# 1. ajouter l'acide benzoïque
+
+
+# 2. afficher le Ka de chaque acide
+for nom, valeur in pKa.items():
+    print(……)
+
+# 3. l'acide le plus fort
+plus_fort = 'acide éthanoïque'        # premier candidat
+for nom in pKa:
+    if ……:
+        plus_fort = nom
+print('Acide le plus fort :', plus_fort)</textarea>
+      <script type="text/x-python" class="py-check">
+d = globals().get('pKa')
+if isinstance(d, dict) and abs(d.get('acide benzoïque', 0) - 4.2) < 1e-9:
+    ok("Question 1 — L'acide benzoïque est dans la table.")
+elif isinstance(d, dict):
+    indice("Question 1 : pKa['acide benzoïque'] = 4.2, avec l'accent et sans espace en trop.")
+if isinstance(d, dict) and len(d) >= 4 and all(nom in _sortie for nom in d) and 'e-05' in _sortie:
+    ok("Question 2 — Un Ka par acide : 1,6 × 10⁻⁵, 2,0 × 10⁻⁴…")
+elif isinstance(d, dict):
+    indice("Question 2 : print(nom, 'Ka =', 10 ** (-valeur)).")
+if globals().get('plus_fort') == 'acide méthanoïque' and isinstance(d, dict) and 'acide benzoïque' in d:
+    ok("Question 3 — L'acide méthanoïque : le plus petit pKa, donc le plus grand Ka.")
+elif globals().get('plus_fort') == 'ion ammonium':
+    indice("Question 3 : le plus fort a le pKa le plus PETIT. Retournez la comparaison.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">pKa['acide benzoïque'] = 4.2
+
+for nom, valeur in pKa.items():
+    print(nom, 'Ka =', 10 ** (-valeur))
+
+plus_fort = 'acide éthanoïque'
+for nom in pKa:
+    if pKa[nom] &lt; pKa[plus_fort]:
+        plus_fort = nom</pre>
+      <p>On compare le p<i>K</i><sub>a</sub> de chaque acide à celui du meilleur candidat trouvé jusque-là. L'acide méthanoïque, de p<i>K</i><sub>a</sub> 3,7, est le plus fort ; l'ion ammonium, de p<i>K</i><sub>a</sub> 9,2, le plus faible. Le dictionnaire évite de tenir deux listes parallèles, une de noms et une de valeurs, qu'il faudrait garder dans le même ordre.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s8" data-titre="Chercher dans la documentation">
+  <h2>Personnaliser un graphique : chercher dans la documentation</h2>
+  <p class="etiquette">attendu de PCSI chimie · BUT Mesures physiques</p>
+  <p class="intro">À l'ECE, tout le code de tracé est fourni. Après le bac, personne ne vous dira quel paramètre écrire : on cherche dans la documentation. Le programme de chimie de PCSI demande de « rendre le graphe exploitable (présence d'une légende, choix des échelles…) », et celui du BUT Mesures physiques d'« utiliser différentes représentations graphiques pour le traitement de données de mesures ». Dans cette étape, la réponse n'est jamais dans l'énoncé : elle est dans la documentation de matplotlib.</p>
+
+  <div class="info">
+    <h4>Lire une page de documentation</h4>
+    <ul>
+      <li>La documentation est en anglais. Chaque fonction a sa page, toujours construite de la même façon : la <b>signature</b> en haut (le nom et ses paramètres), puis <b>Parameters</b> (chaque paramètre, ce qu'il attend), <b>Returns</b>, et des <b>Examples</b> en bas.</li>
+      <li>Les paramètres listés après <code>**kwargs</code> se donnent sous la forme <code>nom=valeur</code>, dans n'importe quel ordre.</li>
+      <li>Quelques mots utiles : <i>width</i> largeur, <i>style</i> style, <i>dashed</i> en tirets, <i>dotted</i> en pointillés, <i>scale</i> échelle, <i>arrow</i> flèche, <i>vertical</i> vertical, <i>row</i> ligne, <i>column</i> colonne.</li>
+      <li>La page d'accueil des fonctions de pyplot : <a href="https://matplotlib.org/stable/api/pyplot_summary.html" target="_blank" rel="noopener">matplotlib.org — pyplot</a>. Votre navigateur sait aussi traduire une page.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-8-1">
+    <h3><span class="num">8.1</span> Le diagramme de distribution, lisible</h3>
+    <details class="rappel"><summary>Rappel de cours — Diagramme de distribution</summary>
+      <p>Le diagramme de distribution d'un couple acide/base donne les pourcentages de l'acide et de la base en fonction du pH. À l'intersection des deux courbes, les deux espèces sont à 50 % : pH = p<i>K</i><sub>a</sub>.</p>
+      <p class="formule">%AH = <span class="frac"><span class="haut">100</span><span class="bas">1 + 10<sup>pH − pK<sub>a</sub></sup></span></span></p>
+    </details>
+    <p class="contexte">Couple acide méthanoïque / ion méthanoate, p<i>K</i><sub>a</sub> = 3,7. Pages utiles : <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html" target="_blank" rel="noopener">pyplot.plot</a>, <a href="https://matplotlib.org/stable/gallery/color/named_colors.html" target="_blank" rel="noopener">les couleurs nommées</a>, et la page d'accueil de pyplot.</p>
+    <ol class="questions">
+      <li>Tracer la courbe de l'acide avec une épaisseur de trait de 3.</li>
+      <li>Tracer la courbe de la base en tirets.</li>
+      <li>Ajouter une droite verticale en pH = p<i>K</i><sub>a</sub>. Indice : au niveau 4, vous avez déjà rencontré <code>plt.axhline</code>.</li>
+      <li>Sans correction automatique : choisir pour chaque courbe une couleur dans la liste des couleurs nommées.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+pKa = 3.7
+pH = np.linspace(0, 8, 300)
+acide = 100 / (1 + 10 ** (pH - pKa))     # % de HCOOH
+base = 100 - acide                       # % de HCOO-
+
+plt.plot(pH, acide, label='HCOOH')
+plt.plot(pH, base, label='HCOO⁻')
+
+plt.xlabel('pH')
+plt.ylabel('pourcentage (%)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+try:
+    lignes = _figure.axes[0].get_lines()
+except Exception:
+    lignes = []
+if any(l.get_linewidth() >= 2.9 and len(l.get_xdata()) > 2 for l in lignes):
+    ok("Question 1 — Trait épais : linewidth=3 (ou lw=3).")
+else:
+    indice("Question 1 : dans la page de pyplot.plot, cherchez un paramètre qui contient le mot width.")
+if any(l.get_linestyle() in ('--', '-.') and len(l.get_xdata()) > 2 for l in lignes):
+    ok("Question 2 — Tirets : '--' ou linestyle='dashed'.")
+elif any(l.get_linestyle() == ':' for l in lignes):
+    ok("Question 2 — Pointillés : ':' convient aussi.")
+verticale = False
+for l in lignes:
+    try:
+        xs = [float(v) for v in l.get_xdata()]
+        verticale = verticale or (len(xs) == 2 and abs(xs[0] - 3.7) < 1e-9 and abs(xs[1] - 3.7) < 1e-9)
+    except Exception:
+        pass
+if verticale:
+    ok("Question 3 — plt.axvline(pKa) : la verticale coupe les courbes à 50 %.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.plot(pH, acide, color='darkorange', linewidth=3, label='HCOOH')
+plt.plot(pH, base, color='teal', linestyle='--', label='HCOO⁻')
+plt.axvline(pKa, color='gray', linestyle=':')</pre>
+      <p><code>linewidth</code> a un nom court, <code>lw</code> ; <code>linestyle</code> accepte <code>'--'</code> ou <code>'dashed'</code>. <code>axvline</code> se trouve dans la page d'accueil de pyplot, juste à côté d'<code>axhline</code> : <i>v</i> pour vertical, <i>h</i> pour horizontal.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-2">
+    <h3><span class="num">8.2</span> Une échelle logarithmique</h3>
+    <details class="rappel"><summary>Rappel de cours — Loi de vitesse d'ordre 1</summary>
+      <p>Si la vitesse volumique de disparition d'un réactif A est proportionnelle à sa concentration, <i>v</i> = <i>k</i> × [A], alors [A] décroît exponentiellement : [A](<i>t</i>) = [A]<sub>0</sub> × e<sup>−<i>kt</i></sup>.</p>
+    </details>
+    <p class="contexte">On suit la concentration d'un réactif A pendant 20 minutes (valeurs construites pour l'exercice). Sur le graphique ordinaire, les dernières mesures sont écrasées contre l'axe : on ne voit pas si la loi d'ordre 1 est vérifiée. Page utile : <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.yscale.html" target="_blank" rel="noopener">pyplot.yscale</a>.</p>
+    <ol class="questions">
+      <li>Trouver dans la documentation comment mettre l'axe vertical en échelle logarithmique, et l'ajouter.</li>
+      <li>Les points sont-ils alignés ? Que peut-on en conclure sur l'ordre de la réaction ?</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t = np.array([0, 100, 200, 400, 600, 800, 1000, 1200])     # en s
+A = np.array([2.00e-2, 1.22e-2, 7.30e-3, 2.74e-3, 9.9e-4, 3.7e-4, 1.33e-4, 5.0e-5])   # en mol/L
+
+plt.plot(t, A, 'o')
+
+plt.xlabel('t (s)')
+plt.ylabel('[A] (mol/L)')
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+try:
+    echelle = _figure.axes[0].get_yscale()
+except Exception:
+    echelle = ''
+if echelle == 'log':
+    ok("Échelle logarithmique : les points s'alignent, la loi d'ordre 1 est vérifiée.")
+else:
+    indice("La page de pyplot.yscale donne la valeur à passer : un mot de trois lettres, entre guillemets.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.yscale('log')</pre>
+      <p>Sur une échelle logarithmique, des valeurs qui se divisent par le même nombre à intervalles de temps égaux sont régulièrement espacées : une exponentielle décroissante devient une droite. Les points sont alignés : la loi de vitesse d'ordre 1 est compatible avec les mesures. <code>plt.semilogy(t, A, 'o')</code>, trouvée dans la même documentation, fait le même travail en une ligne.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-3">
+    <h3><span class="num">8.3</span> Deux graphiques l'un sous l'autre</h3>
+    <details class="rappel"><summary>Rappel de cours — Interférences de deux ondes</summary>
+      <p>Deux ondes de même fréquence qui se superposent s'additionnent. En phase, l'amplitude de la somme est maximale : interférences constructives. En opposition de phase (déphasage de π), elles s'annulent : interférences destructives.</p>
+    </details>
+    <p class="contexte">Le programme de terminale demande de « représenter, à l'aide d'un langage de programmation, la somme de deux signaux sinusoïdaux périodiques synchrones en faisant varier la phase à l'origine de l'un des deux ». On veut les deux signaux en haut, leur somme en bas. Page utile : <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplot.html" target="_blank" rel="noopener">pyplot.subplot</a>.</p>
+    <ol class="questions">
+      <li>Trouver dans la documentation comment découper la figure en deux graphiques l'un sous l'autre, et placer chaque tracé dans le bon.</li>
+      <li>Donner à <code>phi</code> la valeur π. Qu'observe-t-on ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Dans la page de <code>subplot</code>, les trois nombres décrivent le nombre de lignes, le nombre de colonnes, puis le numéro du graphique.</li>
+      <li>Ici, 2 lignes et 1 colonne : <code>plt.subplot(2, 1, 1)</code> pour le graphique du haut.</li>
+      <li>Chaque appel à <code>subplot</code> se place juste avant les tracés et les légendes du graphique qu'il désigne.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+f = 40000                 # fréquence des ultrasons, en Hz
+phi = 0                   # déphasage de s2, en rad
+t = np.linspace(0, 3 / f, 300)
+s1 = 2 * np.sin(2 * np.pi * f * t)
+s2 = 2 * np.sin(2 * np.pi * f * t + phi)
+s = s1 + s2
+
+plt.plot(t, s1, label='s1')
+plt.plot(t, s2, '--', label='s2')
+plt.ylabel('tension (V)')
+plt.legend()
+
+plt.plot(t, s, 'k', label='s1 + s2')
+plt.xlabel('t (s)')
+plt.ylabel('tension (V)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+try:
+    n = len(_figure.axes)
+except Exception:
+    n = 0
+if n >= 2:
+    ok("Question 1 — Deux graphiques : les signaux en haut, la somme en bas.")
+else:
+    indice("Question 1 : un seul graphique. Cherchez dans la page de subplot ce que signifient les trois nombres.")
+g_ = globals()
+if n >= 2 and 'phi' in g_ and abs(phi - _np.pi) < 1e-3 and 's' in g_ and _np.max(abs(s)) < 1e-2:
+    ok("Question 2 — Avec phi = π, la somme est nulle : interférences destructives.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">phi = np.pi
+
+plt.subplot(2, 1, 1)
+plt.plot(t, s1, label='s1')
+plt.plot(t, s2, '--', label='s2')
+plt.ylabel('tension (V)')
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(t, s, 'k', label='s1 + s2')
+plt.xlabel('t (s)')
+plt.ylabel('tension (V)')
+plt.legend()
+plt.show()</pre>
+      <p>Avec φ = 0, la somme a une amplitude de 4 V : constructives. Avec φ = π, les deux signaux sont en opposition de phase et la somme est nulle à chaque instant : destructives.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-4">
+    <h3><span class="num">8.4</span> Une flèche sur le graphique</h3>
+    <p class="contexte">On reprend la droite d'étalonnage du TP4 et le point du sérum dilué. On veut un texte « sérum dilué » placé à côté du point, relié à lui par une flèche. Page utile : <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.annotate.html" target="_blank" rel="noopener">pyplot.annotate</a> — lisez d'abord les exemples en bas de page.</p>
+    <ol class="questions">
+      <li>Ajouter l'annotation avec sa flèche, le texte étant placé vers <i>c</i> = 3 mmol·L⁻¹, σ = 1,0 mS·cm⁻¹.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li><code>plt.annotate</code> attend d'abord le texte, puis <code>xy</code> : les coordonnées du point visé.</li>
+      <li><code>xytext</code> donne la position du texte. Sans lui, le texte se pose sur le point.</li>
+      <li>La flèche demande le paramètre <code>arrowprops</code>, qui reçoit un dictionnaire, par exemple <code>arrowprops={'arrowstyle': '-&gt;'}</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])
+a, b = np.polyfit(c, sigma, 1)
+c_mod = np.linspace(0, 11, 100)
+
+sigma_serum = 0.869
+c_serum = (sigma_serum - b) / a
+
+plt.plot(c, sigma, 'b+', markersize=12, label='mesures')
+plt.plot(c_mod, a * c_mod + b, 'r-', label='modèle affine')
+plt.plot(c_serum, sigma_serum, 'go')
+
+plt.xlabel('c (mmol/L)')
+plt.ylabel('σ (mS/cm)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+try:
+    notes = [t for t in _figure.axes[0].texts if type(t).__name__ == 'Annotation']
+except Exception:
+    notes = []
+if any(getattr(n, 'arrow_patch', None) is not None for n in notes):
+    ok("Annotation avec flèche : le point du sérum est désigné sans ambiguïté.")
+elif notes:
+    indice("Le texte est placé, mais sans flèche : cherchez arrowprops dans la page d'annotate.")
+else:
+    indice("Aucune annotation : plt.annotate('sérum dilué', xy=(…, …), …) avant plt.show().")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.annotate('sérum dilué', xy=(c_serum, sigma_serum), xytext=(3, 1.0),
+             arrowprops={'arrowstyle': '-&gt;'})</pre>
+      <p><code>arrowprops</code> reçoit un dictionnaire, comme ceux de l'étape 7 : la documentation de matplotlib en utilise partout pour regrouper des réglages.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>La <a href="https://matplotlib.org/stable/gallery/index.html" target="_blank" rel="noopener">galerie de matplotlib</a> montre des centaines de graphiques avec leur code. La bonne méthode : trouver une figure qui ressemble à celle que l'on veut, ouvrir son code, et n'en garder que la ligne utile.</p>
+    </aside>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="bilan" data-titre="Bilan">
+  <h2>Bilan du niveau 4</h2>
+  <div class="retenir">
+    <h4>Ce que je sais faire</h4>
+    <ul class="bilan">
+      <li>Simuler des mesures avec <code>np.random.normal</code> et associer un intervalle de confiance à un écart-type.</li>
+      <li>Superposer une courbe de Gauss à un histogramme normalisé.</li>
+      <li>Comparer deux mesures par leur écart normalisé.</li>
+      <li>Valider une régression linéaire avec des barres d'incertitude et des écarts normalisés, sans me fier au seul R².</li>
+      <li>Évaluer par Monte-Carlo l'incertitude sur la pente d'une droite, et sur une grandeur qui s'en déduit.</li>
+      <li>Résoudre une équation avec <code>bisect</code> ou la méthode de Newton, et trouver l'état final d'un équilibre.</li>
+      <li>Résoudre une équation différentielle d'ordre 1 ou 2 avec <code>odeint</code>.</li>
+      <li>Spécifier une fonction, la tester avec <code>assert</code>, utiliser un dictionnaire.</li>
+      <li>Trouver dans la documentation de matplotlib le paramètre qui me manque.</li>
+    </ul>
+  </div>
+  <p>Ces outils sont ceux de la première année de classe préparatoire. Le niveau 5 regarde plus loin : spectre d'un son, échantillonnage, filtrage, ce qu'attendent la deuxième année et les spécialités.</p>
+</section>
+
+<footer class="pp-pied">
+  <p><a class="doc" href="fiches/niveau-4-memo.pdf" download>Mémo du niveau 4 — à imprimer</a></p>
+  <p>© 2026 Loïc Van Hoorde — Choix pédagogiques, conception des activités, relecture : L. Van Hoorde. Mise en forme réalisée avec l'aide de Claude (Anthropic).</p>
+</footer>
+</main>
+
+<script src="parcours.js" type="module"></script>
+<script src="progression-resonance.js" type="module"></script>
+</body>
+</html>

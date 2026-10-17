@@ -1,0 +1,3 @@
+# Exception à la règle *.pdf de la racine : ces fiches sont des documents
+# de cours publiés, sans aucune donnée d’élève.
+!*.pdf

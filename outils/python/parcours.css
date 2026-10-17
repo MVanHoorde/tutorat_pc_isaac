@@ -1,0 +1,493 @@
+/* Parcours Python — feuille commune des pages de niveau.
+   Grammaire visuelle reprise des séquences SNT de Résonance (« Représenter l'information ») :
+   en-tête clair à surtitre mono, une teinte d'accent par séance (rail, pastille S1, numéros,
+   sommaire), surtitres de blocs en petites capitales mono avec filet, encadrés différenciés.
+   Le moteur (parcours.js) pose --accent / --accent-wash sur chaque .seance selon son rang.
+   Polices auto-hébergées (RGPD) : aucune requête vers Google Fonts. */
+@import url("polices/polices.css");
+
+:root{
+  --bg:#E9EDF4; --sheet:#FFFFFF; --soft:#F4F6FB; --ink:#161F33; --ink-soft:#4A566E; --muted:#5E6A80;
+  --faint:#8B97AD; --rule:#D3DAE7; --deep:#131A2E;
+  --lien:#2445C7; --lien-wash:#E7EBFB;
+  --cle:#C33A2F;                                   /* mots-clés : rouge brique SNT */
+  --ok:#12805C; --ok-wash:#E0F2EA; --ok-texte:#0C5C42;
+  --ambre:#9A6A00; --ambre-wash:#FBF1D8; --ambre-texte:#6E4C00;
+  --orange:#C26A12; --orange-wash:#FAEEDE; --orange-texte:#8A4A0B;
+  --rouge:#C33A2F; --rouge-wash:#FBE6E3; --rouge-texte:#8F2A22;
+  --bonus:#0F6D63; --bonus-wash:#E0F1EF;
+  --info:#2445C7; --info-wash:#EEF2FD;
+  --accent:#161F33; --accent-wash:#EDF0F5;         /* redéfinis par séance (parcours.js) */
+  --sans:"IBM Plex Sans",'Inter',-apple-system,"Segoe UI",Roboto,sans-serif;
+  --disp:"Bricolage Grotesque","IBM Plex Sans",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --serif:"Spectral","IBM Plex Sans",Georgia,serif;
+  --ombre:0 1px 2px rgba(22,31,51,.05),0 8px 24px rgba(22,31,51,.06);
+  --focus:0 0 0 3px #FFFFFF, 0 0 0 5px var(--lien);
+  /* aligne l'en-tête sur la colonne de contenu */
+  --marge:max(20px, calc((100vw - 860px) / 2 + 20px));
+}
+@media (min-width:1100px){ :root{ --marge:max(44px, calc((100vw - 1192px) / 2 + 28px)); } }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:76px}
+@media (min-width:1100px){ html{scroll-padding-top:20px} }
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+html,body{margin:0;padding:0}
+body.pp{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overflow-x:hidden}
+.pp a{color:var(--lien);text-underline-offset:2px}
+.pp :focus{outline:none}
+.pp :focus-visible{outline:none;box-shadow:var(--focus);border-radius:4px}
+
+/* ---------------------------------------------------------------- mise en page */
+body.pp{display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"head" "statut" "som" "main"}
+.pp-head{grid-area:head}
+.pp-statut{grid-area:statut}
+.pp-sommaire{grid-area:som}
+.pp > main{grid-area:main;width:100%;max-width:860px;margin:0 auto;padding:8px 20px 0;min-width:0}
+@media (min-width:1100px){
+  body.pp{grid-template-columns:minmax(16px,1fr) 248px minmax(0,860px) minmax(16px,1fr);column-gap:28px;
+    grid-template-areas:"head head head head" "statut statut statut statut" ". som main ."}
+  .pp > main{padding:8px 0 0;max-width:none}
+}
+
+/* ---------------------------------------------------------------- en-tête « hero » clair */
+.pp-head{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;
+  background:
+    radial-gradient(110% 140% at 95% -25%, rgba(36,69,199,.13), transparent 55%),
+    radial-gradient(60% 90% at -5% 125%, rgba(107,69,214,.08), transparent 60%),
+    var(--sheet);
+  border-bottom:1px solid var(--rule);padding:26px var(--marge) 28px}
+/* clin d'œil : l'invite de Python, en filigrane */
+.pp-head::after{content:">>>";position:absolute;right:calc(var(--marge) - 8px);top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-weight:500;font-size:clamp(90px,15vw,190px);letter-spacing:-.06em;line-height:1;
+  color:rgba(36,69,199,.055);pointer-events:none;z-index:0}
+.pp-head > *{position:relative;z-index:1}
+@media (max-width:700px){ .pp-head::after{display:none} }
+.pp-retour{order:-1;margin-bottom:18px;font-size:14px;color:var(--lien)!important;text-decoration:none;
+  border-bottom:1px solid transparent}
+.pp-retour:hover{border-bottom-color:currentColor}
+.pp-surtitre,.pp-invite{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--lien);margin:0 0 10px;max-width:none}
+.pp-chevrons{color:var(--orange);letter-spacing:.02em;margin-right:.5em}
+.pp-head h1{font-family:var(--disp);font-weight:800;font-size:clamp(38px,6.2vw,64px);line-height:1;
+  letter-spacing:-.03em;margin:0 0 8px;color:var(--ink);text-wrap:balance}
+.pp-sous-titre{font-family:var(--mono);font-weight:500;font-size:clamp(17px,2.4vw,24px);line-height:1.3;color:var(--faint);
+  margin:0 0 4px;max-width:none}
+.pp-chapeau{color:var(--ink-soft);font-size:17px;line-height:1.6;max-width:60ch;margin:14px 0 0}
+.pp-head > p:not([class]){color:var(--ink-soft);max-width:60ch;margin:12px 0 0}
+
+/* ---------------------------------------------------------------- statut Python */
+.pp-statut{padding:10px var(--marge) 0;min-height:42px}
+.pp-statut-pastille{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;line-height:1.3;
+  color:var(--ink-soft);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:5px 13px 5px 11px}
+.pp-statut-pastille:empty{display:none}
+.pp-statut-pastille::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.pp-statut[data-etat="charge"] .pp-statut-pastille::before{background:#D49A1A}
+.pp-statut[data-etat="pret"] .pp-statut-pastille::before{background:var(--ok)}
+.pp-statut[data-etat="pret"] .pp-statut-pastille{color:var(--ok-texte);border-color:#A9D8C1}
+.pp-statut[data-etat="echec"] .pp-statut-pastille::before{background:var(--rouge)}
+.pp-statut[data-etat="echec"] .pp-statut-pastille{color:var(--rouge-texte);border-color:#EBC0C4;background:var(--rouge-wash)}
+@media (prefers-reduced-motion:no-preference){
+  .pp-statut[data-etat="charge"] .pp-statut-pastille::before{animation:pp-pulse 1.2s ease-in-out infinite}
+}
+@keyframes pp-pulse{50%{opacity:.3}}
+
+/* ---------------------------------------------------------------- sommaire */
+.pp-snum{display:inline-flex;align-items:center;justify-content:center;flex:none;font-family:var(--mono);font-weight:500;
+  font-size:12px;line-height:1;min-width:28px;height:22px;padding:0 6px;border-radius:6px;
+  background:var(--accent-wash);color:var(--accent);letter-spacing:0}
+.pp-sommaire{position:sticky;top:0;z-index:15;background:rgba(233,237,244,.92);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);
+  padding:8px 12px;min-width:0}
+.pp-som-entete{display:none}
+.pp-som-liste{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+.pp-som-liste > li{flex:0 0 auto}
+.pp-som-seance{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;background:var(--sheet);
+  border:1px solid var(--rule);color:var(--ink)!important;text-decoration:none;font-size:14px;white-space:nowrap}
+.pp-som-seance[aria-current="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.pp-som-seance .pp-snum{height:20px;min-width:26px;font-size:11.5px;border-radius:999px}
+.pp-som-seance[aria-current="true"] .pp-snum{background:var(--accent);color:#fff}
+.pp-som-titre{max-width:24ch;overflow:hidden;text-overflow:ellipsis}
+.pp-som-compte{font-family:var(--mono);font-size:12px;color:var(--faint)}
+.pp-som-seance.complet .pp-som-compte{color:var(--ok)}
+.pp-som-seance.complet .pp-som-compte::before{content:"✓ "}
+.pp-som-exos{display:none}
+
+@media (min-width:1100px){
+  .pp-sommaire{align-self:start;top:16px;margin-top:22px;border:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+    padding:0;max-height:calc(100vh - 32px);overflow-y:auto}
+  .pp-som-entete{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--faint);margin:0 0 10px 4px}
+  .pp-som-entete::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .pp-som-liste{flex-direction:column;overflow:visible;gap:2px}
+  .pp-som-seance{border:0;background:none;border-radius:10px;white-space:normal;padding:7px 10px 7px 8px;
+    align-items:flex-start;line-height:1.35;box-shadow:none}
+  .pp-som-seance:hover{background:rgba(255,255,255,.6)}
+  .pp-som-seance[aria-current="true"]{background:var(--sheet);box-shadow:inset 3px 0 0 var(--accent),var(--ombre)}
+  .pp-som-titre{max-width:none;flex:1;padding-top:1px;font-size:14px}
+  .pp-som-compte{padding-top:3px}
+  .pp-som-exos{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0 0 8px;padding:2px 10px 0 46px}
+  .pp-som-exos a{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:11.5px;
+    color:var(--accent)!important;text-decoration:none;padding:1px 6px;border-radius:5px;
+    border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);background:var(--sheet)}
+  .pp-som-exos a:hover{background:var(--accent-wash)}
+  .pp-som-exos a.reussi{border-color:#A9D8C1;background:var(--ok-wash);color:var(--ok-texte)!important}
+  .pp-som-pastille{display:none}
+  .pp-som-exos a.reussi .pp-som-pastille{display:inline}
+  .pp-som-exos a.reussi .pp-som-pastille::before{content:"✓"}
+}
+
+/* ---------------------------------------------------------------- séances */
+.seance{position:relative;padding:38px 0 8px 24px}
+.seance::before{content:"";position:absolute;left:0;top:44px;bottom:0;width:4px;border-radius:4px;
+  background:linear-gradient(var(--accent) 0 85%, color-mix(in srgb,var(--accent) 15%,transparent))}
+.seance + .seance{margin-top:18px}
+.seance h2{display:flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:600;
+  font-size:clamp(25px,3.4vw,33px);letter-spacing:-.02em;line-height:1.15;margin:0 0 10px -24px}
+.seance h2 .pp-snum{font-size:.5em;height:1.55em;min-width:2.3em;padding:0 .45em;border-radius:8px;
+  background:var(--accent);color:#fff;font-weight:500}
+.seance > .intro{color:var(--ink-soft);font-size:17px;max-width:66ch;margin:0 0 18px}
+.pp p, .pp li{max-width:72ch}
+.pp .surtitre,.pp .rappel-titre,.pp .py-reussites li{max-width:none}
+.pp h3,.pp h4{font-family:var(--disp);font-weight:600}
+code{font-family:var(--mono);font-size:.9em;background:#E8ECF3;border-radius:4px;padding:.05em .3em}
+em.cle{font-style:normal;font-weight:500;color:var(--cle)}
+
+/* surtitre de bloc : petites capitales mono + filet (« S'ENTRAÎNER », « À RETENIR ») */
+.surtitre,.retenir > h4,.info > h4,.coulisses > h4{display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-weight:600;font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;line-height:1.4;
+  color:var(--faint);margin:26px 0 10px;max-width:none}
+.surtitre::after,.retenir > h4::after,.info > h4::after,.coulisses > h4::after{content:"";flex:1;height:1px;background:var(--rule)}
+.surtitre{color:var(--accent)}
+
+/* ---------------------------------------------------------------- code statique */
+pre.code{font-family:var(--mono);font-size:14.5px;line-height:1.55;background:var(--sheet);border:1px solid var(--rule);
+  border-radius:10px;padding:11px 15px;margin:12px 0;overflow-x:auto;white-space:pre;tab-size:4;color:var(--ink)}
+pre.code.sortie{background:#111827;color:#DCE3F2;border-color:#111827;position:relative;padding-top:30px}
+pre.code.sortie::before{content:"affichage";position:absolute;left:15px;top:8px;font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:#7C89A6}
+
+/* coloration syntaxique (éditeur et pre.code, mêmes classes CodeMirror) */
+.tok-keyword{color:#7A3EC8;font-weight:500}
+.tok-bool,.tok-atom{color:#7A3EC8}
+.tok-string,.tok-string2{color:#0B7A55}
+.tok-number{color:#B4500F}
+.tok-comment{color:#6F7A8E;font-style:italic}
+.tok-variableName2{color:#1F5FBF}
+.tok-definition{color:#123F8C;font-weight:500}
+.tok-className{color:#123F8C}
+.tok-propertyName{color:#25466F}
+.tok-operator{color:#5A3C1A}
+.tok-invalid{color:var(--rouge)}
+
+/* ---------------------------------------------------------------- formules */
+.formule{font-family:var(--serif);font-style:italic;font-size:1.25rem;line-height:1.5;text-align:center;
+  background:color-mix(in srgb,var(--accent) 6%,#fff);border:1px solid color-mix(in srgb,var(--accent) 14%,transparent);
+  border-radius:10px;padding:12px 18px;margin:14px auto;max-width:none!important;color:var(--ink);
+  overflow-x:auto;word-spacing:.08em}
+.formule sub,.formule sup,.formule .rm{font-style:normal}
+.formule sub,.formule sup{font-size:.68em}
+.formule code{font-style:normal}
+.frac{display:inline-block;vertical-align:middle;text-align:center;margin:0 .12em;line-height:1.2}
+.frac > .haut,.frac > .bas{display:block;padding:0 .25em}
+.frac > .haut{border-bottom:1.5px solid currentColor;padding-bottom:.08em}
+.frac > .bas{padding-top:.1em}
+p:not(.formule) .frac,li .frac,td .frac{font-size:.86em}
+.par{display:inline-block;font-size:1.65em;line-height:1;vertical-align:middle;font-style:normal;font-weight:400;
+  transform:translateY(-.04em);margin:0 .02em}
+/* Unités : petites et grises. Ni small-caps (elles effaceraient la différence m / M : mW ≠ MW),
+   ni mono (les exposants ⁻² y sont chassés à pleine largeur et se détachent de leur unité). */
+.unite{font-family:var(--sans);font-style:normal;font-size:.86em;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
+.formule .unite{font-size:.72em}
+
+/* ---------------------------------------------------------------- tableaux */
+.pp-table-defil{overflow-x:auto;margin:12px 0;max-width:100%}
+table.tableau{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--sheet)}
+table.tableau th,table.tableau td{border:1px solid var(--rule);padding:7px 11px;text-align:left;vertical-align:top}
+table.tableau th{background:var(--soft);font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+table.tableau caption{caption-side:bottom;text-align:left;font-size:13.5px;color:var(--muted);padding-top:6px}
+
+/* ---------------------------------------------------------------- encadrés */
+.retenir{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--accent);
+  border-radius:4px 12px 12px 4px;padding:4px 20px 16px;margin:20px 0;box-shadow:var(--ombre)}
+.retenir > h4{color:var(--accent);margin:12px 0 10px}
+.retenir ul,.info ul,.coulisses ul{margin:6px 0;padding-left:20px}
+.retenir li + li{margin-top:5px}
+.retenir > :last-child,.info > :last-child,.coulisses > :last-child,.plus > :last-child{margin-bottom:0}
+
+.info{background:var(--info-wash);border-left:4px solid var(--info);border-radius:0 12px 12px 0;
+  padding:4px 20px 14px;margin:18px 0;color:#24304A}
+.info > h4{color:var(--info);margin:12px 0 8px}
+.info > h4::after{background:#C9D3F2}
+
+.coulisses{background:
+    radial-gradient(90% 120% at 100% 0%, rgba(155,107,255,.18), transparent 60%),
+    var(--deep);
+  color:#D3DAEA;border-radius:14px;padding:6px 22px 18px;margin:22px 0;box-shadow:0 10px 30px rgba(19,26,46,.18)}
+.coulisses > h4{color:#B9A6FF;margin:14px 0 10px}
+.coulisses > h4::before{content:"✦";letter-spacing:0;color:#FFD27A}
+.coulisses > h4::after{background:rgba(255,255,255,.14)}
+.coulisses a{color:#AFC2FF}
+.coulisses code{background:rgba(255,255,255,.1);color:#F1F4FA}
+.coulisses em.cle{color:#FF9C8F}
+.coulisses b,.coulisses strong{color:#fff}
+
+.plus{position:relative;margin:18px 0 0;padding:12px 18px 14px;border:1.5px dashed var(--bonus);border-radius:14px;
+  background:repeating-linear-gradient(135deg,var(--bonus-wash) 0 9px,#EAF5F3 9px 18px);font-size:15.5px;color:#1F3B37}
+.plus > h4{display:inline;margin:0;font-size:16px;color:var(--bonus)}
+.plus > p:first-of-type{margin-top:8px}
+.pp-badge{display:inline-flex;align-items:center;font-family:var(--mono);font-weight:500;font-size:12px;line-height:1.2;
+  letter-spacing:.02em;border-radius:999px;padding:3px 10px;margin-right:10px;vertical-align:2px;white-space:nowrap}
+.plus .pp-badge{color:var(--bonus);background:#fff;border:1px solid var(--bonus)}
+
+.etiquette{display:inline-block;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--lien);
+  background:var(--lien-wash);border:1px solid #C7D0F3;border-radius:999px;padding:3px 11px;margin:14px 0 0}
+.etiquette.ece{display:block;font-family:var(--sans);font-size:15.5px;letter-spacing:0;line-height:1.55;color:#5A3510;
+  background:var(--orange-wash);border:1px solid #EED4B6;border-left:4px solid var(--orange);border-radius:4px 12px 12px 4px;
+  padding:12px 18px;margin:20px 0;max-width:none}
+.etiquette.ece .pp-badge{font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:#fff;
+  background:var(--orange);border:1px solid var(--orange);vertical-align:1px}
+
+/* rappel de cours : chip, puis fiche */
+details.rappel{margin:14px 0;border:1px solid transparent;border-radius:14px}
+details.rappel > summary{display:inline-flex;align-items:center;gap:8px;cursor:pointer;list-style:none;
+  font-size:14.5px;font-weight:500;line-height:1.3;color:var(--accent);background:var(--accent-wash);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:999px;padding:6px 14px 6px 10px}
+details.rappel > summary::-webkit-details-marker{display:none}
+details.rappel > summary::before{content:"ⓘ";font-size:1.1em;line-height:1}
+details.rappel > summary::after{content:"▾";font-size:.8em;opacity:.8}
+details.rappel > summary:hover{background:color-mix(in srgb,var(--accent) 14%,#fff)}
+details.rappel[open]{background:var(--sheet);border-color:var(--rule);box-shadow:var(--ombre);padding:12px 20px 16px}
+details.rappel[open] > summary{margin:0 0 6px -8px}
+details.rappel[open] > summary::after{content:"▴"}
+.rappel-titre{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:11.5px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--accent);margin:16px 0 4px}
+.rappel-titre::after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+details.rappel > :last-child{margin-bottom:0}
+
+/* ---------------------------------------------------------------- exercice */
+.exo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:20px 22px 22px;margin:22px 0;
+  box-shadow:var(--ombre)}
+.exo h3{font-size:20px;line-height:1.3;margin:0 0 10px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;
+  letter-spacing:-.01em}
+.exo h3 .num{font-family:var(--mono);font-weight:500;font-size:13.5px;color:var(--accent);background:var(--accent-wash);
+  border-radius:7px;padding:3px 8px;letter-spacing:0}
+.pp-reussi{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ok-texte);background:var(--ok-wash);
+  border:1px solid #A9D8C1;border-radius:999px;padding:1px 10px;letter-spacing:0}
+.exo .contexte{color:var(--ink-soft)}
+.exo ol.questions{padding-left:22px}
+.exo ol.questions li{margin:5px 0}
+.exo ol.questions li::marker{color:var(--accent);font-family:var(--mono);font-weight:500}
+.exo.reussi{border-color:#BFE1CF;box-shadow:inset 0 3px 0 var(--ok),var(--ombre)}
+
+/* ---------------------------------------------------------------- boutons */
+.pp-btn{appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;font-family:var(--sans);
+  font-size:14.5px;font-weight:500;border-radius:9px;padding:7px 14px;min-height:38px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;line-height:1}
+.pp-btn:hover{background:#2A3349}
+.pp-btn:disabled{opacity:.55;cursor:default}
+.pp-btn.lancer{background:var(--ok);border-color:var(--ok)}
+.pp-btn.lancer:hover{background:#0D6A4B}
+.pp-btn.arret{background:var(--rouge-texte);border-color:var(--rouge-texte)}
+.pp-btn.discret{background:transparent;color:var(--ink);border-color:var(--rule)}
+.pp-btn.discret:hover{background:var(--soft)}
+.pp-btn.petit{min-height:34px;padding:5px 12px}
+
+/* ---------------------------------------------------------------- éditeur */
+.py{border:1px solid #C9D1DE;border-radius:12px;margin:16px 0;background:var(--sheet);overflow:hidden;min-width:0}
+.py-barre{display:flex;align-items:flex-end;flex-wrap:wrap;gap:8px;padding:6px 8px 0 10px;background:var(--soft);
+  border-bottom:1px solid var(--rule)}
+.py-barre > .pp-btn,.py-barre > .py-raccourci{margin-bottom:6px;align-self:center}
+.py-nom{font-family:var(--mono);font-size:13px;color:var(--ink);margin-right:auto;background:var(--sheet);
+  border:1px solid var(--rule);border-bottom:0;border-top:2px solid var(--accent);border-radius:8px 8px 0 0;
+  padding:6px 14px 7px 12px;margin-bottom:-1px;position:relative}
+.py-nom::before{content:"● ";color:var(--accent)}
+.py.console .py-barre{align-items:flex-end}
+.py-raccourci{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+@media (max-width:640px){ .py-raccourci{display:none} }
+.py-editeur{min-width:0}
+.py-editeur .cm-editor{max-height:520px}
+.py-editeur .cm-scroller{overflow:auto}
+.py.en-cours .py-editeur{opacity:.9}
+
+.py-touches{display:flex;flex-wrap:wrap;gap:5px;padding:7px 8px;background:var(--soft);border-top:1px solid var(--rule)}
+.py-touche{appearance:none;font-family:var(--mono);font-size:15px;min-width:38px;min-height:36px;padding:0 8px;
+  border:1px solid var(--rule);border-bottom-width:2px;border-radius:7px;background:#fff;color:var(--ink);cursor:pointer;
+  touch-action:manipulation}
+.py-touche:active{background:#E8EBF1}
+
+/* sortie façon terminal clair */
+.py-sortie,.py-log{font-family:var(--mono);font-size:14px;line-height:1.5;background:#F7F8FB;border-top:1px solid var(--rule);
+  padding:10px 14px;max-height:620px;overflow:auto}
+/* une figure ne se lit pas dans un cadre qui défile : la sortie s'allonge */
+.py-sortie:has(.py-figure){max-height:none}
+.py-flux{margin:0;font:inherit;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+.py-flux.err{color:#8A5A00}
+.py-flux.note{color:var(--muted);font-style:italic}
+.py-flux.echo{color:#3A4560}
+.py-info{margin:4px 0;color:var(--muted);font-family:var(--sans);font-size:14px;font-style:italic}
+.py-figure{display:block;max-width:100%;height:auto;margin:10px 0;background:#fff;border:1px solid var(--rule);border-radius:8px}
+.py-remarque{font-family:var(--sans);font-size:14px;margin:8px 0 0;padding:7px 11px;background:var(--ambre-wash);
+  color:var(--ambre-texte);border-radius:8px;border:1px solid #EBD39A}
+
+/* erreur : le message de Python d'abord, puis la phrase en français, puis l'explication */
+.py-erreur{font-family:var(--sans);margin:8px 0 2px;background:#FDF3F2;border:1px solid #F1C6CA;
+  border-left:4px solid var(--rouge);border-radius:4px 10px 10px 4px;color:var(--ink);overflow:hidden}
+.py-erreur-python{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0;padding:9px 14px;
+  background:#FBE3E0;border-bottom:1px solid #F1C6CA;font-family:var(--mono);font-size:14.5px;line-height:1.45;max-width:none!important}
+.py-erreur-ligne{flex:none;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fff;
+  background:var(--rouge);border-radius:5px;padding:2px 7px}
+.py-erreur-brut{color:var(--rouge-texte);font-weight:500;word-break:break-word;min-width:0;background:none;padding:0;font-size:1em}
+.py-erreur-court{margin:0;padding:9px 14px 10px;font-size:15px}
+.py-erreur-detail{margin:0 14px 10px}
+.py-erreur-detail > summary{cursor:pointer;font-size:14px;color:var(--muted);font-weight:500;width:fit-content}
+.py-friendly{font-family:var(--mono);font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+  background:#fff;border:1px solid var(--rule);border-radius:8px;padding:8px 10px;margin:8px 0 0;max-height:360px;overflow:auto}
+
+.py-verdict{font-family:var(--sans);font-size:15px;margin:10px 0 2px;padding:9px 14px;border-radius:9px}
+.py-verdict.ok{background:var(--ok-wash);color:var(--ok-texte);border:1px solid #A9D8C1}
+.py-verdict.indice{background:var(--ambre-wash);color:var(--ambre-texte);border:1px solid #EBCF8E}
+
+/* vérifications réussies, cumulées au fil des exécutions */
+.py-reussites{border-top:1px solid #BFE1CF;background:#F3FAF6;padding:9px 14px 11px;font-size:15px}
+.py-reussites-titre{margin:0 0 4px;font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ok)}
+.py-reussites ul{list-style:none;margin:0;padding:0}
+.py-reussites li{position:relative;padding-left:24px;margin:3px 0;color:var(--ok-texte);max-width:none}
+.py-reussites li::before{content:"✓";position:absolute;left:3px;top:0;font-weight:700;color:var(--ok)}
+.py-reussites li.nouveau{animation:pp-nouveau 1.6s ease-out}
+@keyframes pp-nouveau{from{background:#C9EBD9}to{background:transparent}}
+.py.atteint .py-reussites{background:var(--ok-wash)}
+
+/* console */
+.py.console .py-log{min-height:96px;max-height:420px;border-top:0}
+.py-exemples{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--rule);background:var(--sheet)}
+.py-exemples-titre{font-size:13px;color:var(--muted);margin-right:2px}
+.py-chip{appearance:none;font-family:var(--mono);font-size:13.5px;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  background:var(--accent-wash);color:var(--accent);border-radius:999px;padding:4px 11px;min-height:32px;cursor:pointer}
+.py-chip:hover{background:color-mix(in srgb,var(--accent) 16%,#fff)}
+.py-saisie{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--rule);background:#fff}
+.py-invite{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:500}
+.py-ligne{flex:1;min-width:0;font-family:var(--mono);font-size:16px;border:1px solid var(--rule);border-radius:8px;
+  padding:7px 10px;background:#FBFCFD;color:var(--ink)}
+.py-ligne:focus-visible{box-shadow:var(--focus);border-color:transparent}
+
+/* ---------------------------------------------------------------- aide progressive */
+.aide{margin:14px 0}
+.aide-bouton{appearance:none;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:13px;
+  color:var(--lien);background:none;border:1.5px dashed var(--lien);border-radius:999px;padding:5px 13px;min-height:34px}
+.aide-bouton:hover{background:var(--lien-wash)}
+.aide-compte{font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--lien);margin:0 0 6px}
+.aide ol{list-style:none;margin:0 0 8px;padding:0;counter-reset:aide}
+.aide li{counter-increment:aide;position:relative;background:var(--lien-wash);border-radius:10px;padding:8px 12px 8px 40px;
+  margin:6px 0;font-size:15px;color:#22357F;max-width:none}
+.aide li::before{content:counter(aide);position:absolute;left:11px;top:8px;width:20px;height:20px;border-radius:50%;
+  background:var(--lien);color:#fff;font-family:var(--mono);font-size:11.5px;line-height:20px;text-align:center}
+@media (prefers-reduced-motion:no-preference){ .aide li.vient{animation:pp-apparait .3s ease both} }
+@keyframes pp-apparait{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ---------------------------------------------------------------- QCM et quiz */
+.qcm{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin:16px 0;background:var(--soft);container-type:inline-size}
+.qcm-q{margin:0 0 10px;font-weight:500;display:flex;gap:10px;align-items:baseline}
+.qcm-n{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:50%;
+  background:var(--orange);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;transform:translateY(-1px)}
+.qcm-opts{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+@container (min-width:460px){ .qcm-opts.grille{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@container (min-width:700px){ .qcm-opts.grille.trois{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.qcm .opt{display:block;width:100%;text-align:left;appearance:none;font-family:var(--sans);font-size:15.5px;color:var(--ink);
+  background:#fff;border:1px solid var(--rule);border-radius:9px;padding:9px 14px 9px 38px;margin:0;cursor:pointer;
+  position:relative;min-height:44px;line-height:1.4}
+.qcm .opt.code-seul{font-family:var(--mono);font-size:14.5px}
+.qcm .opt.code-seul code{background:none;padding:0;font-size:1em}
+.qcm .opt::before{content:"";position:absolute;left:13px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
+  border:1.5px solid #AEB6C4}
+@media (hover:hover){ .qcm .opt:hover:not(:disabled){border-color:var(--lien);background:#FBFCFF} }
+.qcm .opt code{font-size:.9em}
+.qcm .opt.bonne{border-color:var(--ok);background:var(--ok-wash);color:var(--ok-texte);font-weight:500}
+.qcm .opt.bonne::before{content:"✓";border:0;color:var(--ok);font-weight:700;margin-top:-.75em;width:auto;height:auto;left:14px}
+.qcm .opt.fausse{border-color:#EBC0C4;background:#FDF5F5;color:#8C5A60;text-decoration:line-through;text-decoration-color:var(--rouge)}
+.qcm .opt.fausse::before{content:"✗";border:0;color:var(--rouge);margin-top:-.75em;width:auto;height:auto;left:14px}
+.qcm .opt:disabled{cursor:default}
+.qcm.resolu .opt:disabled:not(.bonne):not(.fausse){opacity:.55}
+.qcm-retour{margin:9px 0 0;font-size:14.5px;font-weight:500}
+.qcm-retour:empty{display:none}
+.qcm-retour.ok{color:var(--ok-texte)}
+.qcm-retour.non{color:var(--rouge-texte)}
+.qcm-expl{margin-top:8px;padding:9px 13px;background:#fff;border-left:3px solid var(--ok);border-radius:0 9px 9px 0;font-size:15px}
+
+.quiz{border:1px solid #EED4B6;border-radius:14px;margin:20px 0;background:var(--sheet);overflow:hidden;box-shadow:var(--ombre)}
+.quiz-tete{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:11px 16px;background:var(--orange-wash);
+  border-bottom:1px solid #EED4B6;border-left:4px solid var(--orange)}
+.quiz-badge{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--orange-texte)}
+.quiz-tete h4{margin:0;font-size:16.5px;color:#5A3510;flex:1;min-width:12ch}
+.quiz-score{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--orange-texte);background:#fff;
+  border:1px solid #EED4B6;border-radius:999px;padding:3px 11px;white-space:nowrap}
+.quiz.complet .quiz-score{color:var(--ok-texte);border-color:#A9D8C1;background:var(--ok-wash)}
+.quiz.complet .quiz-score::before{content:"✓ "}
+.quiz-corps{padding:4px 16px 8px}
+.quiz .qcm{background:none;border:0;border-bottom:1px dashed var(--rule);border-radius:0;padding:14px 0;margin:0}
+.quiz .qcm:last-child{border-bottom:0}
+
+/* ---------------------------------------------------------------- document à télécharger */
+.doc{display:flex;align-items:center;gap:14px;max-width:520px;margin:16px 0;padding:12px 16px 12px 12px;text-decoration:none!important;
+  background:var(--sheet);border:1px solid color-mix(in srgb,var(--accent) 35%,var(--rule));border-radius:12px;color:var(--ink)!important;
+  box-shadow:var(--ombre)}
+a.doc:hover{background:var(--accent-wash);border-color:var(--accent)}
+.doc-icone{flex:none;width:42px;height:48px;color:var(--accent)}
+.doc-texte{display:flex;flex-direction:column;min-width:0}
+.doc-titre{font-weight:600;font-size:15.5px;line-height:1.35}
+.doc-action{font-family:var(--mono);font-size:12.5px;color:var(--accent);margin-top:2px}
+.doc-fleche{margin-left:auto;font-size:20px;color:var(--accent)}
+.doc.indisponible{border-style:dashed;border-color:var(--rule);box-shadow:none;background:var(--soft);cursor:default}
+.doc.indisponible .doc-icone,.doc.indisponible .doc-action{color:var(--faint)}
+.doc.indisponible .doc-titre{color:var(--muted)}
+
+/* ---------------------------------------------------------------- solution */
+details.solution{margin:16px 0 0;border-top:1px dashed var(--rule);padding-top:12px}
+details.solution > summary{cursor:pointer;font-weight:500;color:var(--accent);font-size:15px;width:fit-content}
+details.solution.verrou > summary{color:var(--faint);cursor:not-allowed;list-style:none}
+details.solution.verrou > summary::-webkit-details-marker{display:none}
+details.solution.verrou > summary::before{content:"🔒 ";font-size:.9em}
+details.solution[open]{background:color-mix(in srgb,var(--accent) 4%,#fff);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+  border-radius:12px;padding:10px 16px 12px}
+
+/* ---------------------------------------------------------------- pied */
+.pp-pied{margin:44px 0 0;padding:22px 0 44px;border-top:1px solid var(--rule);color:var(--muted);font-size:15px}
+.pp-pied a.fiche{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.pp-pied a.fiche::before{content:"⤓";font-size:1.1em}
+
+@media (max-width:600px){
+  .pp > main{padding-inline:16px}
+  .pp-head{padding-top:20px;padding-bottom:22px}
+  .seance{padding-left:14px}
+  .seance::before{width:3px}
+  .seance h2{margin-left:-14px;gap:10px}
+  .exo{padding:16px 14px 18px;border-radius:12px}
+  .py-sortie,.py-log{padding:8px 10px}
+  .retenir,.info,.coulisses,.etiquette.ece{padding-left:14px;padding-right:14px}
+  details.rappel[open]{padding:10px 14px 14px}
+  .formule{font-size:1.12rem;padding:10px 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* Texte justifié avec césure française (la page déclare lang="fr") — demande de Loïc, 17/10/2026.
+   Restent alignés comme avant : formules (centrées), code, options et énoncés de QCM, tableaux,
+   surtitres et pied de page, où la justification creuserait des trous. */
+.pp main p, .pp main li{text-align:justify;-webkit-hyphens:auto;hyphens:auto;hyphenate-limit-chars:7 3 3}
+.pp main p.formule{text-align:center}
+.pp main .qcm-q, .pp main .opt, .pp main .surtitre, .pp main .pp-pied p, .pp main td, .pp main th,
+.pp main .py p, .pp main .py li, .pp main .sortie{text-align:left;-webkit-hyphens:manual;hyphens:manual}
+
+/* Étiquette de formation (niveaux 4 et 5) : « attendu de PCSI », « BUT Mesures physiques »…
+   Plus visible qu'une simple mention : l'élève doit voir d'un coup d'œil d'où vient l'attendu. */
+.pp main p.etiquette:not(.ece){display:inline-flex;align-items:center;gap:8px;margin:2px 0 12px;
+  padding:5px 12px 5px 10px;border-radius:999px;background:var(--accent-wash,#eef1fb);
+  border:1px solid color-mix(in srgb,var(--accent,#2445c7) 35%,transparent);color:var(--accent,#2445c7);
+  font-weight:500;text-align:left;-webkit-hyphens:manual;hyphens:manual}
+.pp main p.etiquette:not(.ece)::before{content:"🎓";font-size:14px;line-height:1}

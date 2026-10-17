@@ -1,0 +1,1853 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Niveau 3 — Vers l'autonomie</title>
+<link rel="stylesheet" href="parcours.css">
+</head>
+<body class="pp" data-niveau="3">
+
+<header class="pp-head">
+  <p class="pp-invite">&gt;&gt;&gt; python · niveau 3 · terminale spé PC</p>
+  <h1>Vers l'autonomie</h1>
+  <p class="pp-sous-titre">fonctions · while · fichiers · dérivée · polyfit · Euler · dichotomie</p>
+  <p class="pp-chapeau">Écrire ses propres programmes, du fichier de mesures jusqu'au modèle, sur tout le programme de terminale.</p>
+  <a class="pp-retour" href="index.html">← Le parcours Python</a>
+</header>
+
+<div class="pp-statut" aria-live="polite"></div>
+<nav class="pp-sommaire" aria-label="Étapes du niveau 3"></nav>
+
+<main>
+
+<section class="seance" id="mode-emploi" data-titre="Mode d'emploi">
+  <h2>Mode d'emploi</h2>
+  <div class="info">
+    <h4>Statut de ce niveau</h4>
+    <p>Ce niveau est en cours d'audit par M. Van Hoorde : il est utilisable, mais pas encore garanti à 100 %. Si un exercice vous semble faux ou bloquant, signalez-le-lui.</p>
+  </div>
+  <p class="intro">Ce niveau suppose acquis les niveaux 1 et 2. Les programmes deviennent plus longs, et le code de départ est parfois presque vide : c'est à vous de l'écrire. On travaille dans l'ordre, chaque étape s'appuie sur les précédentes.</p>
+  <div class="info">
+    <ul>
+      <li>Comme avant : <b>▶ Exécuter</b> (ou Ctrl + Entrée), <b>↺ Code de départ</b>, <b>💡 Aide</b> un indice à la fois, solution après un premier essai, <b>ⓘ Rappel de cours</b>.</li>
+      <li>Certains exercices fournissent un <b>fichier de mesures</b>. Son onglet <b>📄</b>, sous l'éditeur, en affiche le contenu. Python le retrouve à chaque exécution, intact, même si votre programme l'a modifié.</li>
+      <li>Une boucle qui ne s'arrête jamais est coupée au bout de 5 secondes ; le bouton <b>■ Arrêter</b> le fait aussitôt.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s1" data-titre="Écrire ses fonctions">
+  <h2>Écrire ses propres fonctions</h2>
+  <p class="intro">Depuis le niveau 1, vous utilisez des fonctions écrites par d'autres : <code>print</code>, <code>round</code>, <code>np.sqrt</code>… Écrire les siennes permet de donner un nom à un calcul, puis de le réutiliser autant de fois qu'on veut, avec d'autres valeurs.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>def nom(param1, param2):</code> <em class="cle">définit</em> une fonction. Les lignes qui suivent, décalées de quatre espaces (touche ⇥), forment son corps.</li>
+      <li>Définir n'est pas exécuter : le corps ne s'exécute qu'à l'<b>appel</b>, <code>nom(…)</code>. Les paramètres reçoivent alors les valeurs données entre parenthèses, dans l'ordre.</li>
+      <li><code>return valeur</code> <em class="cle">renvoie</em> le résultat à l'endroit de l'appel et termine la fonction. On peut ensuite le ranger dans une variable, ou calculer avec.</li>
+      <li><code>print</code> n'est pas <code>return</code> : <code>print</code> affiche à l'écran, pour vous ; le programme, lui, ne récupère rien. Une fonction sans <code>return</code> renvoie <code>None</code>, la valeur « rien », avec laquelle on ne peut pas calculer.</li>
+      <li>Les variables créées dans une fonction n'existent qu'à l'intérieur : ce sont des variables <em class="cle">locales</em>.</li>
+    </ul>
+    <pre class="code">def energie_cinetique(m, v):     # m en kg, v en m/s
+    Ec = 0.5 * m * v ** 2
+    return Ec                    # renvoie Ec, en J
+
+E1 = energie_cinetique(0.60, 7.0)   # le ballon de basket lancé à 7,0 m/s
+print(E1)                           # affiche : 14.7</pre>
+  </div>
+
+  <details class="rappel"><summary>Rappel de cours — Énergies</summary>
+    <p>Pour un système de masse <i>m</i> (en kg), de vitesse <i>v</i> (en m·s⁻¹), à l'altitude <i>z</i> (en m) dans le champ de pesanteur <i>g</i> = 9,81 N·kg⁻¹ :</p>
+    <p class="formule">E<sub>c</sub> = <span class="frac"><span class="haut">1</span><span class="bas">2</span></span> × m × v²      E<sub>pp</sub> = m × g × z      E<sub>m</sub> = E<sub>c</sub> + E<sub>pp</sub></p>
+    <p>Les énergies s'expriment en joules (J). En l'absence de frottements, l'énergie mécanique se conserve.</p>
+  </details>
+
+  <article class="exo" id="ex-1-1">
+    <h3><span class="num">1.1</span> Prédire</h3>
+    <p class="contexte">Lire ce programme sans l'exécuter, puis répondre au quiz. Pour vérifier, recopiez-le dans l'éditeur et modifiez-le comme indiqué dans chaque question.</p>
+    <pre class="code">def epp(m, z):
+    g = 9.81
+    return m * g * z
+
+E = epp(1.5, 2.0)
+print(E)</pre>
+    <div class="quiz">
+      <h4>Que se passe-t-il ?</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Qu'affiche ce programme ?</p>
+        <button class="opt" data-v="a"><code>epp(1.5, 2.0)</code></button>
+        <button class="opt" data-v="b"><code>None</code></button>
+        <button class="opt" data-v="c"><code>29.43</code></button>
+        <button class="opt" data-v="d"><code>E</code></button>
+        <button class="opt" data-v="e"><code>9.81</code></button>
+        <button class="opt" data-v="f">un message d'erreur</button>
+        <div class="qcm-expl" hidden>L'appel <code>epp(1.5, 2.0)</code> donne <code>m = 1.5</code> et <code>z = 2.0</code> ; la fonction renvoie 1,5 × 9,81 × 2,0 = 29,43, rangé dans <code>E</code>, puis affiché.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">On supprime la dernière ligne, <code>print(E)</code>. Qu'affiche le programme ?</p>
+        <button class="opt" data-v="a"><code>29.43</code></button>
+        <button class="opt" data-v="b"><code>None</code></button>
+        <button class="opt" data-v="c"><code>E</code></button>
+        <button class="opt" data-v="d">rien du tout</button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden><code>return</code> renvoie la valeur au programme, sans l'afficher. Sans <code>print</code>, rien ne s'affiche.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q">On ajoute <code>print(g)</code> à la fin du programme. Qu'affiche cette ligne ?</p>
+        <button class="opt" data-v="a"><code>9.81</code></button>
+        <button class="opt" data-v="b"><code>29.43</code></button>
+        <button class="opt" data-v="c"><code>None</code></button>
+        <button class="opt" data-v="d"><code>g</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <button class="opt" data-v="f">rien du tout</button>
+        <div class="qcm-expl" hidden><code>g</code> est une variable locale : elle n'existe que dans la fonction. En dehors, Python répond <code>NameError: name 'g' is not defined</code>.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Dans la fonction, on remplace <code>return m * g * z</code> par <code>print(m * g * z)</code>. Qu'affiche le programme ?</p>
+        <button class="opt" data-v="a"><code>29.43</code></button>
+        <button class="opt" data-v="b"><code>29.43</code> puis <code>None</code></button>
+        <button class="opt" data-v="c"><code>None</code></button>
+        <button class="opt" data-v="d"><code>29.43</code> puis <code>29.43</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>Le <code>print</code> de la fonction affiche 29.43 ; mais la fonction ne renvoie rien, donc <code>E</code> reçoit <code>None</code>, que le second <code>print</code> affiche.</div>
+      </div>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">def epp(m, z):
+    g = 9.81
+    return m * g * z
+
+E = epp(1.5, 2.0)
+print(E)</textarea>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-1-2">
+    <h3><span class="num">1.2</span> La demi-vie</h3>
+    <details class="rappel"><summary>Rappel de cours — Décroissance radioactive</summary>
+      <p>Le nombre <i>N</i> de noyaux radioactifs d'un échantillon diminue selon la loi de décroissance radioactive, où λ est la constante radioactive (en s⁻¹) :</p>
+      <p class="formule">N(t) = N<sub>0</sub> × e<sup>−λt</sup>      t<sub>1/2</sub> = <span class="frac"><span class="haut">ln 2</span><span class="bas">λ</span></span></p>
+      <p>La demi-vie <i>t</i><sub>1/2</sub> est la durée au bout de laquelle la moitié des noyaux initialement présents se sont désintégrés.</p>
+    </details>
+    <p class="contexte">On veut une fonction qui calcule la demi-vie d'un noyau à partir de sa constante radioactive.</p>
+    <ol class="questions">
+      <li>Écrire une fonction <code>demi_vie(lam)</code> qui renvoie <i>t</i><sub>1/2</sub> (en s) pour une constante radioactive <code>lam</code> (en s⁻¹).</li>
+      <li>L'iode 131 a pour constante radioactive λ = 1,0 × 10⁻⁶ s⁻¹. Afficher sa demi-vie en jours, arrondie au dixième.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>La fonction a un seul paramètre, <code>lam</code>, et une seule ligne dans son corps : <code>return …</code>.</li>
+      <li>ln 2 s'écrit <code>np.log(2)</code> : <code>np.log</code> est le logarithme népérien, celui qu'il faut ici.</li>
+      <li>Un jour dure 24 × 3 600 = 86 400 s : <code>round(demi_vie(1.0e-6) / 86400, 1)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_g = globals()
+if 'demi_vie' in _g and callable(demi_vie):
+    try:
+        _r = demi_vie(1.0)
+        _r2 = demi_vie(2.0)
+    except Exception:
+        _r = _r2 = 'erreur'
+    if _r is None:
+        indice("La fonction ne renvoie rien : il manque la ligne return.")
+    elif isinstance(_r, (int, float)) and abs(_r - _np.log(2)) < 1e-9 and abs(_r2 - _np.log(2) / 2) < 1e-9:
+        ok("Question 1 — demi_vie(lam) renvoie ln 2 / λ.")
+        if '8.0' in _sortie:
+            ok("Question 2 — Iode 131 : t½ ≈ 6,9 × 10⁵ s, soit 8,0 jours.")
+        else:
+            indice("Question 2 : convertissez la demi-vie en jours (1 jour = 86 400 s), puis arrondissez au dixième.")
+    elif isinstance(_r, (int, float)) and abs(_r - _np.log10(2)) < 1e-9:
+        indice("ln 2 s'écrit np.log(2) : np.log10 est le logarithme décimal.")
+    else:
+        indice("Relisez la relation entre la demi-vie et λ dans le rappel de cours.")
+else:
+    indice("Définissez la fonction demi_vie avec def, comme dans l'encadré À retenir.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">import numpy as np
+
+def demi_vie(lam):
+    return np.log(2) / lam
+
+print(round(demi_vie(1.0e-6) / 86400, 1), 'jours')</pre>
+      <p>Python affiche <code>8.0 jours</code> : la demi-vie de l'iode 131 vaut 8,02 jours. La même fonction sert pour tous les noyaux : avec λ = 3,83 × 10⁻¹² s⁻¹, le carbone 14, on trouve environ 5 700 ans.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-3">
+    <h3><span class="num">1.3</span> Un print à la place d'un return</h3>
+    <p class="contexte">Ce programme calcule l'énergie mécanique d'un ballon de 600 g, à 3,6 m du sol, qui se déplace à 4,0 m·s⁻¹. Il s'arrête sur une erreur.</p>
+    <ol class="questions">
+      <li>Exécuter, puis lire la dernière ligne du message de Python : quel mot y désigne la valeur « rien » ?</li>
+      <li>Corriger la fonction fautive, sans toucher aux trois dernières lignes.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">def energie_cinetique(m, v):
+    return 0.5 * m * v ** 2
+
+def energie_potentielle(m, z):
+    g = 9.81
+    print(m * g * z)
+
+m = 0.60          # masse du ballon, en kg
+Em = energie_cinetique(m, 4.0) + energie_potentielle(m, 3.6)
+print('Em =', round(Em, 2), 'J')</textarea>
+      <script type="text/x-python" class="py-check">
+_g = globals()
+if 'energie_potentielle' in _g and callable(energie_potentielle):
+    try:
+        _r = energie_potentielle(1.0, 1.0)
+    except Exception:
+        _r = None
+    if isinstance(_r, (int, float)) and abs(_r - 9.81) < 1e-9 and 'Em' in _g and abs(Em - 25.9896) < 1e-6:
+        ok("Corrigé : la fonction renvoie l'énergie au lieu de l'afficher. Em ≈ 25,99 J.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def energie_potentielle(m, z):
+    g = 9.81
+    return m * g * z</pre>
+      <p>Le message se termine par <code>unsupported operand type(s) for +: 'float' and 'NoneType'</code> : Python ne peut pas ajouter un nombre et <code>None</code>. La fonction affichait l'énergie potentielle, mais ne la renvoyait pas ; l'appel valait donc <code>None</code>. Avec <code>return</code>, <i>E</i><sub>m</sub> = 4,8 + 21,19 ≈ 25,99 J.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-4">
+    <h3><span class="num">1.4</span> La période d'un satellite</h3>
+    <details class="rappel"><summary>Rappel de cours — Troisième loi de Kepler</summary>
+      <p>Pour un satellite en orbite circulaire de rayon <i>r</i> autour d'un astre de masse <i>M</i>, la période de révolution <i>T</i> vérifie :</p>
+      <p class="formule"><span class="frac"><span class="haut">T²</span><span class="bas">r³</span></span> = <span class="frac"><span class="haut">4π²</span><span class="bas">G × M</span></span>   soit   T = 2π × √<span class="par">(</span><span class="frac"><span class="haut">r³</span><span class="bas">G × M</span></span><span class="par">)</span></p>
+      <p><i>G</i> = 6,67 × 10⁻¹¹ N·m²·kg⁻² ; masse de la Terre <i>M</i><sub>T</sub> = 5,97 × 10²⁴ kg ; rayon de la Terre <i>R</i><sub>T</sub> = 6 371 km. Le rayon de l'orbite vaut <i>r</i> = <i>R</i><sub>T</sub> + <i>h</i>, où <i>h</i> est l'altitude.</p>
+    </details>
+    <p class="contexte">Une fonction s'applique aussi à un tableau numpy entier, comme <code>np.sqrt</code>. On compare la station spatiale internationale (altitude 420 km), un satellite GPS (20 200 km) et un satellite géostationnaire (35 786 km).</p>
+    <ol class="questions">
+      <li>Compléter la fonction <code>periode(r)</code>, qui renvoie la période (en s) pour un rayon d'orbite <code>r</code> (en m).</li>
+      <li>Compléter la ligne <code>T = ……</code> pour calculer d'un coup les trois périodes, puis exécuter. Le satellite géostationnaire fait-il un tour en un jour ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+G = 6.67e-11       # constante de gravitation, en N.m²/kg²
+M_T = 5.97e24      # masse de la Terre, en kg
+R_T = 6371e3       # rayon de la Terre, en m
+
+def periode(r):
+    return ……
+
+h = np.array([420e3, 20200e3, 35786e3])   # altitudes : ISS, GPS, géostationnaire, en m
+T = ……
+print('périodes :', np.round(T / 3600, 1), 'h')</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_g = globals()
+if 'periode' in _g and callable(periode):
+    try:
+        _T = periode(42157e3)
+    except Exception:
+        _T = 'erreur'
+    if _T is None:
+        indice("La fonction ne renvoie rien : écrivez return devant le calcul.")
+    elif isinstance(_T, (int, float)) and abs(_T - 2 * _np.pi * _np.sqrt(42157e3 ** 3 / (6.67e-11 * 5.97e24))) < 1:
+        ok("Question 1 — periode(r) applique la troisième loi de Kepler.")
+        if '23.9' in _sortie and '12.' in _sortie and '1.5' in _sortie:
+            ok("Question 2 — 1,5 h, 12,0 h et 23,9 h : le satellite géostationnaire fait un tour en un jour sidéral, 23 h 56 min, comme la Terre sur elle-même.")
+        elif 'T' in _g and _np.size(T) == 3:
+            indice("Question 2 : le rayon de l'orbite n'est pas l'altitude : r = R_T + h.")
+        else:
+            indice("Question 2 : appelez periode avec le tableau des rayons, R_T + h.")
+    else:
+        indice("Écrivez la formule du rappel de cours : 2 * np.pi * np.sqrt(…), avec r ** 3.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def periode(r):
+    return 2 * np.pi * np.sqrt(r ** 3 / (G * M_T))
+
+T = periode(R_T + h)</pre>
+      <p>Python affiche <code>périodes : [ 1.5 12.  23.9] h</code>. La fonction a reçu un tableau de trois rayons : elle a calculé les trois périodes d'un coup. <code>G</code> et <code>M_T</code>, définies en dehors de la fonction, y sont lisibles. <code>np.round</code> arrondit chaque valeur d'un tableau, comme <code>round</code> le fait pour un nombre.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s2" data-titre="La boucle while">
+  <h2>Répéter tant que : la boucle while</h2>
+  <p class="intro">La boucle <code>for</code> du niveau 2 répète un bloc un nombre de fois connu d'avance. Souvent, on ne le connaît pas : « attendre tant que l'activité est trop forte ». C'est le rôle de la boucle <code>while</code>.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>while condition:</code> répète le bloc décalé <b>tant que</b> la condition est vraie. Elle est testée avant chaque tour.</li>
+      <li>Une variable de la condition doit changer dans le bloc, sinon la condition reste vraie pour toujours : c'est une <em class="cle">boucle infinie</em>.</li>
+      <li>Rappels du niveau 2 : <code>for i in range(n):</code> répète le bloc <i>n</i> fois, avec <code>i</code> = 0, 1, …, <i>n</i> − 1 ; <code>L.append(x)</code> ajoute <code>x</code> à la fin de la liste <code>L</code>.</li>
+      <li><code>np.exp(x)</code> calcule e<sup>x</sup>, l'exponentielle de <i>x</i>.</li>
+    </ul>
+    <pre class="code">n = 0                  # nombre de demi-vies écoulées
+reste = 1.0            # fraction des noyaux encore présents
+while reste &gt; 0.01:    # tant qu'il en reste plus de 1 %
+    reste = reste / 2
+    n = n + 1
+print(n, 'demi-vies')  # affiche : 7 demi-vies</pre>
+  </div>
+
+  <article class="exo" id="ex-2-1">
+    <h3><span class="num">2.1</span> Combien de tours ?</h3>
+    <p class="contexte">Prédire ce qu'affiche chacun de ces quatre programmes, puis vérifier en le recopiant dans l'éditeur.</p>
+    <p class="surtitre">Programme A</p>
+    <pre class="code">x = 1
+while x &lt; 100:
+    x = x * 3
+print(x)</pre>
+    <p class="surtitre">Programme B</p>
+    <pre class="code">i = 0
+while i &lt; 5:
+    print('tour')
+    i = i + 1</pre>
+    <p class="surtitre">Programme C</p>
+    <pre class="code">i = 10
+while i &gt; 0:
+    i = i + 1
+print(i)</pre>
+    <p class="surtitre">Programme D</p>
+    <pre class="code">for i in range(3):
+    print(i)</pre>
+    <div class="quiz">
+      <h4>Qu'affiche Python ?</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q">Qu'affiche le programme A ?</p>
+        <button class="opt" data-v="a"><code>81</code></button>
+        <button class="opt" data-v="b"><code>243</code></button>
+        <button class="opt" data-v="c"><code>100</code></button>
+        <button class="opt" data-v="d"><code>729</code></button>
+        <button class="opt" data-v="e"><code>99</code></button>
+        <div class="qcm-expl" hidden><code>x</code> prend les valeurs 1, 3, 9, 27, 81, puis 243. À 81, la condition est encore vraie : un dernier tour donne 243, qui arrête la boucle.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">Combien de fois le programme B affiche-t-il <code>tour</code> ?</p>
+        <button class="opt" data-v="a">3 fois</button>
+        <button class="opt" data-v="b">4 fois</button>
+        <button class="opt" data-v="c">5 fois</button>
+        <button class="opt" data-v="d">6 fois</button>
+        <button class="opt" data-v="e">sans fin</button>
+        <div class="qcm-expl" hidden><code>i</code> vaut 0, 1, 2, 3, 4 au moment de l'affichage : 5 tours. À <code>i = 5</code>, la condition est fausse.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q">Qu'affiche le programme C ?</p>
+        <button class="opt" data-v="a"><code>0</code></button>
+        <button class="opt" data-v="b"><code>10</code></button>
+        <button class="opt" data-v="c"><code>11</code></button>
+        <button class="opt" data-v="d">une erreur : i est mal défini</button>
+        <button class="opt" data-v="e">rien : la boucle tourne sans fin</button>
+        <button class="opt" data-v="f"><code>1</code></button>
+        <div class="qcm-expl" hidden><code>i</code> augmente sans cesse : il reste toujours positif. Boucle infinie, coupée par le parcours au bout de 5 s.</div>
+      </div>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q">Qu'affiche le programme D ?</p>
+        <button class="opt" data-v="a"><code>0</code>, <code>1</code>, <code>2</code></button>
+        <button class="opt" data-v="b"><code>1</code>, <code>2</code>, <code>3</code></button>
+        <button class="opt" data-v="c"><code>0</code>, <code>1</code>, <code>2</code>, <code>3</code></button>
+        <button class="opt" data-v="d"><code>3</code></button>
+        <button class="opt" data-v="e"><code>0</code>, <code>3</code></button>
+        <div class="qcm-expl" hidden><code>range(3)</code> donne 0, 1 et 2 : trois valeurs, en commençant à 0.</div>
+      </div>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">x = 1
+while x &lt; 100:
+    x = x * 3
+print(x)</textarea>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-2-2">
+    <h3><span class="num">2.2</span> Attendre que l'iode 131 décroisse</h3>
+    <details class="rappel"><summary>Rappel de cours — Activité</summary>
+      <p>L'activité <i>A</i> d'un échantillon est le nombre de désintégrations par seconde, en becquerels (Bq). Elle suit la même loi de décroissance que le nombre de noyaux :</p>
+      <p class="formule">A(t) = A<sub>0</sub> × e<sup>−λt</sup>      λ = <span class="frac"><span class="haut">ln 2</span><span class="bas">t<sub>1/2</sub></span></span></p>
+    </details>
+    <p class="contexte">Après un examen de la thyroïde, des déchets contiennent de l'iode 131 (demi-vie 8,02 jours). On les entrepose jusqu'à ce que leur activité soit passée sous 1 % de l'activité initiale (situation construite pour l'exercice).</p>
+    <ol class="questions">
+      <li>Compléter la condition de la boucle et la ligne qui fait avancer le temps <b>d'un jour</b> à chaque tour.</li>
+      <li>Combien de jours faut-il attendre ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>La boucle doit continuer tant que <code>A</code> est supérieure à 1 % de <code>A0</code>, c'est-à-dire <code>0.01 * A0</code>.</li>
+      <li>Avancer d'un jour : <code>t = t + 1</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+
+t12 = 8.02             # demi-vie de l'iode 131, en jours
+lam = np.log(2) / t12  # constante radioactive, en jour⁻¹
+A0 = 4.0e8             # activité initiale, en Bq
+t = 0                  # durée écoulée, en jours
+A = A0
+
+while ……:
+    t = ……
+    A = A0 * np.exp(-lam * t)
+
+print('Activité sous 1 % au bout de', t, 'jours')</textarea>
+      <script type="text/x-python" class="py-check">
+_vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, (int, float)) and not isinstance(v, bool)]
+if any(v == 54 for v in _vals) and '54' in _sortie:
+    ok("54 jours : à ce moment, l'activité est passée sous 4,0 × 10⁶ Bq.")
+elif any(abs(v - 7 * 8.02) < 0.01 for v in _vals):
+    indice("Vous avez avancé d'une demi-vie à chaque tour : avancez d'un jour, t = t + 1.")
+elif any(v == 53 or v == 55 for v in _vals):
+    indice("Un jour d'écart : la boucle doit s'arrêter dès que A est passée sous 0.01 * A0.")
+else:
+    indice("La condition compare A à 0.01 * A0, et le temps avance de 1 à chaque tour.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">while A &gt; 0.01 * A0:
+    t = t + 1
+    A = A0 * np.exp(-lam * t)</pre>
+      <p>Python affiche 54 jours. On ne savait pas d'avance combien de tours faire : c'est la situation type de la boucle <code>while</code>. On aurait aussi pu résoudre e<sup>−λt</sup> = 0,01 : <i>t</i> = <span class="frac"><span class="haut">ln 100</span><span class="bas">λ</span></span> ≈ 53,3 jours.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-2-3">
+    <h3><span class="num">2.3</span> Simuler le hasard des désintégrations</h3>
+    <p class="contexte">D'après « Loi de décroissance radioactive », ressource du groupe de travail de physique-chimie de l'académie de Strasbourg (2023-2024). Un noyau radioactif se désintègre au hasard : on ne peut pas prévoir quand. Pendant une unité de temps, chaque noyau a une probabilité <i>p</i> = 1/50 de se désintégrer. On simule une population de 1 000 noyaux.</p>
+    <div class="info">
+      <h4>Bon à savoir</h4>
+      <p><code>np.random.random(N)</code> tire <i>N</i> nombres au hasard entre 0 et 1. <code>tirages &lt; p</code> les compare un à un à <i>p</i>, et <code>np.sum(tirages &lt; p)</code> compte ceux qui sont plus petits : en moyenne <i>N</i> × <i>p</i>. Chacun représente un noyau qui se désintègre.</p>
+    </div>
+    <ol class="questions">
+      <li>Compléter la condition (on continue tant qu'il reste des noyaux) et la mise à jour de <code>N</code>. Exécuter plusieurs fois : la courbe change-t-elle ?</li>
+      <li>Lire sur le graphique la durée au bout de laquelle il reste 500 noyaux.</li>
+      <li>Recommencer avec <code>N = 10</code>. La courbe ressemble-t-elle encore à une décroissance régulière ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+N = 1000          # nombre initial de noyaux
+p = 1 / 50        # probabilité de désintégration d'un noyau par unité de temps
+L = []            # nombre de noyaux restants, unité de temps après unité de temps
+
+while ……:
+    L.append(N)
+    tirages = np.random.random(N)        # un nombre au hasard par noyau
+    desintegres = np.sum(tirages &lt; p)    # noyaux désintégrés pendant cette unité de temps
+    N = ……
+
+t = list(range(len(L)))   # dates : 0, 1, 2… en unités de temps
+plt.plot(t, L, 'b.')
+plt.xlabel('t (unités de temps)')
+plt.ylabel('noyaux restants')
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+_L = globals().get('L')
+if isinstance(_L, list) and len(_L) > 5:
+    _decroit = all(_L[i + 1] <= _L[i] for i in range(len(_L) - 1)) and _L[-1] > 0
+    if _decroit and _L[0] >= 100:
+        ok("Question 1 — Simulation terminée : " + str(len(_L)) + " unités de temps pour que tous les noyaux disparaissent.")
+    elif _decroit and _L[0] <= 20:
+        ok("Question 3 — Avec " + str(_L[0]) + " noyaux, le hasard se voit : la décroissance se fait par marches irrégulières.")
+    elif not _decroit:
+        indice("N doit diminuer du nombre de noyaux désintégrés : N = N - desintegres.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">while N &gt; 0:
+    ...
+    N = N - desintegres</pre>
+      <p>Chaque exécution donne une courbe un peu différente : c'est le hasard. Il reste 500 noyaux au bout d'environ 34 unités de temps, quelle que soit l'exécution : c'est la demi-vie. Avec 10 noyaux, on voit des paliers et des chutes brusques ; la loi de décroissance ne décrit bien qu'un <b>grand nombre</b> de noyaux.</p>
+      <p>La ressource d'origine tire un nombre au hasard par noyau, dans une boucle <code>for</code>. On a regroupé ces tirages avec <code>np.random.random</code> : le résultat est le même, mais le calcul va cent fois plus vite.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s3" data-titre="Lire un fichier de mesures">
+  <h2>Lire un fichier de mesures</h2>
+  <p class="intro">En TP, on ne recopie pas des dizaines de mesures à la main : le logiciel d'acquisition ou de pointage vidéo les enregistre dans un fichier texte, le plus souvent au format <b>CSV</b>. Python le lit en une ligne.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Un fichier <em class="cle">CSV</em> contient une mesure par ligne ; les valeurs y sont séparées par un caractère, le <em class="cle">séparateur</em> (souvent <code>;</code> en France). La première ligne, l'<b>en-tête</b>, donne le nom et l'unité de chaque colonne.</li>
+      <li><code>t, y = np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)</code> range chaque colonne du fichier dans un tableau numpy :
+        <code>delimiter</code> indique le séparateur, <code>skiprows=1</code> saute la ligne d'en-tête, <code>unpack=True</code> sépare les colonnes. Il faut autant de variables à gauche que de colonnes.</li>
+      <li>Le nom du fichier est un texte : entre guillemets, avec son extension.</li>
+    </ul>
+  </div>
+
+  <div class="info">
+    <h4>Bon à savoir</h4>
+    <ul>
+      <li>Sur un ordinateur, le fichier doit se trouver dans le même dossier que le programme. Ici, il est fourni avec l'exercice : son onglet 📄 est sous l'éditeur.</li>
+      <li>numpy ne lit que le <b>point</b> décimal. Si le logiciel a écrit <code>0,04</code>, choisissez le point dans ses options d'export, ou remplacez les virgules par des points dans un tableur.</li>
+    </ul>
+  </div>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p><code>np.loadtxt</code> fait ce que vous pourriez écrire vous-même : ouvrir le fichier avec <code>open</code>, le parcourir ligne par ligne, découper chaque ligne au séparateur, convertir chaque morceau en nombre avec <code>float</code>.</p>
+    <pre class="code">t = []
+with open('chute.csv') as f:      # ouvre le fichier en lecture
+    f.readline()                  # lit et jette la ligne d'en-tête
+    for ligne in f:               # puis une ligne par tour : '0.04;1.493'
+        morceaux = ligne.split(';')        # ['0.04', '1.493']
+        t.append(float(morceaux[0]))</pre>
+  </div>
+
+  <article class="exo" id="ex-3-1">
+    <h3><span class="num">3.1</span> La chute d'une balle</h3>
+    <p class="contexte">Une balle est lâchée sans vitesse initiale. Le pointage d'une vidéo (25 images par seconde) donne sa hauteur <i>y</i> au cours du temps, dans le fichier <code>chute.csv</code> (valeurs construites pour l'exercice).</p>
+    <ol class="questions">
+      <li>Ouvrir l'onglet 📄 <code>chute.csv</code> : quel est le séparateur ? Compléter la ligne de lecture, puis exécuter.</li>
+      <li>Tracer <i>y</i> en fonction de <i>t</i>, en points, avec des axes légendés.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, y = np.loadtxt('chute.csv', ……)
+print(len(t), 'mesures')
+</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_g = globals()
+if 't' in _g and 'y' in _g and _np.size(t) == 14 and _np.size(y) == 14 and abs(y[0] - 1.5) < 1e-9:
+    ok("Question 1 — 14 mesures lues : t et y sont deux tableaux numpy.")
+try:
+    _ax = _figure.axes[0]
+    _xl, _yl = _ax.get_xlabel(), _ax.get_ylabel()
+    _n = max([len(_l.get_xdata()) for _l in _ax.get_lines()] + [0])
+except Exception:
+    _xl, _yl, _n = '', '', 0
+if _n == 14 and _xl and _yl:
+    ok("Question 2 — Les points ne sont pas alignés : la balle accélère.")
+elif _n == 14:
+    indice("Question 2 : légendez les deux axes, avec les unités.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">t, y = np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+print(len(t), 'mesures')
+plt.plot(t, y, 'b+')
+plt.xlabel('t (s)')
+plt.ylabel('y (m)')
+plt.show()</pre>
+      <p>Le séparateur est le point-virgule. La hauteur diminue de plus en plus vite : la balle accélère. L'étape suivante calcule sa vitesse à partir de ces mesures.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-2">
+    <h3><span class="num">3.2</span> Trois erreurs de lecture</h3>
+    <p class="contexte">Chacun de ces programmes lit le fichier de l'exercice précédent et contient une erreur. Exécuter, lire le message, corriger.</p>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+t, y = np.loadtxt('chute.csv', delimiter=';', unpack=True)
+print(len(t), 'mesures')</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+if 'y' in globals() and len(y) == 14:
+    ok("Corrigé : skiprows=1 saute la ligne d'en-tête, qui contient du texte et non des nombres.")
+      </script>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+t, y = np.loadtxt('chute.cvs', delimiter=';', skiprows=1, unpack=True)
+print(len(t), 'mesures')</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+if 'y' in globals() and len(y) == 14:
+    ok("Corrigé : le fichier s'appelle chute.csv, et non chute.cvs.")
+      </script>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+t, x, y = np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+print(len(t), 'mesures')</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+if 'y' in globals() and len(y) == 14 and 't' in globals() and len(t) == 14:
+    ok("Corrigé : le fichier a deux colonnes, il faut deux variables.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p>1. <code>ValueError: could not convert string 't (s)' to float64</code> : sans <code>skiprows=1</code>, numpy tente de lire l'en-tête comme des nombres. 2. <code>FileNotFoundError</code> : faute de frappe dans l'extension. 3. <code>not enough values to unpack (expected 3, got 2)</code> : trois variables, mais deux colonnes seulement.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-3">
+    <h3><span class="num">3.3</span> La deuxième loi de Kepler</h3>
+    <details class="rappel"><summary>Rappel de cours — Lois de Kepler</summary>
+      <p class="rappel-titre">Première loi</p>
+      <p>Dans le référentiel géocentrique, la trajectoire d'un satellite de la Terre est une ellipse dont le centre de la Terre occupe un foyer.</p>
+      <p class="rappel-titre">Deuxième loi, la loi des aires</p>
+      <p>Le segment qui relie le centre de la Terre au satellite balaie des aires égales pendant des durées égales. Conséquence : le satellite va plus vite quand il est proche de la Terre.</p>
+      <p class="rappel-titre">Outil mathématique</p>
+      <p>L'aire du triangle de sommets O (l'origine), M<sub>1</sub>(x<sub>1</sub> ; y<sub>1</sub>) et M<sub>2</sub>(x<sub>2</sub> ; y<sub>2</sub>) vaut :</p>
+      <p class="formule">aire = <span class="frac"><span class="haut">1</span><span class="bas">2</span></span> × | x<sub>1</sub> × y<sub>2</sub> − x<sub>2</sub> × y<sub>1</sub> |</p>
+    </details>
+    <p class="contexte">Le fichier <code>satellite.csv</code> donne les positions d'un satellite toutes les 1 000 s, sur un tour complet ; la Terre est à l'origine du repère (valeurs construites pour l'exercice). Entre deux positions voisines, l'aire balayée est presque celle du triangle formé avec la Terre.</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui calcule la distance <code>r</code> du satellite au centre de la Terre. La distance est-elle constante ?</li>
+      <li>Compléter la fonction <code>aire</code>, qui renvoie l'aire du triangle formé par l'origine et deux positions.</li>
+      <li>Exécuter : les aires balayées toutes les 1 000 s sont-elles égales ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Le théorème de Pythagore : <code>r = np.sqrt(x ** 2 + y ** 2)</code> calcule les 37 distances d'un coup.</li>
+      <li>La valeur absolue s'écrit <code>abs(…)</code> (niveau 2).</li>
+      <li><code>min</code> et <code>max</code> donnent la plus petite et la plus grande valeur d'une liste ; <code>np.min</code> et <code>np.max</code> font de même pour un tableau numpy.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+t, x, y = np.loadtxt('satellite.csv', delimiter=';', skiprows=1, unpack=True)  # t en s, x et y en km
+
+r = ……          # distance au centre de la Terre, en km
+print('r va de', np.min(r), 'à', round(np.max(r)), 'km')
+
+def aire(x1, y1, x2, y2):
+    return ……
+
+aires = []
+for i in range(len(t) - 1):
+    aires.append(aire(x[i], y[i], x[i + 1], y[i + 1]))
+
+print('aire balayée en 1000 s : de', min(aires), 'à', max(aires), 'km²')</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="satellite.csv">
+@@satellite.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_g = globals()
+if 'x' in _g and 'y' in _g and _np.size(x) == 37:
+    _r = _np.sqrt(x ** 2 + y ** 2)
+    if any(isinstance(v, _np.ndarray) and v.shape == _r.shape and _np.allclose(v, _r) for k, v in _g.items() if not k.startswith('_')):
+        ok("Question 1 — La distance varie de 16 800 à 31 185 km : l'orbite est une ellipse, pas un cercle.")
+if 'aire' in _g and callable(aire):
+    try:
+        _a1, _a2 = aire(1, 0, 0, 1), aire(0, 1, 1, 0)
+    except Exception:
+        _a1 = _a2 = 'erreur'
+    if _a1 is None:
+        indice("La fonction aire ne renvoie rien : il manque return.")
+    elif _a1 == 0.5 and _a2 == 0.5:
+        ok("Question 2 — Les 36 aires sont égales à 1 % près, alors que la distance varie du simple au double : la loi des aires est vérifiée.")
+    elif _a1 == 0.5 and _a2 == -0.5:
+        indice("Une aire est positive : prenez la valeur absolue, abs(…).")
+    elif _a1 != 'erreur':
+        indice("Relisez la formule de l'aire dans le rappel de cours.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">r = np.sqrt(x ** 2 + y ** 2)
+
+def aire(x1, y1, x2, y2):
+    return 0.5 * abs(x1 * y2 - x2 * y1)</pre>
+      <p>La distance va de 16 800 à 31 185 km, mais les aires restent comprises entre 4,60 × 10⁷ et 4,66 × 10⁷ km² : égales à 1 % près. Le petit écart vient de l'approximation du triangle, moins bonne près de la Terre, où le satellite tourne vite.</p>
+    </details>
+  </article>
+
+  <div class="etiquette ece">
+    <p><b>À l'ECE</b>, le pointage d'une vidéo ou une acquisition peut être exporté en fichier texte, que le programme fourni lit. On vous demande alors de vérifier le nom du fichier et son séparateur : deux sources d'erreur très fréquentes.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s4" data-titre="Dérivée numérique">
+  <h2>Dériver des mesures : vitesse, accélération</h2>
+  <p class="intro">La vitesse est la dérivée de la position, l'accélération celle de la vitesse. Avec des mesures, on ne connaît la position qu'à certaines dates : on approche la dérivée par un taux de variation entre deux mesures voisines.</p>
+
+  <details class="rappel"><summary>Rappel de cours — Vitesse et accélération</summary>
+    <p>Les coordonnées du vecteur vitesse sont les dérivées des coordonnées du vecteur position, celles du vecteur accélération les dérivées des coordonnées du vecteur vitesse :</p>
+    <p class="formule">v<sub>x</sub> = <span class="frac"><span class="haut">dx</span><span class="bas">dt</span></span>      a<sub>x</sub> = <span class="frac"><span class="haut">dv<sub>x</sub></span><span class="bas">dt</span></span>      (de même selon y)</p>
+  </details>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Méthode <em class="cle">centrée</em> : la vitesse à la date <i>t</i><sub>i</sub> est estimée avec les mesures qui l'encadrent.</li>
+    </ul>
+    <p class="formule">v<sub>i</sub> ≈ <span class="frac"><span class="haut">x<sub>i+1</sub> − x<sub>i−1</sub></span><span class="bas">t<sub>i+1</sub> − t<sub>i−1</sub></span></span></p>
+    <ul>
+      <li>Avec des tranches, numpy calcule toutes les vitesses d'un coup : <code>x[2:]</code> (tout sauf les deux premières valeurs), <code>x[:-2]</code> (tout sauf les deux dernières), <code>x[1:-1]</code> (tout sauf la première et la dernière). Un indice négatif compte depuis la fin : <code>x[-1]</code> est la dernière valeur.</li>
+      <li>Il n'y a pas de vitesse à la première ni à la dernière date : le tableau des vitesses a <b>deux valeurs de moins</b> que celui des positions. Ses dates sont <code>t[1:-1]</code>.</li>
+      <li>L'accélération s'obtient de la même façon, à partir des vitesses.</li>
+    </ul>
+    <pre class="code">vx = (x[2:] - x[:-2]) / (t[2:] - t[:-2])   # vitesses, en m/s
+tv = t[1:-1]                               # leurs dates</pre>
+  </div>
+
+  <article class="exo" id="ex-4-1">
+    <h3><span class="num">4.1</span> La vitesse de la balle</h3>
+    <p class="contexte">On reprend le pointage de la balle lâchée (exercice 3.1).</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui calcule la vitesse verticale <code>vy</code> par la méthode centrée.</li>
+      <li>Compléter la ligne qui trace <code>vy</code> en fonction de ses dates. Comment la vitesse évolue-t-elle ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, y = np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+
+vy = ……            # vitesse verticale, en m/s
+tv = t[1:-1]       # dates des vitesses
+print(len(t), 'positions et', len(vy), 'vitesses')
+
+plt.plot(……)
+plt.xlabel('t (s)')
+plt.ylabel('vy (m/s)')
+plt.grid()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _y = _np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+_v = (_y[2:] - _y[:-2]) / (_t[2:] - _t[:-2])
+_arr = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, _np.ndarray)]
+if any(v.shape == _v.shape and _np.allclose(v, _v) for v in _arr):
+    ok("Question 1 — 12 vitesses, de −0,43 à −4,71 m/s.")
+elif any(v.shape == _v.shape and _np.allclose(v, -_v) for v in _arr):
+    indice("Question 1 : la vitesse est négative, la balle descend : c'est y[2:] - y[:-2], dans cet ordre.")
+elif any(_np.size(v) == 13 for v in _arr):
+    indice("Question 1 : 13 valeurs, c'est la méthode entre deux points successifs. Utilisez la méthode centrée, avec x[2:] et x[:-2].")
+try:
+    _n = [len(_l.get_xdata()) for _l in _figure.axes[0].get_lines()]
+except Exception:
+    _n = []
+if 12 in _n:
+    ok("Question 2 — Les points sont alignés : la vitesse varie proportionnellement au temps.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">vy = (y[2:] - y[:-2]) / (t[2:] - t[:-2])
+plt.plot(tv, vy, 'b+')</pre>
+      <p>14 positions, 12 vitesses. Les points sont alignés sur une droite qui passe presque par l'origine : la vitesse est proportionnelle au temps, signe d'une accélération constante. Tracer <code>vy</code> en fonction de <code>t</code> donnerait une <code>ValueError</code> : 14 dates pour 12 vitesses.</p>
+      <p>Le même calcul s'écrit avec une boucle, comme dans certains sujets d'ECE : <code>for i in range(1, len(t) - 1):</code> puis <code>vy.append((y[i + 1] - y[i - 1]) / (t[i + 1] - t[i - 1]))</code>, avec <code>vy = []</code> au départ.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-2">
+    <h3><span class="num">4.2</span> Les vecteurs accélération d'un ballon</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« Représenter, à l'aide d'un langage de programmation, des vecteurs accélération d'un point lors d'un mouvement. » (capacité numérique, mouvement dans un champ uniforme)</p>
+    </div>
+    <p class="contexte">Le fichier <code>lancer.csv</code> donne le pointage d'un ballon de basket lancé vers le panier, 20 images par seconde (valeurs construites pour l'exercice). Le programme calcule les vitesses et trace des flèches.</p>
+    <div class="info">
+      <h4>Bon à savoir</h4>
+      <p><code>plt.quiver(X, Y, U, V, …)</code> dessine, au point (<i>X</i> ; <i>Y</i>), une flèche de coordonnées (<i>U</i> ; <i>V</i>). Avec <code>angles='xy', scale_units='xy', scale=30</code>, une accélération de 30 m·s⁻² est représentée par une flèche de 1 m sur le graphique. <code>plt.axis('equal')</code> donne la même échelle aux deux axes, pour que les directions soient justes.</p>
+    </div>
+    <ol class="questions">
+      <li>Compléter les lignes qui calculent <code>ax</code> et <code>ay</code>, puis exécuter. Que dire de la direction et du sens des vecteurs accélération ? Comparer <code>ay</code> moyen à <i>g</i> = 9,81 m·s⁻².</li>
+      <li>Ajouter les vecteurs vitesse en bleu (<code>scale=10</code>), placés aux points <code>x[1:-1]</code>, <code>y[1:-1]</code>.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Même méthode centrée, appliquée aux tableaux <code>vx</code> et <code>vy</code>, avec leurs dates <code>tv</code>.</li>
+      <li><code>ax = (vx[2:] - vx[:-2]) / (tv[2:] - tv[:-2])</code>.</li>
+      <li>Pour les vitesses, recopiez la ligne <code>plt.quiver</code> et changez les positions, les coordonnées des flèches, la couleur et l'échelle.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, x, y = np.loadtxt('lancer.csv', delimiter=';', skiprows=1, unpack=True)
+
+# vitesses, aux dates t[1:-1]
+vx = (x[2:] - x[:-2]) / (t[2:] - t[:-2])
+vy = (y[2:] - y[:-2]) / (t[2:] - t[:-2])
+tv = t[1:-1]
+
+# accélérations, aux dates t[2:-2]
+ax = ……
+ay = ……
+print('ay moyen :', round(np.mean(ay), 2), 'm/s²')
+
+plt.plot(x, y, 'k+', label='positions')
+plt.quiver(x[2:-2], y[2:-2], ax, ay, color='red', angles='xy', scale_units='xy', scale=30)
+plt.axis('equal')
+plt.xlabel('x (m)')
+plt.ylabel('y (m)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="lancer.csv">
+@@lancer.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _x, _y = _np.loadtxt('lancer.csv', delimiter=';', skiprows=1, unpack=True)
+_vx = (_x[2:] - _x[:-2]) / (_t[2:] - _t[:-2])
+_vy = (_y[2:] - _y[:-2]) / (_t[2:] - _t[:-2])
+_tv = _t[1:-1]
+_ay = (_vy[2:] - _vy[:-2]) / (_tv[2:] - _tv[:-2])
+_ax = (_vx[2:] - _vx[:-2]) / (_tv[2:] - _tv[:-2])
+_g = globals()
+if 'ax' in _g and 'ay' in _g and _np.shape(ay) == _ay.shape and _np.allclose(ay, _ay) and _np.shape(ax) == _ax.shape and _np.allclose(ax, _ax):
+    ok("Question 1 — Les vecteurs accélération sont verticaux, vers le bas, et ay moyen ≈ −9,83 m/s² : c'est le vecteur g.")
+elif 'ay' in _g and _np.size(ay) == 17:
+    indice("Question 1 : 17 valeurs, c'est le bon nombre. Vérifiez le calcul : vitesses vx ou vy, dates tv.")
+elif 'ay' in _g:
+    indice("Question 1 : appliquez la méthode centrée aux vitesses, avec leurs dates tv.")
+try:
+    _nq = sum(1 for _c in _figure.axes[0].collections if type(_c).__name__ == 'Quiver')
+except Exception:
+    _nq = 0
+if _nq >= 2:
+    ok("Question 2 — Les vecteurs vitesse sont tangents à la trajectoire ; leur coordonnée horizontale ne change pas.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">ax = (vx[2:] - vx[:-2]) / (tv[2:] - tv[:-2])
+ay = (vy[2:] - vy[:-2]) / (tv[2:] - tv[:-2])
+...
+plt.quiver(x[1:-1], y[1:-1], vx, vy, color='blue', angles='xy', scale_units='xy', scale=10)</pre>
+      <p>Les vecteurs accélération sont tous verticaux, dirigés vers le bas, de même longueur aux erreurs de pointage près : <i>a</i><sub>y</sub> moyen ≈ −9,83 m·s⁻², proche de −<i>g</i>. C'est la deuxième loi de Newton : le ballon n'est soumis qu'à son poids, donc son accélération est égale au champ de pesanteur. Dériver deux fois amplifie les petites erreurs de pointage : les flèches ne sont pas toutes rigoureusement égales.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-3">
+    <h3><span class="num">4.3</span> La vitesse volumique de disparition</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« À l'aide d'un langage de programmation et à partir de données expérimentales, tracer l'évolution temporelle d'une concentration, d'une vitesse volumique d'apparition ou de disparition et tester une relation donnée entre la vitesse volumique de disparition et la concentration d'un réactif. »</p>
+    </div>
+    <details class="rappel"><summary>Rappel de cours — Vitesse volumique</summary>
+      <p>La vitesse volumique de disparition d'un réactif R est l'opposé de la dérivée de sa concentration par rapport au temps, en mol·L⁻¹·s⁻¹ :</p>
+      <p class="formule">v<sub>d</sub>(t) = − <span class="frac"><span class="haut">d[R]</span><span class="bas">dt</span></span></p>
+    </details>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 49. Les ions peroxodisulfate S<sub>2</sub>O<sub>8</sub><sup>2−</sup> réagissent avec les ions iodure I<sup>−</sup>, en excès, pour former du diiode, jaune. Un spectrophotomètre enregistre l'absorbance <i>A</i> toutes les 20 s dans <code>absorbance.csv</code> (valeurs construites). D'après la loi de Beer-Lambert, la concentration en ions peroxodisulfate vaut alors :</p>
+    <p class="formule">[S<sub>2</sub>O<sub>8</sub><sup>2−</sup>] = c<sub>0</sub> × <span class="par">(</span>1 − <span class="frac"><span class="haut">A</span><span class="bas">A<sub>f</sub></span></span><span class="par">)</span></p>
+    <p class="contexte">où <i>c</i><sub>0</sub> = 0,50 mmol·L⁻¹ est la concentration initiale et <i>A</i><sub>f</sub> = 0,850 l'absorbance finale, mesurée au bout d'une heure.</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui calcule la concentration <code>c</code> ; exécuter pour tracer son évolution.</li>
+      <li>Compléter la ligne qui calcule la vitesse volumique de disparition <code>v</code>. Comment évolue-t-elle au cours du temps ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, A = np.loadtxt('absorbance.csv', delimiter=';', skiprows=1, unpack=True)
+c0 = 0.50          # concentration initiale, en mmol/L
+Af = 0.850         # absorbance finale
+
+c = ……             # [S2O8 2-], en mmol/L
+plt.plot(t, c, 'b+')
+plt.xlabel('t (s)')
+plt.ylabel('[S2O8 2-] (mmol/L)')
+plt.show()
+
+v = ……             # vitesse volumique de disparition, en mmol/L/s
+tv = t[1:-1]
+plt.plot(tv, v, 'r+')
+plt.xlabel('t (s)')
+plt.ylabel('v (mmol/L/s)')
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="absorbance.csv">
+@@absorbance.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _A = _np.loadtxt('absorbance.csv', delimiter=';', skiprows=1, unpack=True)
+_c = 0.50 * (1 - _A / 0.850)
+_v = -(_c[2:] - _c[:-2]) / (_t[2:] - _t[:-2])
+_g = globals()
+if 'c' in _g and _np.shape(c) == _c.shape and _np.allclose(c, _c):
+    ok("Question 1 — La concentration diminue de 0,50 à 0,11 mmol/L en 10 minutes, de moins en moins vite.")
+elif 'c' in _g and _np.shape(c) == _c.shape and _np.allclose(c, 0.50 * _A / 0.850):
+    indice("Question 1 : vous avez calculé la concentration du diiode formé. Celle des ions peroxodisulfate vaut c0 * (1 - A / Af).")
+if 'v' in _g and _np.shape(v) == _v.shape:
+    if _np.allclose(v, _v):
+        ok("Question 2 — La vitesse de disparition diminue au cours du temps, de 1,2 × 10⁻³ à 2,6 × 10⁻⁴ mmol/L/s.")
+    elif _np.allclose(v, -_v):
+        indice("Question 2 : la vitesse de disparition est positive : n'oubliez pas le signe moins de la définition.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">c = c0 * (1 - A / Af)
+v = -(c[2:] - c[:-2]) / (t[2:] - t[:-2])</pre>
+      <p>La concentration diminue de plus en plus lentement, et la vitesse de disparition diminue avec elle : plus il reste de réactif, plus la réaction est rapide. Est-ce une proportionnalité ? Réponse à l'exercice 5.3.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s5" data-titre="Modéliser par une droite">
+  <h2>Modéliser par une droite avec np.polyfit</h2>
+  <p class="intro">Quand des points semblent alignés, on cherche la droite qui passe au plus près d'eux : c'est la <b>modélisation</b> que fait le tableur ou le logiciel de TP. En Python, une seule fonction suffit.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>a, b = np.polyfit(x, y, 1)</code> renvoie le coefficient directeur <i>a</i> et l'ordonnée à l'origine <i>b</i> de la droite <i>y</i> = <i>a</i> × <i>x</i> + <i>b</i> la plus proche des points. Le <code>1</code> est le degré : une droite.</li>
+      <li>On trace la droite modèle avec <code>plt.plot(x, a * x + b, 'r-')</code>, par-dessus les points de mesure.</li>
+      <li>Pour tester une <b>proportionnalité</b> <i>y</i> = <i>k</i> × <i>x</i> : les points doivent être alignés et <i>b</i> doit être très petit devant les valeurs de <i>y</i>.</li>
+      <li>Pour une loi exponentielle <i>y</i> = <i>y</i><sub>0</sub> × e<sup>−λx</sup>, on <em class="cle">linéarise</em> : ln <i>y</i> = ln <i>y</i><sub>0</sub> − λ × <i>x</i>. Les points (<i>x</i> ; ln <i>y</i>) sont alignés et le coefficient directeur vaut −λ.</li>
+    </ul>
+    <pre class="code">a, b = np.polyfit(tv, vy, 1)              # droite vy = a × t + b
+print('a =', a, 'b =', b)
+plt.plot(tv, vy, 'b+', label='mesures')
+plt.plot(tv, a * tv + b, 'r-', label='modèle')</pre>
+  </div>
+
+  <article class="exo" id="ex-5-1">
+    <h3><span class="num">5.1</span> Mesurer g</h3>
+    <details class="rappel"><summary>Rappel de cours — Chute libre</summary>
+      <p>Un objet en chute libre n'est soumis qu'à son poids. D'après la deuxième loi de Newton, son accélération est égale au champ de pesanteur : <i>a</i><sub>y</sub> = −<i>g</i> sur un axe vertical vers le haut. Lâché sans vitesse initiale, sa vitesse vaut :</p>
+      <p class="formule">v<sub>y</sub>(t) = −g × t</p>
+    </details>
+    <p class="contexte">On reprend les vitesses de la balle de l'exercice 4.1.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>a, b = ……</code> pour modéliser <code>vy</code> en fonction de <code>tv</code> par une droite.</li>
+      <li>Compléter le tracé du modèle. Le coefficient directeur est-il conforme à la valeur de <i>g</i>, 9,81 m·s⁻² ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, y = np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+vy = (y[2:] - y[:-2]) / (t[2:] - t[:-2])
+tv = t[1:-1]
+
+a, b = ……
+print('a =', round(a, 2), 'm/s²   b =', round(b, 3), 'm/s')
+
+plt.plot(tv, vy, 'b+', label='mesures')
+plt.plot(tv, ……, 'r-', label='modèle')
+plt.xlabel('t (s)')
+plt.ylabel('vy (m/s)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="chute.csv">
+@@chute.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _y = _np.loadtxt('chute.csv', delimiter=';', skiprows=1, unpack=True)
+_v = (_y[2:] - _y[:-2]) / (_t[2:] - _t[:-2])
+_a, _b = _np.polyfit(_t[1:-1], _v, 1)
+_g = globals()
+if 'a' in _g and isinstance(a, (float, _np.floating)) and abs(a - _a) < 1e-6:
+    ok("Question 1 — a ≈ −9,79 m/s² et b ≈ −0,005 m/s, très petit : vy est proportionnelle à t.")
+elif 'a' in _g and isinstance(a, (float, _np.floating)) and abs(a * _a - 1) < 0.01:
+    indice("Question 1 : dans np.polyfit(x, y, 1), les abscisses viennent en premier : tv, puis vy.")
+try:
+    _n = len(_figure.axes[0].get_lines())
+except Exception:
+    _n = 0
+if _n >= 2:
+    ok("Question 2 — Le modèle passe au milieu des points : g ≈ 9,79 m/s², à 0,2 % de 9,81 m/s².")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">a, b = np.polyfit(tv, vy, 1)
+plt.plot(tv, a * tv + b, 'r-', label='modèle')</pre>
+      <p><i>a</i> ≈ −9,79 m·s⁻² : la balle tombe avec une accélération très proche de <i>g</i>, les frottements de l'air sont négligeables. <i>b</i> ≈ −0,005 m·s⁻¹ est presque nul : la balle était bien lâchée sans vitesse.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-2">
+    <h3><span class="num">5.2</span> Peser le Soleil</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« Exploiter, à l'aide d'un langage de programmation, des données astronomiques ou satellitaires pour tester les deuxième et troisième lois de Kepler. »</p>
+    </div>
+    <details class="rappel"><summary>Rappel de cours — Troisième loi de Kepler</summary>
+      <p>Le carré de la période de révolution <i>T</i> d'une planète est proportionnel au cube du demi-grand axe <i>a</i> de son orbite :</p>
+      <p class="formule"><span class="frac"><span class="haut">T²</span><span class="bas">a³</span></span> = k   avec   k = <span class="frac"><span class="haut">4π²</span><span class="bas">G × M</span></span></p>
+      <p><i>M</i> est la masse du Soleil, <i>G</i> = 6,67 × 10⁻¹¹ N·m²·kg⁻².</p>
+    </details>
+    <p class="contexte">Le fichier <code>planetes.csv</code> donne, pour les huit planètes, le demi-grand axe en unités astronomiques (1 UA = 1,496 × 10¹¹ m) et la période en années (1 an = 3,156 × 10⁷ s). Données de la NASA (fiches planétaires).</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui modélise <code>T²</code> en fonction de <code>a³</code> par une droite. La troisième loi est-elle vérifiée ?</li>
+      <li>En déduire la masse <code>M</code> du Soleil.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li><code>np.polyfit(X, Y, 1)</code>, avec <code>X = a ** 3</code> et <code>Y = T ** 2</code>, donne <i>k</i> et <i>b</i>.</li>
+      <li>Isolez <i>M</i> dans <i>k</i> = 4π² / (<i>G</i> × <i>M</i>) : <i>M</i> = 4π² / (<i>G</i> × <i>k</i>).</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+a_UA, T_an = np.loadtxt('planetes.csv', delimiter=';', skiprows=1, unpack=True)
+a = a_UA * 1.496e11      # demi-grand axe, en m
+T = T_an * 3.156e7       # période de révolution, en s
+G = 6.67e-11
+
+X = a ** 3
+Y = T ** 2
+k, b = ……
+M = ……
+print('k =', k, 's²/m³')
+print('M =', M, 'kg')
+
+plt.plot(X, Y, 'b+', label='planètes')
+plt.plot(X, k * X + b, 'r-', label='modèle')
+plt.xlabel('a³ (m³)')
+plt.ylabel('T² (s²)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="planetes.csv">
+@@planetes.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_a, _T = _np.loadtxt('planetes.csv', delimiter=';', skiprows=1, unpack=True)
+_k = _np.polyfit((_a * 1.496e11) ** 3, (_T * 3.156e7) ** 2, 1)[0]
+_vals = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, (float, _np.floating))]
+if any(abs(v - _k) < 1e-4 * _k for v in _vals):
+    ok("Question 1 — k ≈ 2,97 × 10⁻¹⁹ s²/m³ : les huit points sont alignés sur une droite passant par l'origine.")
+if any(abs(v - 1.99e30) < 0.02e30 for v in _vals):
+    ok("Question 2 — M ≈ 1,99 × 10³⁰ kg : la masse du Soleil.")
+elif any(abs(v - _f) < 1e-3 * abs(_f) for v in _vals for _f in (4 * _np.pi ** 2 * 6.67e-11 / _k, 6.67e-11 * _k / (4 * _np.pi ** 2), 4 * _np.pi ** 2 * _k / 6.67e-11)):
+    indice("Question 2 : isolez M correctement, M = 4 * np.pi ** 2 / (G * k).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">k, b = np.polyfit(X, Y, 1)
+M = 4 * np.pi ** 2 / (G * k)</pre>
+      <p><i>k</i> ≈ 2,97 × 10⁻¹⁹ s²·m⁻³ et <i>M</i> ≈ 1,99 × 10³⁰ kg. L'ordonnée à l'origine, <i>b</i> ≈ 8 × 10¹³ s², est négligeable devant les valeurs de <i>T</i>², jusqu'à 2,7 × 10¹⁹ s² : <i>T</i>² est proportionnel à <i>a</i>³, la troisième loi est vérifiée. Les quatre planètes proches du Soleil se serrent près de l'origine : <i>a</i>³ s'étend sur cinq ordres de grandeur.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-3">
+    <h3><span class="num">5.3</span> Tester une loi de vitesse</h3>
+    <details class="rappel"><summary>Rappel de cours — Loi de vitesse d'ordre 1</summary>
+      <p>Une réaction suit une loi de vitesse d'ordre 1 par rapport au réactif R si sa vitesse volumique de disparition est proportionnelle à la concentration de R, avec <i>k</i> la constante de vitesse (en s⁻¹) :</p>
+      <p class="formule">v<sub>d</sub> = k × [R]</p>
+    </details>
+    <p class="contexte">On reprend la réaction des ions peroxodisulfate (exercice 4.3, d'après le sujet d'ECE n° 49). Le programme recalcule la concentration et la vitesse de disparition.</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui modélise <code>v</code> en fonction de la concentration par une droite. Attention : il faut la concentration aux mêmes dates que les vitesses.</li>
+      <li>La réaction suit-elle une loi d'ordre 1 ? Donner la valeur de <i>k</i>.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, A = np.loadtxt('absorbance.csv', delimiter=';', skiprows=1, unpack=True)
+c = 0.50 * (1 - A / 0.850)                    # [S2O8 2-], en mmol/L
+v = -(c[2:] - c[:-2]) / (t[2:] - t[:-2])      # vitesse de disparition, en mmol/L/s
+cv = c[1:-1]                                  # concentrations aux dates des vitesses
+
+k, b = ……
+print('k =', k, 's⁻¹   b =', b, 'mmol/L/s')
+
+plt.plot(cv, v, 'b+', label='mesures')
+plt.plot(cv, k * cv + b, 'r-', label='modèle')
+plt.xlabel('[S2O8 2-] (mmol/L)')
+plt.ylabel('v (mmol/L/s)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="absorbance.csv">
+@@absorbance.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _A = _np.loadtxt('absorbance.csv', delimiter=';', skiprows=1, unpack=True)
+_c = 0.50 * (1 - _A / 0.850)
+_v = -(_c[2:] - _c[:-2]) / (_t[2:] - _t[:-2])
+_k = _np.polyfit(_c[1:-1], _v, 1)[0]
+_g = globals()
+if 'k' in _g and isinstance(k, (float, _np.floating)) and abs(k - _k) < 1e-9:
+    ok("Points alignés, b ≈ −3 × 10⁻⁶ mmol/L/s, négligeable : la vitesse est proportionnelle à la concentration. Ordre 1, k ≈ 2,5 × 10⁻³ s⁻¹.")
+elif 'k' in _g and isinstance(k, (float, _np.floating)) and abs(k * _k - 1) < 0.1:
+    indice("Les abscisses d'abord : np.polyfit(cv, v, 1).")
+else:
+    indice("Modélisez v en fonction de cv : np.polyfit(cv, v, 1). Avec c, les deux tableaux n'ont pas la même longueur.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">k, b = np.polyfit(cv, v, 1)</pre>
+      <p>Les points sont alignés sur une droite qui passe par l'origine (<i>b</i> est cent fois plus petit que les vitesses) : la réaction est d'ordre 1 par rapport aux ions peroxodisulfate, avec <i>k</i> ≈ 2,5 × 10⁻³ s⁻¹. Les points les plus dispersés sont ceux de fin de réaction : la dérivée y est calculée sur de petites variations, plus sensibles aux erreurs de mesure.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-4">
+    <h3><span class="num">5.4</span> Linéariser une décroissance</h3>
+    <p class="contexte">Un minigénérateur fournit du baryum 137m, radioactif. Un compteur Geiger enregistre le nombre de désintégrations détectées en 10 s, toutes les 30 s, dans <code>comptages.csv</code> (valeurs construites). Ce nombre est proportionnel à l'activité : il suit la loi de décroissance <i>N</i> = <i>N</i><sub>0</sub> × e<sup>−λt</sup>. La ressource de l'académie de Strasbourg (exercice 2.3) ajuste cette exponentielle avec <code>curve_fit</code>, de la bibliothèque scipy ; on obtient le même résultat en linéarisant.</p>
+    <ol class="questions">
+      <li>Compléter la ligne qui calcule ln <i>N</i>, puis celle qui en déduit λ à partir du coefficient directeur.</li>
+      <li>En déduire la demi-vie du baryum 137m, et la comparer à la valeur tabulée : 2,55 min.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>ln s'écrit <code>np.log</code>.</li>
+      <li>Le coefficient directeur de la droite ln <i>N</i> = f(<i>t</i>) vaut −λ : <code>lam = -p</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, N = np.loadtxt('comptages.csv', delimiter=';', skiprows=1, unpack=True)
+
+lnN = ……
+p, q = np.polyfit(t, lnN, 1)
+lam = ……                       # constante radioactive, en s⁻¹
+print('lambda =', lam, 's⁻¹')
+
+plt.plot(t, lnN, 'b+', label='mesures')
+plt.plot(t, p * t + q, 'r-', label='modèle')
+plt.xlabel('t (s)')
+plt.ylabel('ln N')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="comptages.csv">
+@@comptages.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _N = _np.loadtxt('comptages.csv', delimiter=';', skiprows=1, unpack=True)
+_p = _np.polyfit(_t, _np.log(_N), 1)[0]
+_vals = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, (float, _np.floating))]
+if 'lam' in globals() and isinstance(lam, (float, _np.floating)):
+    if abs(lam + _p) < 1e-9:
+        ok("Question 1 — λ ≈ 4,6 × 10⁻³ s⁻¹.")
+    elif abs(lam - _p) < 1e-9:
+        indice("Question 1 : λ est positive ; le coefficient directeur vaut −λ.")
+    elif abs(lam + _np.polyfit(_t, _np.log10(_N), 1)[0]) < 1e-9:
+        indice("Question 1 : ln s'écrit np.log ; np.log10 est le logarithme décimal.")
+if any(abs(v - _np.log(2) / -_p) < 0.5 for v in _vals) or any(abs(v - _np.log(2) / -_p / 60) < 0.01 for v in _vals) or '150' in _sortie or '2.5' in _sortie:
+    ok("Question 2 — t½ ≈ 150 s, soit 2,5 min, proche de la valeur tabulée de 2,55 min.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">lnN = np.log(N)
+lam = -p
+t12 = np.log(2) / lam
+print('t½ =', round(t12), 's =', round(t12 / 60, 2), 'min')</pre>
+      <p>λ ≈ 4,6 × 10⁻³ s⁻¹ et <i>t</i><sub>1/2</sub> ≈ 150 s ≈ 2,5 min, à 2 % de la valeur tabulée. Les derniers points s'écartent un peu plus de la droite : avec peu de désintégrations comptées, le hasard pèse davantage (exercice 2.3).</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s6" data-titre="La méthode d'Euler">
+  <h2>Résoudre une équation différentielle : la méthode d'Euler</h2>
+  <p class="intro">Plusieurs lois du programme sont des <b>équations différentielles</b> : la dérivée d'une grandeur y dépend de la grandeur elle-même. La méthode d'Euler les résout pas à pas, sans chercher la solution exacte : c'est ainsi que les ordinateurs simulent la plupart des phénomènes physiques.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Pour une équation de la forme <i>y</i>′ = <i>a</i> × <i>y</i> + <i>b</i>, si l'on connaît <i>y</i> à la date <i>t</i>, on estime <i>y</i> un petit peu plus tard, à la date <i>t</i> + Δ<i>t</i> :</li>
+    </ul>
+    <p class="formule">y(t + Δt) ≈ y(t) + y′(t) × Δt   soit   y(t + Δt) ≈ y(t) + (a × y(t) + b) × Δt</p>
+    <ul>
+      <li>On part de la valeur initiale <i>y</i>(0) et on répète ce calcul avec une boucle, en rangeant chaque valeur dans une liste.</li>
+      <li>Δ<i>t</i> est le <em class="cle">pas</em>. Plus il est petit, plus la solution approchée est proche de la solution exacte, mais plus il faut de calculs.</li>
+    </ul>
+    <pre class="code">for i in range(n):
+    y = y + (a * y + b) * dt     # un pas d'Euler
+    liste_y.append(y)</pre>
+  </div>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p>Leonhard Euler a décrit cette méthode en 1768, deux siècles avant les ordinateurs : on la faisait à la main. Elle figure parmi les exemples d'algorithmes du programme de mathématiques de terminale (« résolution par la méthode d'Euler de <i>y</i>′ = <i>ay</i> + <i>b</i> ») et elle est au programme de toutes les classes préparatoires scientifiques. Les simulations de la météo ou des crash-tests reposent sur des méthodes plus précises, mais de la même famille.</p>
+  </div>
+
+  <article class="exo" id="ex-6-1">
+    <h3><span class="num">6.1</span> La décroissance pas à pas</h3>
+    <details class="rappel"><summary>Rappel de cours — Équation de la décroissance radioactive</summary>
+      <p>Le nombre <i>N</i> de noyaux radioactifs vérifie l'équation différentielle ci-dessous ; c'est la forme <i>y</i>′ = <i>ay</i> + <i>b</i>, avec <i>a</i> = −λ et <i>b</i> = 0. Sa solution exacte est la loi de décroissance.</p>
+      <p class="formule"><span class="frac"><span class="haut">dN</span><span class="bas">dt</span></span> = −λ × N   et   N(t) = N<sub>0</sub> × e<sup>−λt</sup></p>
+    </details>
+    <p class="contexte">On reprend le baryum 137m de l'exercice 5.4 : λ = 4,53 × 10⁻³ s⁻¹, avec 1 000 noyaux au départ.</p>
+    <ol class="questions">
+      <li>Compléter la ligne de la méthode d'Euler, puis exécuter.</li>
+      <li>Compléter la ligne qui trace la solution exacte. Les deux courbes sont-elles proches ?</li>
+      <li>Remplacer le pas par 60 s, et le nombre de tours par 10. Que constatez-vous ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+lam = 4.53e-3      # constante radioactive, en s⁻¹
+N = 1000           # nombre initial de noyaux
+dt = 10            # pas, en s
+temps = [0]
+noyaux = [N]
+
+for i in range(60):                    # 60 pas de 10 s : 600 s
+    N = ……                             # un pas d'Euler
+    temps.append(temps[-1] + dt)
+    noyaux.append(N)
+
+t = np.array(temps)
+plt.plot(t, noyaux, 'b.', label='Euler')
+plt.plot(t, ……, 'r-', label='solution exacte')
+plt.xlabel('t (s)')
+plt.ylabel('N')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_L = globals().get('noyaux')
+_T = globals().get('temps')
+if isinstance(_L, list) and isinstance(_T, list) and len(_L) == len(_T) and len(_L) >= 3 and _L[0] == 1000:
+    _dt = _T[1] - _T[0]
+    if all(abs(_L[i + 1] - (_L[i] - 4.53e-3 * _L[i] * _dt)) < 1e-6 for i in range(len(_L) - 1)):
+        ok("Question 1 — Chaque pas retire λ × N × Δt noyaux : " + str(round(_L[-1])) + " noyaux au bout de " + str(round(_T[-1])) + " s.")
+    elif _L[1] > _L[0]:
+        indice("Question 1 : N augmente : la dérivée vaut −λ × N, avec un signe moins.")
+    else:
+        indice("Question 1 : relisez l'encadré À retenir, avec a = −λ et b = 0 : N = N + (-lam * N) * dt.")
+try:
+    _n = len(_figure.axes[0].get_lines())
+except Exception:
+    _n = 0
+if _n >= 2:
+    ok("Question 2 — Euler et la solution exacte sont tracées ensemble.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">N = N + (-lam * N) * dt
+plt.plot(t, 1000 * np.exp(-lam * t), 'r-', label='solution exacte')</pre>
+      <p>Avec un pas de 10 s, les deux courbes sont presque confondues : 62 noyaux au bout de 600 s par Euler, 66 d'après la loi exacte. Avec un pas de 60 s, les points d'Euler passent nettement sous la courbe : à chaque pas, la méthode utilise la pente du début du pas, plus forte que la pente moyenne.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-6-2">
+    <h3><span class="num">6.2</span> La charge du défibrillateur</h3>
+    <details class="rappel"><summary>Rappel de cours — Charge d'un condensateur</summary>
+      <p>Dans un circuit RC série alimenté par un générateur de tension <i>E</i>, la tension <i>u</i><sub>C</sub> aux bornes du condensateur vérifie, avec τ = <i>R</i> × <i>C</i> la constante de temps :</p>
+      <p class="formule"><span class="frac"><span class="haut">du<sub>C</sub></span><span class="bas">dt</span></span> = <span class="frac"><span class="haut">E − u<sub>C</sub></span><span class="bas">τ</span></span>   et   u<sub>C</sub>(t) = E × <span class="par">(</span>1 − e<sup>−<span class="frac"><span class="haut">t</span><span class="bas">τ</span></span></sup><span class="par">)</span></p>
+      <p>C'est la forme <i>y</i>′ = <i>ay</i> + <i>b</i>, avec <i>a</i> = −<span class="frac"><span class="haut">1</span><span class="bas">τ</span></span> et <i>b</i> = <span class="frac"><span class="haut">E</span><span class="bas">τ</span></span>. À la date τ, <i>u</i><sub>C</sub> atteint 63 % de <i>E</i>.</p>
+    </details>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 41 : un défibrillateur est modélisé par un circuit RC. Ici, <i>E</i> = 12 V, <i>R</i> = 10 kΩ et <i>C</i> = 2 200 µF (valeurs construites pour l'exercice). Le condensateur est déchargé à <i>t</i> = 0.</p>
+    <ol class="questions">
+      <li>Écrire la méthode d'Euler pour calculer <i>u</i><sub>C</sub> de 0 à 140 s, avec un pas de 1 s. Ranger les tensions dans une liste <code>u_liste</code> et les dates dans <code>t_liste</code>.</li>
+      <li>Tracer la tension obtenue et la solution exacte sur le même graphique.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Avant la boucle : <code>u = 0</code>, <code>t = 0</code>, <code>u_liste = [u]</code>, <code>t_liste = [t]</code>.</li>
+      <li>140 pas de 1 s : <code>for i in range(140):</code>.</li>
+      <li>Dans la boucle : <code>u = u + (E - u) / tau * dt</code>, <code>t = t + dt</code>, puis les deux <code>append</code>.</li>
+      <li>La solution exacte se calcule sur un tableau numpy : <code>ts = np.array(t_liste)</code>, puis <code>E * (1 - np.exp(-ts / tau))</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+E = 12.0          # tension du générateur, en V
+R = 10e3          # résistance, en ohms
+C = 2200e-6       # capacité, en F
+tau = R * C       # constante de temps, en s
+dt = 1.0          # pas, en s
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_cands = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, (list, _np.ndarray)) and len(v) >= 100]
+def _euler(L):
+    try:
+        if abs(L[0]) > 1e-12 or abs(L[1] - 12.0 / 22.0) > 1e-6:
+            return False
+        return all(abs(L[i + 1] - (L[i] + (12.0 - L[i]) / 22.0)) < 1e-6 for i in range(len(L) - 1))
+    except Exception:
+        return False
+if any(_euler(L) for L in _cands):
+    ok("Question 1 — La tension monte vers 12 V : environ 7,7 V à la date τ = 22 s, contre 7,6 V pour la solution exacte.")
+elif _cands:
+    indice("Question 1 : un pas d'Euler s'écrit u = u + (E - u) / tau * dt, en partant de u = 0.")
+try:
+    _n = len(_figure.axes[0].get_lines())
+except Exception:
+    _n = 0
+if _n >= 2:
+    ok("Question 2 — Les deux courbes sont tracées : elles sont presque confondues.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">u = 0
+t = 0
+u_liste = [u]
+t_liste = [t]
+for i in range(140):
+    u = u + (E - u) / tau * dt
+    t = t + dt
+    u_liste.append(u)
+    t_liste.append(t)
+
+ts = np.array(t_liste)
+plt.plot(t_liste, u_liste, 'b.', label='Euler')
+plt.plot(ts, E * (1 - np.exp(-ts / tau)), 'r-', label='solution exacte')
+plt.xlabel('t (s)')
+plt.ylabel('uC (V)')
+plt.legend()
+plt.show()</pre>
+      <p>Au bout de 5τ = 110 s, le condensateur est chargé à plus de 99 %. Le sujet d'ECE obtient la courbe par l'expérience, puis la modélise ; ici, on la calcule à partir de l'équation différentielle.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-6-3">
+    <h3><span class="num">6.3</span> Le choix du pas</h3>
+    <p class="contexte">Le programme ci-dessous reprend la charge du condensateur (τ = 22 s) avec un pas <code>dt</code> que l'on peut changer. Essayer successivement 1 s, 10 s, 20 s, 30 s et 50 s, puis répondre.</p>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+E, tau = 12.0, 22.0
+dt = 30.0                  # pas, en s : à modifier
+n = round(140 / dt)        # nombre de pas pour aller jusqu'à 140 s
+
+u, t = 0, 0
+u_liste, t_liste = [u], [t]
+for i in range(n):
+    u = u + (E - u) / tau * dt
+    t = t + dt
+    u_liste.append(u)
+    t_liste.append(t)
+
+ts = np.linspace(0, 140, 200)
+plt.plot(t_liste, u_liste, 'bo-', label='Euler, dt = ' + str(dt) + ' s')
+plt.plot(ts, E * (1 - np.exp(-ts / tau)), 'r-', label='solution exacte')
+plt.xlabel('t (s)')
+plt.ylabel('uC (V)')
+plt.legend()
+plt.show()</textarea>
+    </div>
+    <div class="quiz">
+      <h4>Le pas et la précision</h4>
+      <div class="qcm" data-bonne="f">
+        <p class="qcm-q">Pour lequel de ces pas la tension calculée dépasse-t-elle <i>E</i> = 12 V dès le premier pas ?</p>
+        <button class="opt" data-v="a">1 s</button>
+        <button class="opt" data-v="b">5 s</button>
+        <button class="opt" data-v="c">10 s</button>
+        <button class="opt" data-v="d">15 s</button>
+        <button class="opt" data-v="e">20 s</button>
+        <button class="opt" data-v="f">30 s</button>
+        <div class="qcm-expl" hidden>Premier pas : <i>u</i> = 0 + 12 / 22 × Δ<i>t</i>. Pour Δ<i>t</i> = 30 s, <i>u</i> ≈ 16,4 V : plus que <i>E</i>, ce qui est physiquement impossible. Pour 20 s, 10,9 V seulement.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q">D'où vient ce comportement ?</p>
+        <button class="opt" data-v="a">Python arrondit trop les calculs.</button>
+        <button class="opt" data-v="b">La boucle fait trop de tours.</button>
+        <button class="opt" data-v="c">Le pas est plus long que τ.</button>
+        <button class="opt" data-v="d">La tension E est trop élevée.</button>
+        <button class="opt" data-v="e">La solution exacte est fausse.</button>
+        <div class="qcm-expl" hidden>Euler suppose que la pente reste la même pendant tout le pas. C'est raisonnable si le pas est court devant τ, la durée caractéristique du phénomène ; faux s'il est plus long. Règle pratique : un pas au moins dix fois plus petit que τ.</div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s7" data-titre="La dichotomie">
+  <h2>Résoudre une équation par dichotomie</h2>
+  <p class="intro">Quand on ne sait pas isoler l'inconnue d'une équation, Python peut l'encadrer de plus en plus finement. La <b>dichotomie</b> (« couper en deux ») utilise la boucle <code>while</code> et une fonction.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>On écrit l'équation sous la forme <i>f</i>(<i>x</i>) = 0. Si <i>f</i>(<i>a</i>) et <i>f</i>(<i>b</i>) sont de signes contraires, une solution se trouve entre <i>a</i> et <i>b</i>.</li>
+      <li>On coupe l'intervalle en son milieu <i>m</i>. Si <i>f</i>(<i>a</i>) × <i>f</i>(<i>m</i>) ≤ 0, le changement de signe est dans [<i>a</i> ; <i>m</i>] : on remplace <i>b</i> par <i>m</i>. Sinon, il est dans [<i>m</i> ; <i>b</i>] : on remplace <i>a</i> par <i>m</i>.</li>
+      <li>On recommence tant que l'intervalle est plus large que la précision voulue. Chaque tour divise sa largeur par deux : 20 tours la divisent par un million.</li>
+    </ul>
+    <pre class="code">def f(t):                   # à quelle date uC atteint-elle 10 V ?
+    return 12 * (1 - np.exp(-t / 22)) - 10
+
+a, b = 0, 140               # f(0) &lt; 0 et f(140) &gt; 0
+while b - a &gt; 0.001:
+    m = (a + b) / 2
+    if f(a) * f(m) &lt;= 0:
+        b = m
+    else:
+        a = m
+print(round((a + b) / 2, 2), 's')   # affiche : 39.42 s</pre>
+  </div>
+
+  <article class="exo" id="ex-7-1">
+    <h3><span class="num">7.1</span> Quand le ballon touche-t-il le sol ?</h3>
+    <p class="contexte">On reprend le ballon de l'exercice 4.2, s'il manque le panier. Sa hauteur vaut <i>y</i>(<i>t</i>) = 2,00 + 5,734 × <i>t</i> − 4,905 × <i>t</i>² (en m, <i>t</i> en s). Il est en l'air à <i>t</i> = 0,5 s ; à <i>t</i> = 2,0 s, la formule donne une hauteur négative.</p>
+    <ol class="questions">
+      <li>Compléter la dichotomie, puis exécuter.</li>
+      <li>Combien de tours de boucle a-t-il fallu ? Ajouter un compteur pour le savoir.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">def y(t):
+    return 2.00 + 5.734 * t - 4.905 * t ** 2
+
+a = 0.5          # y(a) &gt; 0
+b = 2.0          # y(b) &lt; 0
+while b - a &gt; 1e-6:
+    m = ……
+    if y(a) * y(m) &lt;= 0:
+        b = ……
+    else:
+        a = ……
+
+print('Le ballon touche le sol à t =', round((a + b) / 2, 4), 's')</textarea>
+      <script type="text/x-python" class="py-check">
+_g = globals()
+_t0 = (5.734 + (5.734 ** 2 + 4 * 4.905 * 2.00) ** 0.5) / (2 * 4.905)
+if 'a' in _g and 'b' in _g and isinstance(a, float) and isinstance(b, float) and abs(a - _t0) < 2e-6 and abs(b - _t0) < 2e-6:
+    ok("Question 1 — t ≈ 1,4502 s.")
+    _vals = [v for k_, v in _g.items() if not k_.startswith('_') and isinstance(v, int) and not isinstance(v, bool)]
+    if any(v == 21 for v in _vals):
+        ok("Question 2 — 21 tours : la largeur passe de 1,5 s à moins de 1 µs.")
+    elif _vals:
+        indice("Question 2 : partez de n = 0 avant la boucle, et ajoutez n = n + 1 dans la boucle.")
+elif 'a' in _g and 'b' in _g and isinstance(a, float) and abs(b - a) > 1e-6:
+    indice("La boucle s'est arrêtée trop tôt, ou a et b ne bougent pas : relisez l'encadré À retenir.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">n = 0
+while b - a &gt; 1e-6:
+    m = (a + b) / 2
+    if y(a) * y(m) &lt;= 0:
+        b = m
+    else:
+        a = m
+    n = n + 1
+print(n, 'tours')</pre>
+      <p><i>t</i> ≈ 1,4502 s, en 21 tours : 1,5 / 2²¹ ≈ 7 × 10⁻⁷ s. Ici, une équation du second degré aurait suffi ; la dichotomie, elle, marche aussi quand aucune formule n'existe.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-7-2">
+    <h3><span class="num">7.2</span> Le taux d'avancement final</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« Déterminer, à l'aide d'un langage de programmation, le taux d'avancement final d'une transformation, modélisée par la réaction d'un acide sur l'eau. »</p>
+    </div>
+    <details class="rappel"><summary>Rappel de cours — Acide faible dans l'eau</summary>
+      <p>Un acide AH réagit partiellement sur l'eau : AH + H<sub>2</sub>O ⇄ A<sup>−</sup> + H<sub>3</sub>O<sup>+</sup>. À l'état final, pour une concentration apportée <i>c</i>, [A<sup>−</sup>] = [H<sub>3</sub>O<sup>+</sup>] = <i>x</i> et [AH] = <i>c</i> − <i>x</i> (concentrations en mol·L⁻¹, <i>c</i>° = 1 mol·L⁻¹) :</p>
+      <p class="formule">K<sub>A</sub> = <span class="frac"><span class="haut">x²</span><span class="bas">c − x</span></span>   donc   x² + K<sub>A</sub> × x − K<sub>A</sub> × c = 0      τ = <span class="frac"><span class="haut">x</span><span class="bas">c</span></span></p>
+    </details>
+    <p class="contexte">On dissout de l'acide éthanoïque (p<i>K</i><sub>A</sub> = 4,76) à <i>c</i> = 1,0 × 10⁻² mol·L⁻¹. La solution <i>x</i> est entre 0 et <i>c</i>.</p>
+    <ol class="questions">
+      <li>Écrire la dichotomie qui trouve <i>x</i> = [H<sub>3</sub>O<sup>+</sup>] à 10⁻⁹ mol·L⁻¹ près.</li>
+      <li>Calculer le taux d'avancement final τ, et le pH.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Recopiez la boucle de l'exercice 7.1 : seuls la fonction, l'intervalle de départ et la précision changent.</li>
+      <li>Au départ : <code>a, b = 0, c</code> ; la boucle tourne <code>while b - a &gt; 1e-9:</code>.</li>
+      <li>Après la boucle : <code>x = (a + b) / 2</code>, puis <code>tau = x / c</code> et <code>pH = -np.log10(x)</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+c = 1.0e-2           # concentration apportée, en mol/L
+Ka = 10 ** (-4.76)   # constante d'acidité
+
+def f(x):
+    return x ** 2 + Ka * x - Ka * c
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_Ka = 10 ** (-4.76)
+_x = (-_Ka + _np.sqrt(_Ka ** 2 + 4 * _Ka * 1.0e-2)) / 2
+_vals = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, (float, _np.floating))]
+if any(abs(v - _x) < 2e-9 for v in _vals):
+    ok("Question 1 — [H3O+] ≈ 4,08 × 10⁻⁴ mol/L.")
+    if any(abs(v - _x / 1.0e-2) < 1e-5 or abs(v - 100 * _x / 1.0e-2) < 1e-3 for v in _vals):
+        ok("Question 2 — τ ≈ 0,041, soit 4,1 % : la réaction de l'acide éthanoïque sur l'eau est très limitée. pH ≈ 3,39.")
+    else:
+        indice("Question 2 : τ = x / c.")
+elif any(abs(v - _x) < 5e-5 for v in _vals):
+    indice("La valeur est proche, mais pas assez précise : la boucle doit tourner tant que b - a > 1e-9.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">a, b = 0, c
+while b - a &gt; 1e-9:
+    m = (a + b) / 2
+    if f(a) * f(m) &lt;= 0:
+        b = m
+    else:
+        a = m
+x = (a + b) / 2
+tau = x / c
+print('[H3O+] =', x, 'mol/L ; tau =', round(tau, 3), '; pH =', round(-np.log10(x), 2))</pre>
+      <p>[H<sub>3</sub>O<sup>+</sup>] ≈ 4,08 × 10⁻⁴ mol·L⁻¹, τ ≈ 0,041 et pH ≈ 3,39 : à peine 4 % des molécules d'acide ont réagi. Une précision de 10⁻⁹ mol·L⁻¹ est nécessaire ici : la solution elle-même ne vaut que 4 × 10⁻⁴.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-7-3">
+    <h3><span class="num">7.3</span> Une dichotomie réutilisable</h3>
+    <p class="contexte">Plutôt que de recopier la boucle à chaque fois, on la range dans une fonction. Une fonction peut recevoir une autre fonction en paramètre : on écrit son nom, sans parenthèses, comme dans <code>dichotomie(y, 0.5, 2.0, 1e-6)</code>.</p>
+    <ol class="questions">
+      <li>Compléter le corps de la fonction <code>dichotomie(f, a, b, precision)</code>, qui renvoie le milieu de l'intervalle final. Le premier appel doit retrouver le résultat de l'exercice 7.1.</li>
+      <li>Utiliser <code>dichotomie</code> pour trouver la date à laquelle la tension du défibrillateur (exercice 6.2) atteint 11 V.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Le corps de la fonction, c'est la boucle <code>while</code> de l'exercice 7.1, avec <code>precision</code> à la place de <code>1e-6</code>, et <code>f</code> à la place de <code>y</code>.</li>
+      <li>Pour la question 2, définissez une fonction <code>g(t)</code> qui renvoie <code>12 * (1 - np.exp(-t / 22)) - 11</code>, et cherchez la solution entre 0 et 140 s.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+def dichotomie(f, a, b, precision):
+    ……
+    return (a + b) / 2
+
+def y(t):
+    return 2.00 + 5.734 * t - 4.905 * t ** 2
+
+print('ballon au sol :', round(dichotomie(y, 0.5, 2.0, 1e-6), 4), 's')</textarea>
+      <script type="text/x-python" class="py-check">
+_g = globals()
+if 'dichotomie' in _g and callable(dichotomie):
+    try:
+        _r1 = dichotomie(lambda x: x - 0.3, 0, 1, 1e-7)
+        _r2 = dichotomie(lambda x: 2 - x, 0, 3, 1e-7)
+    except Exception:
+        _r1 = _r2 = None
+    if isinstance(_r1, float) and isinstance(_r2, float) and abs(_r1 - 0.3) < 1e-6 and abs(_r2 - 2) < 1e-6:
+        ok("Question 1 — La fonction dichotomie marche pour n'importe quelle fonction f.")
+        if '54.7' in _sortie:
+            ok("Question 2 — uC atteint 11 V à t ≈ 54,7 s, soit 22 × ln 12.")
+        elif '39.4' in _sortie:
+            indice("Question 2 : 39,4 s, c'est pour 10 V. Cherchez 11 V.")
+    elif _r1 is not None:
+        indice("Question 1 : la fonction ne trouve pas la bonne solution. Vérifiez la boucle, et l'emploi de f et de precision.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def dichotomie(f, a, b, precision):
+    while b - a &gt; precision:
+        m = (a + b) / 2
+        if f(a) * f(m) &lt;= 0:
+            b = m
+        else:
+            a = m
+    return (a + b) / 2
+
+def g(t):
+    return 12 * (1 - np.exp(-t / 22)) - 11
+
+print('11 V à t =', round(dichotomie(g, 0, 140, 1e-3), 1), 's')</pre>
+      <p>11 V est atteint à <i>t</i> ≈ 54,7 s. La fonction <code>dichotomie</code> s'écrit une fois, se vérifie une fois, puis sert pour toutes les équations : c'est tout l'intérêt d'écrire ses propres fonctions.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>La bibliothèque scipy contient une dichotomie toute faite, <code>scipy.optimize.bisect</code>, et des méthodes plus rapides : elles sont au programme des classes préparatoires (niveau 4).</p>
+    </aside>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s8" data-titre="Programmes complets">
+  <h2>Écrire un programme complet</h2>
+  <p class="intro">Deux projets inspirés de sujets d'ECE, dans lesquels c'est vous qui écrivez l'essentiel du programme. Chaque projet se valide étape par étape : rien ne presse, la solution reste disponible après un premier essai.</p>
+
+  <article class="exo" id="ex-8-1">
+    <h3><span class="num">8.1</span> Les quantités de matière au cours d'un titrage</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« Représenter, à l'aide d'un langage de programmation, l'évolution des quantités de matière des espèces en fonction du volume de solution titrante versé. »</p>
+    </div>
+    <details class="rappel"><summary>Rappel de cours — Titrage et équivalence</summary>
+      <p>À l'équivalence, les réactifs ont été introduits dans les proportions stœchiométriques de la réaction support du titrage. Avant l'équivalence, le réactif titrant versé est entièrement consommé ; après, c'est le réactif titré qui a disparu, et le titrant s'accumule.</p>
+      <p class="formule">CH<sub>3</sub>COOH + HO<sup>−</sup> → CH<sub>3</sub>COO<sup>−</sup> + H<sub>2</sub>O      à l'équivalence : n<sub>0</sub>(HO<sup>−</sup>) = c<sub>A</sub> × V<sub>E</sub></p>
+    </details>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 3. On titre <i>V</i><sub>0</sub> = 20,0 mL de soude diluée (ions Na<sup>+</sup> et HO<sup>−</sup>, <i>c</i><sub>B</sub> = 5,0 × 10⁻² mol·L⁻¹) par du vinaigre dilué, une solution d'acide éthanoïque CH<sub>3</sub>COOH de concentration <i>c</i><sub>A</sub> = 0,10 mol·L⁻¹ (valeurs construites). Une concentration en mol·L⁻¹ multipliée par un volume en mL donne une quantité en mmol.</p>
+    <ol class="questions">
+      <li>Compléter la fonction <code>n_hydroxyde(V)</code>, qui renvoie la quantité d'ions HO<sup>−</sup> (en mmol) quand on a versé <i>V</i> mL d'acide.</li>
+      <li>Écrire la fonction <code>n_acide(V)</code> pour l'acide éthanoïque.</li>
+      <li>Écrire la fonction <code>n_ethanoate(V)</code> pour les ions éthanoate, puis exécuter et interpréter le graphique.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Avant l'équivalence, chaque mmol d'acide versée consomme une mmol d'ions HO<sup>−</sup> : <code>n0 - cA * V</code>. Après, il n'en reste plus.</li>
+      <li>L'acide versé avant l'équivalence est consommé : il n'en reste pas. Après, ce qui est versé en plus de <code>cA * VE</code> s'accumule : <code>cA * V - n0</code>.</li>
+      <li>Les ions éthanoate se forment à mesure que l'acide réagit : <code>cA * V</code> avant l'équivalence ; après, leur quantité ne change plus.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+V0 = 20.0        # volume de soude titré, en mL
+cB = 5.0e-2      # concentration en ions HO-, en mol/L
+cA = 0.10        # concentration de l'acide titrant, en mol/L
+n0 = cB * V0     # quantité initiale d'ions HO-, en mmol
+VE = n0 / cA     # volume équivalent, en mL
+
+def n_sodium(V):           # ions spectateurs : leur quantité ne change pas
+    return n0
+
+def n_hydroxyde(V):
+    if V &lt; VE:
+        return ……
+    else:
+        return ……
+
+def n_acide(V):
+    ……
+
+def n_ethanoate(V):
+    ……
+
+volumes = np.linspace(0, 20, 101)    # volumes d'acide versés, en mL
+na, nh, nac, ne = [], [], [], []
+for V in volumes:
+    na.append(n_sodium(V))
+    nh.append(n_hydroxyde(V))
+    nac.append(n_acide(V))
+    ne.append(n_ethanoate(V))
+
+plt.plot(volumes, na, label='Na+')
+plt.plot(volumes, nh, label='HO-')
+plt.plot(volumes, nac, label='CH3COOH')
+plt.plot(volumes, ne, label='CH3COO-')
+plt.xlabel('V versé (mL)')
+plt.ylabel('n (mmol)')
+plt.legend()
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+_g = globals()
+def _vals(nom):
+    f = _g.get(nom)
+    if not callable(f):
+        return None
+    try:
+        return [f(5.0), f(15.0)]
+    except Exception:
+        return None
+def _proche(L, M):
+    return L is not None and all(isinstance(u, (int, float)) and abs(u - w) < 1e-9 for u, w in zip(L, M))
+_h, _a, _e = _vals('n_hydroxyde'), _vals('n_acide'), _vals('n_ethanoate')
+if _proche(_h, [0.5, 0.0]):
+    ok("Question 1 — HO- : 1,0 mmol au départ, consommé jusqu'à l'équivalence, à V = 10,0 mL.")
+elif _h is not None and None in _h:
+    indice("Question 1 : chaque branche du if doit se terminer par return.")
+elif _h is not None:
+    indice("Question 1 : à V = 5 mL, il reste 1,0 − 0,10 × 5 = 0,5 mmol d'ions HO-.")
+if _proche(_a, [0.0, 0.5]):
+    ok("Question 2 — CH3COOH : absent avant l'équivalence, il s'accumule ensuite.")
+elif _a is not None:
+    indice("Question 2 : même forme que n_hydroxyde ; à V = 15 mL, 0,5 mmol d'acide sont en excès.")
+if _proche(_e, [0.5, 1.0]):
+    ok("Question 3 — CH3COO- : formé jusqu'à l'équivalence, puis constant à 1,0 mmol.")
+elif _e is not None:
+    indice("Question 3 : après l'équivalence, la quantité d'ions éthanoate reste égale à n0.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">def n_hydroxyde(V):
+    if V &lt; VE:
+        return n0 - cA * V
+    else:
+        return 0
+
+def n_acide(V):
+    if V &lt; VE:
+        return 0
+    else:
+        return cA * V - n0
+
+def n_ethanoate(V):
+    if V &lt; VE:
+        return cA * V
+    else:
+        return n0</pre>
+      <p>Les quatre courbes changent de pente à <i>V</i><sub>E</sub> = 10,0 mL : les ions HO<sup>−</sup> disparaissent, l'acide commence à s'accumuler, les ions éthanoate cessent de se former. Les ions Na<sup>+</sup>, spectateurs, restent à 1,0 mmol. Ce sont ces changements de pente qu'exploite un titrage conductimétrique.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-2">
+    <h3><span class="num">8.2</span> Projet : le record de plongeon</h3>
+    <div class="info">
+      <h4>Au programme de terminale</h4>
+      <p>« Représenter, à partir de données expérimentales variées, l'évolution des grandeurs énergétiques d'un système en mouvement dans un champ uniforme à l'aide d'un langage de programmation ou d'un tableur. »</p>
+    </div>
+    <p class="contexte">D'après ECE PC, banque 2026, sujet n° 34. En 2015, un plongeur a battu le record du monde de plongeon de haut vol : 58,8 m. On annonce une chute de 3,58 s et une entrée dans l'eau à 123 km/h, dans un bassin de 8 m de profondeur. Le fichier <code>plongeon.csv</code> donne l'altitude <i>z</i> du plongeur au-dessus de l'eau, pointée sur la vidéo (valeurs construites d'après le sujet). Masse du plongeur et de sa combinaison : <i>m</i> = 73 kg ; leur volume : <i>V</i> = 76 L.</p>
+
+    <p class="surtitre">Étape 1 — L'énergie mécanique se conserve-t-elle ?</p>
+    <ol class="questions">
+      <li>Compléter les deux fonctions et les lignes qui calculent <code>vz</code>, <code>Ec</code> et <code>Epp</code>, puis exécuter.</li>
+      <li>L'énergie mécanique est-elle constante ? Le modèle de la chute libre convient-il ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+t, z = np.loadtxt('plongeon.csv', delimiter=';', skiprows=1, unpack=True)
+m = 73           # masse, en kg
+g = 9.81         # en N/kg
+
+def energie_cinetique(m, v):
+    return ……
+
+def energie_potentielle(m, z):
+    return ……
+
+vz = ……                                  # vitesse verticale, en m/s
+tv = t[1:-1]
+Ec = energie_cinetique(m, vz)
+Epp = ……                                 # attention : aux dates tv
+Em = Ec + Epp
+
+plt.plot(tv, Ec, 'b.-', label='Ec')
+plt.plot(tv, Epp, 'g.-', label='Epp')
+plt.plot(tv, Em, 'r.-', label='Em')
+plt.xlabel('t (s)')
+plt.ylabel('énergie (J)')
+plt.legend()
+plt.show()</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="plongeon.csv">
+@@plongeon.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _z = _np.loadtxt('plongeon.csv', delimiter=';', skiprows=1, unpack=True)
+_vz = (_z[2:] - _z[:-2]) / (_t[2:] - _t[:-2])
+_Em = 0.5 * 73 * _vz ** 2 + 73 * 9.81 * _z[1:-1]
+_g = globals()
+if 'Em' in _g and _np.shape(Em) == _Em.shape and _np.allclose(Em, _Em):
+    ok("Étape 1, question 1 — Ec augmente, Epp diminue d'autant.")
+    try:
+        _n = len(_figure.axes[0].get_lines())
+    except Exception:
+        _n = 0
+    if _n >= 3:
+        ok("Étape 1, question 2 — Em reste voisine de 42 000 J, à 1 % près : la chute libre est un bon modèle.")
+elif 'Epp' in _g and 'z' in _g and _np.size(Epp) == _np.size(_z):
+    indice("Étape 1 : Epp a 22 valeurs et Ec 20 : calculez Epp avec z[1:-1], aux dates des vitesses.")
+elif 'Em' in _g:
+    indice("Étape 1 : vérifiez les formules des énergies (rappel de l'étape 1) et la méthode centrée pour vz.")
+      </script>
+    </div>
+
+    <p class="surtitre">Étape 2 — La vitesse d'entrée dans l'eau</p>
+    <ol class="questions">
+      <li>Modéliser <code>vz</code> en fonction du temps par une droite, et comparer le coefficient directeur à <i>g</i>.</li>
+      <li>Calculer la vitesse à <i>t</i> = 3,58 s avec ce modèle, et l'afficher en km/h. L'annonce de 123 km/h est-elle crédible ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+t, z = np.loadtxt('plongeon.csv', delimiter=';', skiprows=1, unpack=True)
+vz = (z[2:] - z[:-2]) / (t[2:] - t[:-2])
+tv = t[1:-1]
+
+</textarea>
+      <script type="text/plain" class="py-fichier" data-nom="plongeon.csv">
+@@plongeon.csv@@
+      </script>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_t, _z = _np.loadtxt('plongeon.csv', delimiter=';', skiprows=1, unpack=True)
+_vz = (_z[2:] - _z[:-2]) / (_t[2:] - _t[:-2])
+_a, _b = _np.polyfit(_t[1:-1], _vz, 1)
+_v = _a * 3.58 + _b
+_vals = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, (float, _np.floating))]
+if any(abs(v - _a) < 1e-6 for v in _vals):
+    ok("Étape 2, question 1 — Coefficient directeur ≈ −9,82 m/s² : l'accélération vaut g.")
+if any(abs(abs(v) - abs(_v)) < 1e-3 or abs(abs(v) - abs(_v) * 3.6) < 1e-2 for v in _vals):
+    ok("Étape 2, question 2 — Environ 35 m/s, soit 127 km/h : à 3 % de l'annonce, qui est crédible.")
+elif any(abs(abs(v) - abs(_v) / 3.6) < 1e-3 for v in _vals):
+    indice("Étape 2 : pour passer des m/s aux km/h, on multiplie par 3,6.")
+      </script>
+    </div>
+
+    <p class="surtitre">Étape 3 — Et dans l'eau ?</p>
+    <details class="rappel"><summary>Rappel de cours — Poussée d'Archimède</summary>
+      <p>Un corps immergé subit la poussée d'Archimède, verticale vers le haut, de valeur <i>P</i><sub>A</sub> = ρ<sub>eau</sub> × <i>V</i> × <i>g</i>, avec ρ<sub>eau</sub> = 1,0 kg·L⁻¹ et <i>V</i> en litres. S'il n'est soumis qu'à son poids et à cette poussée, son accélération est constante, et sa profondeur maximale vaut :</p>
+      <p class="formule">a = <span class="frac"><span class="haut">P<sub>A</sub> − P</span><span class="bas">m</span></span>      z<sub>min</sub> = − <span class="frac"><span class="haut">v<sub>0</sub>²</span><span class="bas">2 × a</span></span></p>
+    </details>
+    <ol class="questions">
+      <li>Calculer le poids <code>P</code>, la poussée d'Archimède <code>P_A</code> et l'accélération <code>a</code> dans l'eau.</li>
+      <li>Calculer la profondeur atteinte <code>z_min</code> avec la vitesse d'entrée de l'étape 2. Le bassin de 8 m suffit-il ? Qu'est-ce que ce modèle oublie ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">m = 73           # masse, en kg
+V = 76           # volume, en L
+rho = 1.0        # masse volumique de l'eau, en kg/L
+g = 9.81         # en N/kg
+v0 = ……          # vitesse d'entrée dans l'eau trouvée à l'étape 2, en m/s
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+_vals = [v for k_, v in globals().items() if not k_.startswith('_') and isinstance(v, float)]
+_acc = (1.0 * 76 * 9.81 - 73 * 9.81) / 73
+if any(abs(v - _acc) < 1e-6 for v in _vals):
+    ok("Étape 3, question 1 — P ≈ 716 N, P_A ≈ 746 N : a ≈ 0,40 m/s², vers le haut.")
+elif any(abs(v + _acc) < 1e-6 for v in _vals):
+    indice("Étape 3 : a = (P_A - P) / m est positive : la poussée l'emporte sur le poids.")
+if any(-1700 < v < -1300 for v in _vals):
+    ok("Étape 3, question 2 — z_min ≈ −1 500 m : absurde pour un bassin de 8 m. Le modèle oublie les frottements de l'eau, qui freinent très fortement le plongeur.")
+elif any(1300 < v < 1700 for v in _vals):
+    indice("Étape 3 : la profondeur est négative, z_min = -v0 ** 2 / (2 * a).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code"># étape 1
+def energie_cinetique(m, v):
+    return 0.5 * m * v ** 2
+
+def energie_potentielle(m, z):
+    return m * g * z
+
+vz = (z[2:] - z[:-2]) / (t[2:] - t[:-2])
+Epp = energie_potentielle(m, z[1:-1])
+
+# étape 2
+a, b = np.polyfit(tv, vz, 1)
+v = a * 3.58 + b
+print('a =', round(a, 2), 'm/s² ; v =', round(abs(v) * 3.6), 'km/h')
+
+# étape 3
+P = m * g
+P_A = rho * V * g
+a = (P_A - P) / m
+z_min = -v0 ** 2 / (2 * a)
+print('a =', round(a, 2), 'm/s² ; z_min =', round(z_min), 'm')</pre>
+      <p>Étape 1 : <i>E</i><sub>m</sub> ≈ 42 000 J, constante aux erreurs de pointage près ; elle vaut bien <i>m</i> × <i>g</i> × 58,8 m. Étape 2 : <i>a</i> ≈ −9,82 m·s⁻², et <i>v</i>(3,58 s) ≈ 35,1 m·s⁻¹ ≈ 127 km/h. Étape 3 : <i>a</i> ≈ 0,40 m·s⁻², donc <i>z</i><sub>min</sub> ≈ −1 530 m. Ce résultat absurde montre que le poids et la poussée d'Archimède ne suffisent pas : dans l'eau, les frottements sont considérables, et ce sont eux qui arrêtent le plongeur en quelques mètres.</p>
+    </details>
+  </article>
+
+  <div class="etiquette ece">
+    <p><b>À l'ECE</b>, ces programmes sont fournis presque complets, et on vous demande d'en compléter quelques lignes. Savoir les écrire en entier, c'est comprendre chaque ligne qu'on vous donne, et repérer celle qui est fausse.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="bilan" data-titre="Bilan">
+  <h2>Bilan du niveau 3</h2>
+  <div class="retenir">
+    <h4>Ce que je sais faire</h4>
+    <ul class="bilan">
+      <li>Écrire une fonction avec <code>def</code> et <code>return</code>, l'appeler, et ne pas confondre <code>return</code> avec <code>print</code>.</li>
+      <li>Répéter un calcul tant qu'une condition est vraie, avec <code>while</code>, sans boucle infinie.</li>
+      <li>Lire un fichier de mesures avec <code>np.loadtxt</code>, en réglant le séparateur et la ligne d'en-tête.</li>
+      <li>Calculer une vitesse, une accélération ou une vitesse volumique à partir de mesures, par la méthode centrée.</li>
+      <li>Modéliser des points par une droite avec <code>np.polyfit</code>, et linéariser une exponentielle.</li>
+      <li>Résoudre une équation différentielle <i>y</i>′ = <i>ay</i> + <i>b</i> par la méthode d'Euler, en choisissant un pas adapté.</li>
+      <li>Résoudre une équation par dichotomie, et ranger l'algorithme dans une fonction réutilisable.</li>
+      <li>Écrire un programme complet qui part d'un fichier de mesures pour conclure sur un modèle physique.</li>
+    </ul>
+  </div>
+  <p>Le niveau 4 ouvre sur les classes préparatoires et les BUT : régression raisonnée avec les incertitudes, simulations de Monte-Carlo, bibliothèque scipy, et ce que chaque formation attend.</p>
+</section>
+
+<footer class="pp-pied">
+  <p><a class="doc" href="fiches/niveau-3-memo.pdf" download>Mémo du niveau 3 — à imprimer</a></p>
+  <p>© 2026 Loïc Van Hoorde — Choix pédagogiques, conception des activités, relecture : L. Van Hoorde. Mise en forme réalisée avec l'aide de Claude (Anthropic).</p>
+</footer>
+</main>
+
+<script src="parcours.js" type="module"></script>
+<script src="progression-resonance.js" type="module"></script>
+</body>
+</html>

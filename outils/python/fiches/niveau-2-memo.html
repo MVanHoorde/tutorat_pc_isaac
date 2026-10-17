@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche ECE — Python, niveau 2</title>
+<link rel="stylesheet" href="../polices/polices.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg:#e9edf4; --ink:#161f33; --ink-soft:#4a566e; --ink-faint:#8b97ad; --line:#d3dae7; --surface-2:#f4f6fb;
+    --bleu:#2445c7; --bleu-w:#e7ebfb; --vert:#12805c; --vert-w:#e0f2ea; --violet:#6b4a9a; --violet-w:#efe9f7;
+    --orange:#c26a12; --orange-w:#faeede; --rouge:#c33a2f; --rouge-w:#fbe6e3; --cyan:#0f6d63; --cyan-w:#e0f1ef;
+    --deep:#131A2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font-family: "IBM Plex Sans", "Inter", "Segoe UI", sans-serif; font-size: 9.6pt; line-height: 1.36; }
+  .feuille { width: 210mm; height: 297mm; padding: 11mm 13mm 10mm; overflow: hidden; page-break-after: always; position: relative; }
+  .feuille:last-child { page-break-after: auto; }
+  code, pre, .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+  code { font-size: 8.8pt; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; white-space: nowrap; }
+
+  .hero { background: linear-gradient(135deg, #f4f6fb 0%, #e7ebfb 100%); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px 10px; margin-bottom: 8px; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--bleu); margin: 0; }
+  .hero h1 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; font-weight: 800; font-size: 25pt; letter-spacing: -.02em; line-height: 1.05; margin: 2px 0 1px; }
+  .hero .sous { font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-size: 10.5pt; margin: 0; }
+
+  .bloc { --a: var(--bleu); --w: var(--bleu-w); border-left: 4px solid var(--a); padding: 0 0 0 9px; margin: 7px 0 0; }
+  .bloc > .lab { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase; color: var(--a); font-weight: 500; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  .bloc > .lab::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .b-vert { --a: var(--vert); --w: var(--vert-w); } .b-violet { --a: var(--violet); --w: var(--violet-w); }
+  .b-orange { --a: var(--orange); --w: var(--orange-w); } .b-rouge { --a: var(--rouge); --w: var(--rouge-w); } .b-cyan { --a: var(--cyan); --w: var(--cyan-w); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border-bottom: 1px solid var(--line); padding: 2.4px 5px; vertical-align: top; }
+  td:first-child { width: 33%; color: var(--ink-soft); }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+  ol.methode { margin: 2px 0 0; padding-left: 18px; }
+  ol.methode li { margin: 1.5px 0; }
+  .ece { background: var(--orange-w); border: 1px solid #EED4B6; border-radius: 6px; padding: 5px 9px; margin: 5px 0 0; color: #5A3510; }
+  .ece p { margin: 0 0 3px; } .ece p:last-child { margin: 0; }
+
+  pre.ex { background: #fbfcfe; border: 1px solid var(--line); border-left: 4px solid var(--a, var(--bleu)); border-radius: 6px; padding: 7px 10px; margin: 4px 0 0; font-size: 8.1pt; line-height: 1.42; white-space: pre; }
+  pre.ex .c { color: #6b7a90; font-style: italic; }
+  pre.ex .k { color: var(--violet); font-weight: 500; }
+  pre.ex .s { color: var(--vert); }
+  pre.ex .n { color: var(--orange); }
+  .sortie { font-family: "IBM Plex Mono", monospace; font-size: 8.2pt; background: var(--deep); color: #dfe6f5; border-radius: 6px; padding: 5px 10px; margin: 3px 0 0; white-space: pre; }
+  .note { font-size: 8.8pt; color: var(--ink-soft); margin: 3px 0 0; }
+
+  .pieges td:first-child { width: 17%; } .pieges td:nth-child(2) { width: 22%; }
+  .crit td:first-child { width: 22%; }
+  ul.bilan { list-style: none; padding: 0; margin: 2px 0; columns: 2; column-gap: 16px; }
+  ul.bilan li { padding: 1.5px 0 1.5px 17px; position: relative; break-inside: avoid; }
+  ul.bilan li::before { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border: 1.4px solid var(--ink-soft); border-radius: 2px; }
+  .lignes { border-bottom: 1px dotted var(--ink-faint); height: 16px; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 7.2pt; color: var(--ink-faint); display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+
+<!-- ============================ PAGE 1 ============================ -->
+<section class="feuille">
+  <div class="hero">
+    <p class="kicker">&gt;&gt;&gt; python · niveau 2 · terminale spé PC · fiche ECE</p>
+    <h1>Fiche ECE</h1>
+    <p class="sous">méthode · if · for · tranches · hasard · affichage formaté</p>
+  </div>
+
+  <div class="bloc b-orange">
+    <p class="lab">Le jour de l'épreuve</p>
+    <div class="ece">
+      <p>Le programme est <b>fourni</b>, presque entièrement écrit et commenté : on ne vous demande jamais d'écrire un programme entier. Les fonctions utiles sont rappelées dans le sujet.</p>
+      <p>Vous saisissez vos mesures, complétez parfois une formule, une conversion, un titre ou un axe ; puis vous <b>exécutez et exploitez</b> : lire une valeur, comparer à un modèle, écrire un résultat avec son incertitude, conclure.</p>
+    </div>
+    <p style="margin:5px 0 0"><b>Méthode pour la partie Python d'un sujet</b></p>
+    <ol class="methode">
+      <li><b>Lire tout le programme</b> d'abord : repérer les lignes à compléter (<code>……</code>, « À COMPLÉTER ») et les unités en commentaire.</li>
+      <li><b>Saisir les mesures</b> : point décimal, virgule entre les valeurs, autant de valeurs dans chaque liste.</li>
+      <li><b>Convertir</b> si le sujet le demande : µm → m <code>* 1e-6</code>, cm → m <code>* 1e-2</code>, mmol/L → mol/L <code>* 1e-3</code>.</li>
+      <li><b>Exécuter tout de suite</b> ; en cas d'erreur, lire la ligne indiquée, puis le type d'erreur.</li>
+      <li><b>Critiquer le résultat</b> : ordre de grandeur, unité. Python n'avertit jamais d'un résultat absurde.</li>
+      <li><b>Exploiter par écrit</b> : incertitude à 1 chiffre significatif, arrondie à l'excès ; valeur au même rang ; conclusion justifiée.</li>
+    </ol>
+  </div>
+
+  <div class="grille">
+    <div>
+      <div class="bloc">
+        <p class="lab">Décider</p>
+        <table>
+          <tr><td>comparer</td><td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td></tr>
+          <tr><td>réponse</td><td><code>True</code> (vrai) ou <code>False</code> (faux)</td></tr>
+          <tr><td>valeur absolue</td><td><code>abs(x)</code></td></tr>
+          <tr><td>si, sinon si, sinon</td><td><code>if</code> · <code>elif</code> · <code>else</code>, puis <code>:</code></td></tr>
+          <tr><td>le bloc</td><td>décalé de <b>4 espaces</b></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-vert">
+        <p class="lab">Répéter</p>
+        <table>
+          <tr><td>chaque élément</td><td><code>for x in liste:</code></td></tr>
+          <tr><td>0, 1, 2, 3</td><td><code>range(4)</code></td></tr>
+          <tr><td>1, 2, 3</td><td><code>range(1, 4)</code></td></tr>
+          <tr><td>chaque rang</td><td><code>for i in range(len(c)):</code></td></tr>
+          <tr><td>liste vide, ajout</td><td><code>L = []</code> · <code>L.append(x)</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="bloc b-violet">
+        <p class="lab">Tranches</p>
+        <table>
+          <tr><td>5 premiers</td><td><code>x[:5]</code> (rangs 0 à 4)</td></tr>
+          <tr><td>à partir du rang 5</td><td><code>x[5:]</code></td></tr>
+          <tr><td>rangs 2 et 3</td><td><code>x[2:4]</code> (fin exclue)</td></tr>
+          <tr><td>le dernier</td><td><code>x[-1]</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-cyan">
+        <p class="lab">Hasard et Monte-Carlo</p>
+        <table>
+          <tr><td>incertitude-type u</td><td><code>np.random.normal(x, u, N)</code></td></tr>
+          <tr><td>tolérance ± t</td><td><code>np.random.uniform(x - t, x + t, N)</code></td></tr>
+          <tr><td>u du résultat</td><td><code>np.std(resultats, ddof=1)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-rouge">
+        <p class="lab">Lire un affichage formaté</p>
+        <table>
+          <tr><td><code>f"λ = {x} m"</code></td><td><code>{…}</code> remplacé par la valeur</td></tr>
+          <tr><td><code>{x:.2f}</code> · <code>{x:.0f}</code></td><td>2 chiffres après la virgule · à l'unité</td></tr>
+          <tr><td><code>{x:.1e}</code></td><td>écriture scientifique : <code>2.9e-09</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Conclure avec un z-score</p>
+    <table class="crit">
+      <tr><td>formule</td><td><i>z</i> = |<i>x</i><sub>exp</sub> − <i>x</i><sub>réf</sub>| / <i>u</i>(<i>x</i>) · deux mesures : <i>z</i> = |<i>x</i><sub>1</sub> − <i>x</i><sub>2</sub>| / √(<i>u</i><sub>1</sub>² + <i>u</i><sub>2</sub>²)</td></tr>
+      <tr><td><i>z</i> &lt; 1</td><td>valeurs très compatibles : l'écart est plus petit que l'incertitude</td></tr>
+      <tr><td>1 ≤ <i>z</i> &lt; 2</td><td>valeurs compatibles : l'écart est du même ordre que l'incertitude</td></tr>
+      <tr><td><i>z</i> ≥ 2</td><td>valeurs non compatibles : chercher une cause (mesure, incertitude, modèle)</td></tr>
+    </table>
+  </div>
+  <footer><span>Fiche ECE · Python niveau 2 · Résonance</span><span>1 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 2 ============================ -->
+<section class="feuille">
+  <div class="bloc">
+    <p class="lab">Exemple commenté 1 · type A, z-score et conclusion (d'après les sujets 78 et 89)</p>
+<pre class="ex"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="c"># 1. les mesures : listes de même longueur, point décimal, unités en commentaire</span>
+D = <span class="n">1.50</span>                                                       <span class="c"># en m</span>
+a = np.array([<span class="n">40</span>, <span class="n">50</span>, <span class="n">70</span>, <span class="n">100</span>, <span class="n">120</span>, <span class="n">280</span>, <span class="n">400</span>]) * <span class="n">1e-6</span>          <span class="c"># µm -&gt; m</span>
+L = np.array([<span class="n">4.9</span>, <span class="n">3.9</span>, <span class="n">2.8</span>, <span class="n">2.0</span>, <span class="n">1.6</span>, <span class="n">0.70</span>, <span class="n">0.49</span>]) * <span class="n">1e-2</span>     <span class="c"># cm -&gt; m</span>
+lam_ref = <span class="n">650e-9</span>                                            <span class="c"># valeur de référence</span>
+
+<span class="c"># 2. un λ par fente, d'un coup : L = 2λD/a donne λ = L·a/(2D) ; parenthèses obligatoires</span>
+lam = L * a / (<span class="n">2</span> * D)
+
+<span class="c"># 3. incertitude de type A : écart-type expérimental (ddof=1), divisé par racine de n</span>
+n = len(lam)
+lam_moy = np.mean(lam)
+u_lam = np.std(lam, ddof=<span class="n">1</span>) / np.sqrt(n)
+print(<span class="s">'λ ='</span>, round(lam_moy * <span class="n">1e9</span>, <span class="n">1</span>), <span class="s">'nm   u ='</span>, round(u_lam * <span class="n">1e9</span>, <span class="n">1</span>), <span class="s">'nm'</span>)
+
+<span class="c"># 4. z-score, puis conclusion : un seul bloc est exécuté, le premier dont la condition est vraie</span>
+z = abs(lam_moy - lam_ref) / u_lam
+print(<span class="s">'z ='</span>, round(z, <span class="n">2</span>))
+<span class="k">if</span> z &lt; <span class="n">1</span>:                                <span class="c"># deux-points, puis bloc décalé de 4 espaces</span>
+    print(<span class="s">'valeurs très compatibles'</span>)
+<span class="k">elif</span> z &lt; <span class="n">2</span>:                              <span class="c"># testé seulement si z &gt;= 1</span>
+    print(<span class="s">'valeurs compatibles'</span>)
+<span class="k">else</span>:
+    print(<span class="s">'valeurs non compatibles'</span>)</pre>
+    <p class="sortie">λ = 652.9 nm   u = 2.9 nm
+z = 0.97
+valeurs très compatibles</p>
+    <p class="note">Résultat écrit : λ = (653 ± 3) nm. L'incertitude 2,9 nm est arrondie à l'excès, à un chiffre : 3 nm ; la valeur, au même rang.</p>
+  </div>
+
+  <div class="bloc b-cyan">
+    <p class="lab">Exemple commenté 2 · simulation de Monte-Carlo (d'après les sujets 1, 22 et 78)</p>
+<pre class="ex" style="--a:var(--cyan)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="c"># fentes de Young : λ = i × b / D, chaque grandeur avec son incertitude-type</span>
+N = <span class="n">100000</span>                                         <span class="c"># nombre de tirages</span>
+i_sim = np.random.normal(<span class="n">2.20e-3</span>, <span class="n">0.05e-3</span>, N)       <span class="c"># valeur, incertitude-type, N</span>
+b_sim = np.random.normal(<span class="n">0.50e-3</span>, <span class="n">0.01e-3</span>, N)
+D_sim = np.random.normal(<span class="n">1.00</span>, <span class="n">0.01</span>, N)
+<span class="c"># une tolérance « ± t » de fabricant se simule par np.random.uniform(x - t, x + t, N)</span>
+
+lam_sim = i_sim * b_sim / D_sim             <span class="c"># N valeurs possibles de λ, calculées d'un coup</span>
+print(f<span class="s">"λ = {np.mean(lam_sim):.2e} m"</span>)                   <span class="c"># .2e : 2 chiffres après la virgule</span>
+print(f<span class="s">"u(λ) = {np.std(lam_sim, ddof=1):.1e} m"</span>)        <span class="c"># l'écart-type des résultats = u(λ)</span></pre>
+    <p class="sortie">λ = 1.10e-06 m
+u(λ) = 3.5e-08 m</p>
+    <p class="note">Les tirages changent à chaque exécution, mais le résultat reste stable à ce nombre de chiffres. La formule de composition des incertitudes relatives donne la même valeur : λ = (1,10 ± 0,04) µm.</p>
+  </div>
+
+  <div class="bloc b-orange">
+    <p class="lab">Les formules des six mini-projets</p>
+    <table>
+      <tr><td>signal sinusoïdal</td><td><code>A * np.sin(2 * np.pi * f * t + phi)</code> ; en phase (0) : amplitude 2A ; en opposition (π) : somme nulle</td></tr>
+      <tr><td>diffraction</td><td><i>L</i> = 2λ<i>D</i> / <i>a</i> : <i>L</i> proportionnelle à 1/<i>a</i>, de coefficient <i>k</i> = 2λ<i>D</i></td></tr>
+      <tr><td>distribution AH / A⁻</td><td>%AH = 100 / (1 + 10<sup>pH − pK<sub>A</sub></sup>) ; %A⁻ = 100 − %AH ; croisement à pH = pK<sub>A</sub></td></tr>
+      <tr><td>taux d'avancement</td><td><i>x</i>² + K<sub>A</sub><i>x</i> − K<sub>A</sub><i>C</i> = 0 ; Δ = K<sub>A</sub>² + 4K<sub>A</sub><i>C</i> ; <i>x</i> = (−K<sub>A</sub> + √Δ) / 2 ; τ = <i>x</i> / <i>C</i></td></tr>
+      <tr><td>effet Doppler</td><td><i>v</i> = <i>c</i> × Δ<i>f</i> / <i>f</i><sub>E</sub> ; <i>u</i>(<i>v</i>) = <i>c</i> × <i>u</i>(Δ<i>f</i>) / <i>f</i><sub>E</sub></td></tr>
+      <tr><td>étalonnage</td><td><i>c</i> = σ / <i>k</i> ; <i>c</i><sub>mère</sub> = <i>F</i> × <i>c</i><sub>fille</sub> ; <i>t</i> = <i>c</i> × <i>M</i> (<i>c</i> en mol/L)</td></tr>
+    </table>
+  </div>
+  <footer><span>Fiche ECE · Python niveau 2 · Résonance</span><span>2 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 3 ============================ -->
+<section class="feuille">
+  <div class="bloc b-violet">
+    <p class="lab">Exemple commenté 3 · une boucle, une tranche, une liste construite</p>
+<pre class="ex" style="--a:var(--violet)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="c"># 20 mesures du pH de l'eau du robinet ; la liste continue sur deux lignes</span>
+mesures = np.array([<span class="n">7.62</span>, <span class="n">7.58</span>, <span class="n">7.65</span>, <span class="n">7.60</span>, <span class="n">7.71</span>, <span class="n">7.55</span>, <span class="n">7.63</span>, <span class="n">7.59</span>, <span class="n">7.66</span>, <span class="n">7.61</span>,
+                    <span class="n">7.57</span>, <span class="n">7.64</span>, <span class="n">7.68</span>, <span class="n">7.60</span>, <span class="n">7.62</span>, <span class="n">7.56</span>, <span class="n">7.67</span>, <span class="n">7.63</span>, <span class="n">7.59</span>, <span class="n">7.61</span>])
+
+incertitudes = []                     <span class="c"># liste vide, remplie au fil de la boucle</span>
+<span class="k">for</span> n <span class="k">in</span> [<span class="n">5</span>, <span class="n">10</span>, <span class="n">20</span>]:                <span class="c"># n vaut 5, puis 10, puis 20</span>
+    serie = mesures[:n]               <span class="c"># tranche : les n premières mesures</span>
+    u = np.std(serie, ddof=<span class="n">1</span>) / np.sqrt(n)
+    incertitudes.append(u)            <span class="c"># ajout à la fin de la liste</span>
+    print(n, <span class="s">'mesures : u ='</span>, round(u, <span class="n">3</span>))
+print(incertitudes[-<span class="n">1</span>] &lt; incertitudes[<span class="n">0</span>])   <span class="c"># hors de la boucle : une comparaison</span></pre>
+    <p class="sortie">5 mesures : u = 0.023
+10 mesures : u = 0.014
+20 mesures : u = 0.009
+True</p>
+    <p class="note">Quatre fois plus de mesures divisent l'incertitude par 2 environ : c'est le √<i>n</i> de la formule. Résultat : pH = 7,62 ± 0,01.</p>
+  </div>
+
+  <div class="bloc b-rouge">
+    <p class="lab">Les pièges de l'ECE</p>
+    <table class="pieges">
+      <tr><td>0,124</td><td><code>0.124</code></td><td>Le séparateur décimal est le point ; la virgule sépare les valeurs d'une liste.</td></tr>
+      <tr><td>µm → m</td><td><code>* 1e-6</code></td><td><code>10e-6</code> vaut 10⁻⁵, dix fois trop ; <code>^</code> n'est pas une puissance.</td></tr>
+      <tr><td>5 mesures</td><td>5 valeurs</td><td>Deux listes de longueurs différentes : <code>ValueError</code> au tracé.</td></tr>
+      <tr><td>λ = L·a/2D</td><td><code>/ (2 * D)</code></td><td>Sans parenthèses, <code>L * a / 2 * D</code> multiplie par <i>D</i>.</td></tr>
+      <tr><td>if, for</td><td><code>:</code> + 4 espaces</td><td>Deux-points oubliés : <code>SyntaxError</code> ; bloc non décalé : <code>IndentationError</code>.</td></tr>
+      <tr><td>comparer</td><td><code>==</code></td><td><code>=</code> range une valeur, <code>==</code> compare.</td></tr>
+      <tr><td>écart-type</td><td><code>ddof=1</code></td><td>Sans lui, numpy divise par <i>n</i> au lieu de <i>n</i> − 1.</td></tr>
+      <tr><td>mmol/L</td><td><code>* 1e-3</code></td><td><i>t</i> = <i>c</i> × <i>M</i> demande <i>c</i> en mol/L : sinon, mille fois trop.</td></tr>
+      <tr><td>un graphique</td><td>l'exploiter</td><td>Tracé mais ni lu ni commenté, il ne rapporte rien.</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Ce que je sais faire</p>
+    <ul class="bilan">
+      <li>Conclure avec <code>if</code>, <code>elif</code>, <code>else</code> et un z-score.</li>
+      <li>Répéter un calcul avec <code>for</code>, <code>range</code> et <code>append</code>.</li>
+      <li>Extraire une partie d'une série avec une tranche.</li>
+      <li>Évaluer une incertitude par Monte-Carlo.</li>
+      <li>Superposer deux signaux synchrones déphasés.</li>
+      <li>Tracer un diagramme de distribution ; calculer τ.</li>
+      <li>Tester un modèle et en tirer une grandeur.</li>
+      <li>Mener une exploitation complète, jusqu'à la conclusion.</li>
+    </ul>
+    <p style="margin:7px 0 2px"><b>Point à revoir :</b></p>
+    <div class="lignes"></div><div class="lignes"></div>
+  </div>
+  <footer><span>© 2026 Loïc Van Hoorde — mise en forme réalisée avec l'aide de Claude (Anthropic)</span><span>3 / 3</span></footer>
+</section>
+</body>
+</html>

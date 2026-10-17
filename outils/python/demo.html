@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Démonstration — parcours Python</title>
+<link rel="stylesheet" href="parcours.css">
+</head>
+<body class="pp" data-niveau="0">
+<header class="pp-head">
+  <a class="pp-retour" href="index.html">← Le parcours Python</a>
+  <p class="pp-surtitre">&gt;&gt;&gt; Python · Démonstration · Terminale spé PC</p>
+  <h1>Le moteur du parcours</h1>
+  <p class="pp-sous-titre">console · script · quiz · figures</p>
+  <p class="pp-chapeau">Page de test : chaque composant du parcours y figure au moins une fois. Elle sert de référence de grammaire HTML pour les pages de niveau, et de terrain au test automatique.</p>
+</header>
+<div class="pp-statut" aria-live="polite"></div>
+<nav class="pp-sommaire"></nav>
+<main>
+
+<section class="seance" id="mode-emploi" data-titre="Mode d'emploi">
+  <h2>Mode d'emploi</h2>
+  <p class="intro">La séance d'accueil et le bilan restent en encre ; les autres prennent chacune leur couleur.</p>
+  <div class="info">
+    <p>Python se télécharge dans la tablette à la première ouverture : comptez une minute la première fois, quelques secondes ensuite.</p>
+  </div>
+</section>
+
+<section class="seance" id="s1" data-titre="Python, une calculatrice">
+  <h2>Séance 1 — Python, une calculatrice</h2>
+  <p class="intro">Python calcule comme une calculatrice. Caractères à vérifier : é è à ç œ « guillemets » l’apostrophe – tiret, 3 × 10⁻¹ ≈ 0,3 ; m² ; m³ ; λ θ σ Δ μ ; 20 °C. Un <em class="cle">mot-clé</em> du cours, une variable <i>c</i>. <em>Italique : la célérité c.</em></p>
+
+  <div class="retenir"><h4>À retenir ★★</h4>
+    <ul><li>La puissance s'écrit <code>**</code> : <code>10**3</code> vaut 1000.</li>
+        <li>La virgule décimale s'écrit avec un point : <code>2.25</code>.</li></ul>
+    <pre class="code">
+      c = 340          # célérité du son, en m/s
+      d = c * 2.5
+      print("distance :", d, "m")
+    </pre>
+    <pre class="code sortie">
+      distance : 850.0 m
+    </pre>
+  </div>
+
+  <div class="info"><h4>Bon à savoir</h4>
+    <p>Le point décimal vient de la notation anglo-saxonne : <code>0.68</code> se lit « zéro point soixante-huit ».</p>
+  </div>
+
+  <details class="rappel"><summary>Rappel de cours — Niveau d'intensité sonore</summary>
+    <p class="rappel-titre">Définition</p>
+    <p>Le niveau d'intensité sonore <i>L</i> (en dB) d'un son d'intensité <i>I</i> (en W·m⁻²) est :</p>
+    <p class="formule">L = 10 × log<span class="par">(</span><span class="frac"><span class="haut">I</span><span class="bas">I<sub>0</sub></span></span><span class="par">)</span></p>
+    <p class="rappel-titre">Valeurs de référence</p>
+    <p>Seuil d'audibilité : <i>I</i><sub>0</sub> = 1,0 × 10⁻¹² <span class="unite">W·m⁻²</span>. Une période vaut <span class="frac"><span class="haut">1</span><span class="bas"><i>f</i></span></span> et λ ≈ <span class="frac"><span class="haut"><i>c</i></span><span class="bas"><i>f</i></span></span>.</p>
+    <p class="formule">θ ≈ <span class="frac"><span class="haut">λ</span><span class="bas">a</span></span>   et   Δf = f<sub>E</sub> × <span class="frac"><span class="haut">v</span><span class="bas">c</span></span>   ;   σ = ε × ℓ − 2</p>
+  </details>
+
+  <p class="surtitre">S'entraîner</p>
+
+  <article class="exo" id="ex-1-1">
+    <h3><span class="num">1.1</span> Une première affectation</h3>
+    <p class="contexte">On affecte la célérité du son à une variable.</p>
+    <ol class="questions"><li>Complétez la ligne pour que <code>c</code> vaille 340.</li><li>Exécutez.</li></ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        c = …
+        print("c =", c)
+      </textarea>
+      <script type="text/x-python" class="py-check">
+if 'c' in globals() and isinstance(c, (int, float)) and abs(c - 340) < 1: ok("Bien vu : c vaut 340 m/s.")
+else: indice("Vérifiez la valeur affectée à c.")
+      </script>
+    </div>
+    <div class="aide"><ol>
+      <li>Les points de suspension <code>…</code> sont à remplacer par une valeur.</li>
+      <li>La célérité du son dans l'air vaut environ 340 m/s.</li>
+      <li>La ligne complète s'écrit <code>c = 340</code>.</li>
+    </ol></div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">
+        c = 340
+        print("c =", c)
+      </pre>
+      <p>On remplace les points de suspension par la valeur.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-2">
+    <h3><span class="num">1.2</span> Prédire avant d'exécuter</h3>
+    <div class="qcm" data-bonne="b">
+      <p class="qcm-q">Que vaut <code>7 / 2</code> en Python ?</p>
+      <button class="opt" data-v="a"><code>3</code></button>
+      <button class="opt" data-v="b"><code>3.5</code></button>
+      <button class="opt" data-v="c"><code>3,5</code></button>
+      <div class="qcm-expl" hidden>L'opérateur <code>/</code> donne toujours un nombre décimal (float) : 3.5.</div>
+    </div>
+    <div class="py" data-mode="console" data-exemples="3 + 4|2 ** 10|7 / 2|7 // 2|lambda = 0.68"></div>
+    <aside class="plus"><h4>Pour aller plus loin</h4><p>Documentation : <a href="https://docs.python.org/fr/3/tutorial/introduction.html">le tutoriel Python</a>.</p></aside>
+  </article>
+
+  <article class="exo" id="ex-1-3">
+    <h3><span class="num">1.3</span> Quiz : les opérations</h3>
+    <div class="quiz">
+      <h4>Les opérations de Python</h4>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q">Comment s'écrit 2<sup>10</sup> en Python ?</p>
+        <button class="opt" data-v="a"><code>2^10</code></button>
+        <button class="opt" data-v="b"><code>2e10</code></button>
+        <button class="opt" data-v="c"><code>2x10</code></button>
+        <button class="opt" data-v="d"><code>2 ** 10</code></button>
+        <button class="opt" data-v="e"><code>pow 2, 10</code></button>
+        <button class="opt" data-v="f"><code>2(10)</code></button>
+        <div class="qcm-expl" hidden>La puissance s'écrit <code>**</code>. Le <code>^</code> existe mais fait tout autre chose.</div>
+      </div>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q">Que vaut <code>3.00e8</code> ?</p>
+        <button class="opt" data-v="a">3,00 × 10⁸</button>
+        <button class="opt" data-v="b">3,00 × e⁸</button>
+        <button class="opt" data-v="c">3,008</button>
+        <button class="opt" data-v="d">300</button>
+        <div class="qcm-expl" hidden>Le <code>e</code> se lit « fois 10 puissance ».</div>
+      </div>
+    </div>
+  </article>
+
+  <p class="etiquette ece"><b>À l'ECE</b> — Le programme est fourni et presque complet ; on vous demande d'y saisir des valeurs ou une formule.</p>
+</section>
+
+<section class="seance" id="s2" data-titre="Tracer une courbe">
+  <h2>Séance 2 — Tracer une courbe</h2>
+  <p class="intro">numpy et matplotlib se chargent en tâche de fond.</p>
+  <a class="doc" href="fiches/tp/demo-sujet.pdf" download>TP5 — Ondes sonores et effet Doppler</a>
+  <a class="doc" href="fiches/niveau-1-memo.pdf" download>Mémo du niveau 1</a>
+
+  <article class="exo" id="ex-2-1">
+    <h3><span class="num">2.1</span> Deux figures</h3>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        t = np.linspace(0, 0.01, 200)        # temps, en s
+        u = 2 * np.sin(2 * np.pi * 440 * t)  # tension, en V
+        plt.plot(t, u, label="440 Hz")
+        plt.xlabel("t (s)")
+        plt.ylabel("u (V)")
+        plt.title("Signal sinusoïdal — 440 Hz")
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+        mesures = np.array([341, 338, 344, 340, 339, 342, 337, 343])
+        print("moyenne :", np.mean(mesures), " écart-type :", round(np.std(mesures, ddof=1), 2))
+        plt.hist(mesures, bins=4)
+        plt.xlabel("c (m/s)")
+        plt.title("Histogramme des mesures")
+        plt.show()
+      </textarea>
+      <script type="text/x-python" class="py-check">
+if 'u' in globals() and abs(max(u) - 2) < 0.01: ok("Question 1 — Courbe tracée : amplitude 2 V.")
+if 'mesures' in globals() and len(mesures) == 8: ok("Question 2 — Histogramme des 8 mesures.")
+      </script>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-2-2">
+    <h3><span class="num">2.2</span> Une correction en trois questions</h3>
+    <p class="contexte">Chaque question validée reste cochée, même si l'exécution suivante échoue.</p>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">
+        f = 500        # Hz
+        lam = 0.68     # m
+        c = …
+        T = …
+      </textarea>
+      <script type="text/x-python" class="py-check">
+if 'f' in globals() and 'lam' in globals(): ok("Question 1 — Les données sont saisies.")
+if 'c' in globals() and isinstance(c, (int, float)) and abs(c - 340) < 1: ok("Question 2 — c = λ × f = 340 m/s.")
+else: indice("Question 2 : c s'obtient en multipliant lam par f.")
+if 'T' in globals() and isinstance(T, (int, float)) and abs(T - 0.002) < 1e-6: ok("Question 3 — T = 1 / f = 0,002 s.")
+      </script>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-2-3">
+    <h3><span class="num">2.3</span> Erreurs fréquentes</h3>
+    <p class="contexte">Ces programmes contiennent une erreur.</p>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        vitesse = 12.5
+        duree = 4
+        print(vitese * duree)
+      </textarea>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        i = 0
+        while i < 10:
+            print("tour")
+      </textarea>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        f = 500
+        c = 340
+        lambda = c / f
+        print(lambda)
+      </textarea>
+    </div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        print = 3.0e8
+        print(print)
+      </textarea>
+    </div>
+  </article>
+
+  <div class="coulisses">
+    <p>Quand vous cliquez sur <b>▶ Exécuter</b>, aucun serveur ne travaille : un vrai Python, compilé pour le navigateur (Pyodide), tourne dans la tablette elle-même. C'est pourquoi le premier chargement prend du temps.</p>
+  </div>
+
+  <table class="tableau">
+    <thead><tr><th>Écriture</th><th>Python</th><th>Valeur</th></tr></thead>
+    <tbody>
+      <tr><td>3,00 × 10⁸</td><td><code>3.00e8</code></td><td>300 000 000</td></tr>
+      <tr><td>1,0 × 10⁻¹²</td><td><code>1.0e-12</code></td><td>0,000 000 000 001</td></tr>
+      <tr><td>2³</td><td><code>2 ** 3</code></td><td>8</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="seance" id="s3" data-titre="Couleurs 3 à 6">
+  <h2>Séance 3 — Couleurs</h2>
+  <p class="intro">Séances vides : elles montrent le cycle des teintes. Celle-ci porte aussi l'exemple de fichier de données.</p>
+
+  <article class="exo" id="ex-3-1">
+    <h3><span class="num">3.1</span> Lire un fichier de données</h3>
+    <p class="contexte">Un <code>&lt;script type="text/plain" class="py-fichier" data-nom="mesures.csv"&gt;</code> placé dans le <code>.py</code> est écrit dans le répertoire courant de Python avant chaque exécution ; un onglet 📄 sous l'éditeur en montre le contenu.</p>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">
+        import numpy as np
+        t, y = np.loadtxt('mesures.csv', delimiter=';', skiprows=1, unpack=True)
+        print(len(t), 'mesures ; dernière hauteur :', y[-1], 'm')
+        with open('mesures.csv') as f:
+            print('en-tête :', f.readline().strip())
+      </textarea>
+      <script type="text/plain" class="py-fichier" data-nom="mesures.csv">
+        t (s);y (m)
+        0.00;1.200
+        0.04;1.192
+        0.08;1.169
+        0.12;1.129
+      </script>
+      <script type="text/x-python" class="py-check">
+if 'y' in globals() and len(y) == 4 and abs(y[-1] - 1.129) < 1e-9: ok("Fichier lu : 4 mesures.")
+      </script>
+    </div>
+  </article>
+</section>
+<section class="seance" id="s4" data-titre="Quatrième teinte"><h2>4. Quatrième teinte</h2><p class="intro">Ambre.</p></section>
+<section class="seance" id="s5" data-titre="Cinquième teinte"><h2>5. Cinquième teinte</h2><p class="intro">Corail.</p></section>
+<section class="seance" id="s6" data-titre="Sixième teinte"><h2>6. Sixième teinte</h2><p class="intro">Cyan.</p></section>
+
+<section class="seance" id="bilan" data-titre="Bilan">
+  <h2>Bilan</h2>
+  <div class="retenir"><ul><li>Un encadré sans titre reçoit « À retenir ».</li></ul></div>
+</section>
+
+<footer class="pp-pied">
+  <p>Fiche du niveau : <a class="fiche" href="fiches/demo.pdf" download>Télécharger la fiche PDF</a></p>
+</footer>
+</main>
+<script src="parcours.js" type="module"></script>
+</body>
+</html>

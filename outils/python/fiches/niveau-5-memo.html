@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mémo Python — Niveau 5</title>
+<link rel="stylesheet" href="../polices/polices.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg:#e9edf4; --ink:#161f33; --ink-soft:#4a566e; --ink-faint:#8b97ad; --line:#d3dae7; --surface-2:#f4f6fb;
+    --bleu:#2445c7; --bleu-w:#e7ebfb; --vert:#12805c; --vert-w:#e0f2ea; --violet:#6b4a9a; --violet-w:#efe9f7;
+    --orange:#c26a12; --orange-w:#faeede; --rouge:#c33a2f; --rouge-w:#fbe6e3; --cyan:#0f6d63; --cyan-w:#e0f1ef;
+    --deep:#131A2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 9.6pt; line-height: 1.36; }
+  .feuille { width: 210mm; height: 297mm; padding: 11mm 13mm 10mm; overflow: hidden; page-break-after: always; position: relative; }
+  .feuille:last-child { page-break-after: auto; }
+  code, pre, .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+  code { font-size: 8.8pt; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; white-space: nowrap; }
+
+  .hero { background: linear-gradient(135deg, #f4f6fb 0%, #e7ebfb 100%); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px 10px; margin-bottom: 8px; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--bleu); margin: 0; }
+  .hero h1 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; font-weight: 800; font-size: 25pt; letter-spacing: -.02em; line-height: 1.05; margin: 2px 0 1px; }
+  .hero .sous { font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-size: 10.5pt; margin: 0; }
+
+  .bloc { --a: var(--bleu); --w: var(--bleu-w); border-left: 4px solid var(--a); padding: 0 0 0 9px; margin: 7px 0 0; }
+  .bloc > .lab { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase; color: var(--a); font-weight: 500; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  .bloc > .lab::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .bloc h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 12.5pt; margin: 0 0 3px; }
+  .b-vert { --a: var(--vert); --w: var(--vert-w); } .b-violet { --a: var(--violet); --w: var(--violet-w); }
+  .b-orange { --a: var(--orange); --w: var(--orange-w); } .b-rouge { --a: var(--rouge); --w: var(--rouge-w); } .b-cyan { --a: var(--cyan); --w: var(--cyan-w); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border-bottom: 1px solid var(--line); padding: 2.4px 5px; vertical-align: top; }
+  td:first-child { width: 33%; color: var(--ink-soft); }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+  pre.ex { background: #fbfcfe; border: 1px solid var(--line); border-left: 4px solid var(--a, var(--bleu)); border-radius: 6px; padding: 7px 10px; margin: 4px 0 0; font-size: 8.3pt; line-height: 1.42; white-space: pre; }
+  pre.ex .c { color: #6b7a90; font-style: italic; }
+  pre.ex .k { color: var(--violet); font-weight: 500; }
+  pre.ex .s { color: var(--vert); }
+  pre.ex .n { color: var(--orange); }
+  .sortie { font-family: "IBM Plex Mono", monospace; font-size: 8.2pt; background: var(--deep); color: #dfe6f5; border-radius: 6px; padding: 5px 10px; margin: 3px 0 0; white-space: pre; }
+  .note { font-size: 8.8pt; color: var(--ink-soft); margin: 3px 0 0; }
+
+  .pieges td:first-child { width: 17%; } .pieges td:nth-child(2) { width: 20%; }
+  ul.bilan { list-style: none; padding: 0; margin: 2px 0; columns: 2; column-gap: 16px; }
+  ul.bilan li { padding: 1.5px 0 1.5px 17px; position: relative; break-inside: avoid; }
+  ul.bilan li::before { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border: 1.4px solid var(--ink-soft); border-radius: 2px; }
+  .lignes { border-bottom: 1px dotted var(--ink-faint); height: 16px; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 7.2pt; color: var(--ink-faint); display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+
+<!-- ============================ PAGE 1 ============================ -->
+<section class="feuille">
+  <div class="hero">
+    <p class="kicker">&gt;&gt;&gt; python · niveau 5 · terminale spé PC · mémo</p>
+    <h1>Pour aller plus loin</h1>
+    <p class="sous">numériser · échantillonner · spectre · filtrer · diffusion · hasard · Student</p>
+  </div>
+
+  <div class="grille">
+    <div>
+      <div class="bloc">
+        <p class="lab">Numériser · BUT Mesures physiques</p>
+        <table>
+          <tr><td>pas d'un CAN</td><td><code>p = U_max / (2 ** n - 1)</code></td></tr>
+          <tr><td>entier lu</td><td><code>N = np.round(u / p)</code></td></tr>
+          <tr><td>tension restituée</td><td><code>N * p</code> ; erreur ≤ <i>p</i> / 2</td></tr>
+          <tr><td>plus grand écart</td><td><code>np.max(np.abs(a - b))</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-vert">
+        <p class="lab">Échantillonner · PC, MP, PSI</p>
+        <table>
+          <tr><td>instants des mesures</td><td><code>np.arange(0, duree, 1 / fe)</code></td></tr>
+          <tr><td>Nyquist-Shannon</td><td><i>f</i><sub>e</sub> &gt; 2 × <i>f</i><sub>max</sub></td></tr>
+          <tr><td>repliement</td><td><i>f</i> entre <i>f</i><sub>e</sub>/2 et <i>f</i><sub>e</sub> vue à <i>f</i><sub>e</sub> − <i>f</i></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-violet">
+        <p class="lab">Spectre · PSI</p>
+        <table>
+          <tr><td>transformée</td><td><code>X = np.fft.rfft(x)</code></td></tr>
+          <tr><td>amplitudes</td><td><code>np.abs(X) * 2 / len(x)</code></td></tr>
+          <tr><td>fréquences</td><td><code>np.fft.rfftfreq(N, 1 / fe)</code></td></tr>
+          <tr><td>résolution</td><td><i>f</i><sub>e</sub> / <i>N</i> = 1 / durée</td></tr>
+          <tr><td>pic le plus haut</td><td><code>freq[np.argmax(A)]</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="bloc b-orange">
+        <p class="lab">Filtrer · MP, TSI2</p>
+        <table>
+          <tr><td>moyenne glissante</td><td><code>np.mean(T[i - k : i + k + 1])</code></td></tr>
+          <tr><td>ajouter à une liste</td><td><code>liste.append(v)</code></td></tr>
+          <tr><td>passe-bas (Euler)</td><td><code>y[i] = y[i-1] + Te/tau * (x[i-1] - y[i-1])</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-cyan">
+        <p class="lab">Tableaux 2D · PC, MP, TSI2</p>
+        <table>
+          <tr><td>créer</td><td><code>T = np.zeros((nl, nc))</code> · <code>T.shape</code></td></tr>
+          <tr><td>un élément</td><td><code>T[j, i]</code> : ligne j, colonne i</td></tr>
+          <tr><td>ligne, colonne</td><td><code>T[j, :]</code> · <code>T[:, i]</code></td></tr>
+          <tr><td>sans les bords</td><td><code>T[j, 1:-1]</code> ; dernier : <code>-1</code></td></tr>
+          <tr><td>stabilité</td><td><i>r</i> = <i>D</i> Δ<i>t</i> / Δ<i>x</i>² ≤ 0,5</td></tr>
+        </table>
+      </div>
+      <div class="bloc b-rouge">
+        <p class="lab">Hasard et statistiques · PC, BUT Chimie</p>
+        <table>
+          <tr><td>pas au hasard</td><td><code>np.random.choice([-1, 1], size=(n, p))</code></td></tr>
+          <tr><td>somme des lignes</td><td><code>np.sum(M, axis=1)</code></td></tr>
+          <tr><td>marche aléatoire</td><td>écart-type ∝ √<i>t</i></td></tr>
+          <tr><td>Student, 95 %</td><td><code>stats.t.ppf(0.975, n - 1)</code></td></tr>
+          <tr><td>LD · LQ</td><td>3 <i>s</i><sub>blanc</sub> / <i>k</i> · 10 <i>s</i><sub>blanc</sub> / <i>k</i></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="bloc b-violet" style="margin-top:9px">
+    <p class="lab">Exemple commenté 1 · le spectre d'une note</p>
+<pre class="ex" style="--a:var(--violet)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+fe = <span class="n">8000</span>                             <span class="c"># fréquence d'échantillonnage, en Hz : fe > 2 × fmax</span>
+t = np.arange(<span class="n">0</span>, <span class="n">1.0</span>, <span class="n">1</span> / fe)          <span class="c"># 1 s de mesures : spectre précis au hertz</span>
+x = np.sin(<span class="n">2</span> * np.pi * <span class="n">220</span> * t) + <span class="n">0.5</span> * np.sin(<span class="n">2</span> * np.pi * <span class="n">440</span> * t)   <span class="c"># fondamentale + rang 2</span>
+
+N = len(x)
+A = np.abs(np.fft.rfft(x)) * <span class="n">2</span> / N      <span class="c"># amplitudes : module, puis × 2 / N</span>
+freq = np.fft.rfftfreq(N, <span class="n">1</span> / fe)      <span class="c"># 2e paramètre : Te = 1 / fe, pas fe</span>
+
+print(<span class="s">'fondamentale :'</span>, freq[np.argmax(A)], <span class="s">'Hz'</span>)   <span class="c"># fréquence du pic le plus haut</span>
+print(<span class="s">'pics :'</span>, freq[A > <span class="n">0.1</span>], <span class="s">'Hz'</span>)              <span class="c"># fréquences où A dépasse 0,1</span>
+plt.plot(freq, A)
+plt.xlabel(<span class="s">'f (Hz)'</span>)
+plt.ylabel(<span class="s">'amplitude'</span>)
+plt.show()</pre>
+    <p class="sortie">fondamentale : 220.0 Hz
+pics : [220. 440.] Hz</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 5 · Résonance</span><span>1 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 2 ============================ -->
+<section class="feuille">
+  <div class="bloc b-cyan">
+    <p class="lab">Exemple commenté 2 · la diffusion thermique dans un mur</p>
+<pre class="ex" style="--a:var(--cyan)"><span class="k">import</span> numpy <span class="k">as</span> np
+
+L, nx, D = <span class="n">0.20</span>, <span class="n">41</span>, <span class="n">8e-7</span>         <span class="c"># épaisseur (m), nombre de points, diffusivité (m²/s)</span>
+dx = L / (nx - <span class="n">1</span>)                <span class="c"># pas d'espace : 5 mm</span>
+dt = <span class="n">12.5</span>                         <span class="c"># pas de temps, en s</span>
+r = D * dt / dx ** <span class="n">2</span>              <span class="c"># doit rester ≤ 0,5, sinon le calcul explose</span>
+print(<span class="s">'r ='</span>, round(r, <span class="n">2</span>))
+nt = int(<span class="n">12</span> * <span class="n">3600</span> / dt)           <span class="c"># nombre de pas pour 12 h</span>
+
+T = np.zeros((nt + <span class="n">1</span>, nx))        <span class="c"># une LIGNE par instant, une COLONNE par point du mur</span>
+T[<span class="n">0</span>, :] = <span class="n">20</span>                      <span class="c"># condition initiale : tout le mur à 20 °C</span>
+T[:, <span class="n">0</span>] = <span class="n">0</span>                       <span class="c"># face extérieure à 0 °C, à tout instant</span>
+T[:, <span class="n">-1</span>] = <span class="n">20</span>                     <span class="c"># face intérieure à 20 °C, à tout instant</span>
+
+<span class="k">for</span> j <span class="k">in</span> range(nt):              <span class="c"># chaque point intérieur se rapproche de la moyenne de ses voisins</span>
+    T[j + <span class="n">1</span>, <span class="n">1</span>:<span class="n">-1</span>] = T[j, <span class="n">1</span>:<span class="n">-1</span>] + r * (T[j, <span class="n">2</span>:] - <span class="n">2</span> * T[j, <span class="n">1</span>:<span class="n">-1</span>] + T[j, :<span class="n">-2</span>])
+    <span class="c">#                 le point     voisins de droite    lui-même      voisins de gauche</span>
+
+print(<span class="s">'milieu après 1 h :'</span>, round(T[<span class="n">288</span>, <span class="n">20</span>], <span class="n">1</span>), <span class="s">'°C'</span>)   <span class="c"># 1 h = 288 pas ; colonne 20 = milieu</span>
+print(<span class="s">'milieu après 12 h :'</span>, round(T[<span class="n">-1</span>, <span class="n">20</span>], <span class="n">1</span>), <span class="s">'°C'</span>)  <span class="c"># dernière ligne : régime permanent</span></pre>
+    <p class="sortie">r = 0.4
+milieu après 1 h : 16.2 °C
+milieu après 12 h : 10.0 °C</p>
+    <p class="note">En régime permanent, le profil est une droite de 0 à 20 °C : le milieu est à 10 °C.</p>
+  </div>
+
+  <div class="bloc b-rouge">
+    <p class="lab">Exemple commenté 3 · Student et limites d'un dosage</p>
+<pre class="ex" style="--a:var(--rouge)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> scipy <span class="k">import</span> stats                <span class="c"># scipy : téléchargé à la première utilisation</span>
+
+c = np.array([<span class="n">0.0</span>, <span class="n">1.0</span>, <span class="n">2.0</span>, <span class="n">3.0</span>, <span class="n">4.0</span>, <span class="n">5.0</span>])                  <span class="c"># gamme étalon, en mg/L</span>
+A = np.array([<span class="n">0.001</span>, <span class="n">0.126</span>, <span class="n">0.247</span>, <span class="n">0.373</span>, <span class="n">0.495</span>, <span class="n">0.621</span>])
+k, b = np.polyfit(c, A, <span class="n">1</span>)                                    <span class="c"># pente k, ordonnée à l'origine b</span>
+
+blanc = np.array([<span class="n">0.002</span>, <span class="n">-0.001</span>, <span class="n">0.003</span>, <span class="n">0.000</span>, <span class="n">0.001</span>,
+                  <span class="n">-0.002</span>, <span class="n">0.002</span>, <span class="n">0.001</span>, <span class="n">-0.001</span>, <span class="n">0.000</span>])     <span class="c"># 10 mesures du blanc</span>
+s_blanc = np.std(blanc, ddof=<span class="n">1</span>)    <span class="c"># écart-type expérimental : ddof=1</span>
+LD = <span class="n">3</span> * s_blanc / k               <span class="c"># limite de détection : sous LD, rien n'est affirmé</span>
+LQ = <span class="n">10</span> * s_blanc / k              <span class="c"># limite de quantification : au-dessus, résultat fiable</span>
+print(<span class="s">'LD ='</span>, round(LD, <span class="n">3</span>), <span class="s">'mg/L   LQ ='</span>, round(LQ, <span class="n">3</span>), <span class="s">'mg/L'</span>)
+
+mes = np.array([<span class="n">0.471</span>, <span class="n">0.468</span>, <span class="n">0.475</span>, <span class="n">0.466</span>, <span class="n">0.472</span>])   <span class="c"># 5 mesures seulement</span>
+n = len(mes)
+u = np.std(mes, ddof=<span class="n">1</span>) / np.sqrt(n)         <span class="c"># incertitude-type de la moyenne (type A)</span>
+t95 = stats.t.ppf(<span class="n">0.975</span>, n - <span class="n">1</span>)            <span class="c"># Student : 95 %, n - 1 degrés de liberté → 2,78</span>
+print(<span class="s">'A ='</span>, round(np.mean(mes), <span class="n">4</span>), <span class="s">'±'</span>, round(t95 * u, <span class="n">4</span>))</pre>
+    <p class="sortie">LD = 0.038 mg/L   LQ = 0.128 mg/L
+A = 0.4704 ± 0.0044</p>
+    <p class="note">Avec 2<i>u</i>, on aurait écrit ± 0,0031 : avec cinq mesures, Student élargit l'intervalle.</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 5 · Résonance</span><span>2 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 3 ============================ -->
+<section class="feuille">
+  <div class="bloc b-rouge">
+    <p class="lab">Les pièges</p>
+    <table class="pieges">
+      <tr><td>pas d'un CAN</td><td><code>2 ** n - 1</code></td><td>2<sup><i>n</i></sup> valeurs, mais 2<sup><i>n</i></sup> − 1 intervalles entre 0 et <i>U</i><sub>max</sub>.</td></tr>
+      <tr><td>rfftfreq</td><td><code>1 / fe</code></td><td>Le second paramètre est la période d'échantillonnage <i>T</i><sub>e</sub>, pas <i>f</i><sub>e</sub>.</td></tr>
+      <tr><td>amplitudes</td><td><code>* 2 / N</code></td><td>Sans ce facteur, un pic d'amplitude 0,8 s'affiche à 3 200.</td></tr>
+      <tr><td>pic intrus</td><td><i>f</i><sub>e</sub> − <i>f</i></td><td>Une composante au-delà de <i>f</i><sub>e</sub> / 2 se replie : aucun message, un spectre faux.</td></tr>
+      <tr><td>tranche</td><td><code>T[a : b]</code></td><td>S'arrête AVANT <code>b</code> : pour aller jusqu'à <code>i + k</code>, écrire <code>i + k + 1</code>.</td></tr>
+      <tr><td>tableau 2D</td><td><code>T[j, i]</code></td><td>La ligne d'abord, la colonne ensuite. <code>shape</code> donne (lignes, colonnes).</td></tr>
+      <tr><td>somme</td><td><code>axis=1</code></td><td>Somme de chaque ligne ; <code>axis=0</code> somme chaque colonne.</td></tr>
+      <tr><td>stabilité</td><td><i>r</i> ≤ 0,5</td><td>Au-delà, le schéma explicite explose (10⁴⁹ °C), sans message d'erreur.</td></tr>
+      <tr><td>Student</td><td><code>0.975, n - 1</code></td><td>2,5 % de chaque côté pour 95 % ; <i>n</i> − 1 degrés de liberté.</td></tr>
+      <tr><td>LD, LQ</td><td><code>/ k</code></td><td>Une absorbance divisée par la pente donne une concentration.</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">D'où viennent ces notions</p>
+    <table>
+      <tr><td>numériser, CAN</td><td>BUT Mesures physiques (R2.08)</td></tr>
+      <tr><td>échantillonnage, repliement</td><td>CPGE PC, MP, PSI (2e année) ; BUT Mesures physiques</td></tr>
+      <tr><td>transformée de Fourier discrète</td><td>CPGE PSI ; en PC, « non exigible »</td></tr>
+      <tr><td>filtrage numérique</td><td>CPGE MP, TSI2</td></tr>
+      <tr><td>différences finies, tableaux 2D</td><td>CPGE PC, MP, TSI2</td></tr>
+      <tr><td>marche aléatoire</td><td>CPGE PC</td></tr>
+      <tr><td>Student, limites de détection</td><td>BUT Chimie (R3.08)</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Ce que je sais faire</p>
+    <ul class="bilan">
+      <li>Calculer le pas d'un CAN et l'erreur de numérisation.</li>
+      <li>Choisir <i>f</i><sub>e</sub> avec Nyquist-Shannon ; reconnaître un repliement.</li>
+      <li>Calculer et lire le spectre d'un son avec <code>rfft</code>.</li>
+      <li>Lisser par moyenne glissante ; filtrer par récurrence.</li>
+      <li>Résoudre la diffusion par différences finies, en restant stable.</li>
+      <li>Simuler une marche aléatoire : étalement en √<i>t</i>.</li>
+      <li>Écrire un intervalle de confiance avec Student.</li>
+      <li>Calculer les limites de détection et de quantification.</li>
+    </ul>
+    <p style="margin:7px 0 2px"><b>Point à revoir :</b></p>
+    <div class="lignes"></div><div class="lignes"></div>
+  </div>
+  <footer><span>© 2026 Loïc Van Hoorde — mise en forme réalisée avec l'aide de Claude (Anthropic)</span><span>3 / 3</span></footer>
+</section>
+</body>
+</html>

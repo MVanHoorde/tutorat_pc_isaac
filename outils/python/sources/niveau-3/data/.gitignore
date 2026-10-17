@@ -1,0 +1,3 @@
+# Exception à la règle *.csv de la racine : ces fichiers sont des données
+# d’exercice construites (aucune donnée d’élève), intégrées à niveau-3.html.
+!*.csv

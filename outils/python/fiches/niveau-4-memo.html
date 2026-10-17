@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mémo Python — Niveau 4</title>
+<link rel="stylesheet" href="../polices/polices.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg:#e9edf4; --ink:#161f33; --ink-soft:#4a566e; --ink-faint:#8b97ad; --line:#d3dae7; --surface-2:#f4f6fb;
+    --bleu:#2445c7; --bleu-w:#e7ebfb; --vert:#12805c; --vert-w:#e0f2ea; --violet:#6b4a9a; --violet-w:#efe9f7;
+    --orange:#c26a12; --orange-w:#faeede; --rouge:#c33a2f; --rouge-w:#fbe6e3; --cyan:#0f6d63; --cyan-w:#e0f1ef;
+    --deep:#131A2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 9.6pt; line-height: 1.36; }
+  .feuille { width: 210mm; height: 297mm; padding: 11mm 13mm 10mm; overflow: hidden; page-break-after: always; position: relative; }
+  .feuille:last-child { page-break-after: auto; }
+  code, pre, .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+  code { font-size: 8.8pt; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; white-space: nowrap; }
+
+  .hero { background: linear-gradient(135deg, #f4f6fb 0%, #e7ebfb 100%); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px 10px; margin-bottom: 8px; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--bleu); margin: 0; }
+  .hero h1 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; font-weight: 800; font-size: 25pt; letter-spacing: -.02em; line-height: 1.05; margin: 2px 0 1px; }
+  .hero .sous { font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-size: 10.5pt; margin: 0; }
+
+  .bloc { --a: var(--bleu); --w: var(--bleu-w); border-left: 4px solid var(--a); padding: 0 0 0 9px; margin: 7px 0 0; }
+  .bloc > .lab { font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase; color: var(--a); font-weight: 500; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  .bloc > .lab::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .bloc h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 12.5pt; margin: 0 0 3px; }
+  .b-vert { --a: var(--vert); --w: var(--vert-w); } .b-violet { --a: var(--violet); --w: var(--violet-w); }
+  .b-orange { --a: var(--orange); --w: var(--orange-w); } .b-rouge { --a: var(--rouge); --w: var(--rouge-w); } .b-cyan { --a: var(--cyan); --w: var(--cyan-w); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border-bottom: 1px solid var(--line); padding: 2.4px 5px; vertical-align: top; }
+  td:first-child { width: 33%; color: var(--ink-soft); }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+  pre.ex { background: #fbfcfe; border: 1px solid var(--line); border-left: 4px solid var(--a, var(--bleu)); border-radius: 6px; padding: 7px 10px; margin: 4px 0 0; font-size: 8.3pt; line-height: 1.42; white-space: pre; }
+  pre.ex .c { color: #6b7a90; font-style: italic; }
+  pre.ex .k { color: var(--violet); font-weight: 500; }
+  pre.ex .s { color: var(--vert); }
+  pre.ex .n { color: var(--orange); }
+  .sortie { font-family: "IBM Plex Mono", monospace; font-size: 8.2pt; background: var(--deep); color: #dfe6f5; border-radius: 6px; padding: 5px 10px; margin: 3px 0 0; white-space: pre; }
+  .note { font-size: 8.8pt; color: var(--ink-soft); margin: 3px 0 0; }
+
+  .pieges td:first-child { width: 17%; } .pieges td:nth-child(2) { width: 20%; }
+  ul.bilan { list-style: none; padding: 0; margin: 2px 0; columns: 2; column-gap: 16px; }
+  ul.bilan li { padding: 1.5px 0 1.5px 17px; position: relative; break-inside: avoid; }
+  ul.bilan li::before { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border: 1.4px solid var(--ink-soft); border-radius: 2px; }
+  .lignes { border-bottom: 1px dotted var(--ink-faint); height: 16px; }
+  footer { position: absolute; left: 13mm; right: 13mm; bottom: 6mm; font-size: 7.2pt; color: var(--ink-faint); display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; }
+</style>
+<body>
+
+<!-- ============================ PAGE 1 ============================ -->
+<section class="feuille">
+  <div class="hero">
+    <p class="kicker">&gt;&gt;&gt; python · niveau 4 · terminale spé PC · mémo</p>
+    <h1>Ouverture vers le supérieur</h1>
+    <p class="sous">loi normale · régression · Monte-Carlo · scipy · tests · documentation</p>
+  </div>
+
+  <div class="grille">
+    <div>
+      <div class="bloc">
+        <p class="lab">Loi normale · attendu de PCSI</p>
+        <table>
+          <tr><td>N tirages gaussiens</td><td><code>np.random.normal(m, s, N)</code></td></tr>
+          <tr><td>[m − s ; m + s]</td><td>≈ 68 % des valeurs</td></tr>
+          <tr><td>[m − 2s ; m + 2s]</td><td>≈ 95 % : intervalle de confiance</td></tr>
+          <tr><td>proportion</td><td><code>np.mean(abs(x - m) &lt; s)</code></td></tr>
+          <tr><td>histogramme normé</td><td><code>plt.hist(x, bins=40, density=True)</code></td></tr>
+          <tr><td>exponentielle</td><td><code>np.exp(x)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-vert">
+        <p class="lab">Comparer, valider · CPGE</p>
+        <table>
+          <tr><td>écart normalisé</td><td>|x₁ − x₂| / √(u₁² + u₂²)</td></tr>
+          <tr><td>seuils (cours)</td><td>&lt; 1 très compatibles · ≥ 2 non compatibles</td></tr>
+          <tr><td>barres d'incertitude</td><td><code>plt.errorbar(x, y, yerr=u, fmt='o')</code></td></tr>
+          <tr><td>écarts au modèle</td><td><code>E = (y - (a*x + b)) / u</code></td></tr>
+          <tr><td>modèle validé si</td><td>tous |E| &lt; 2, signes au hasard</td></tr>
+          <tr><td>R² seul</td><td>ne valide rien</td></tr>
+        </table>
+      </div>
+      <div class="bloc b-orange">
+        <p class="lab">Tester · informatique de CPGE</p>
+        <table>
+          <tr><td>spécification</td><td><code>"""Ce que reçoit, ce que renvoie."""</code></td></tr>
+          <tr><td>test</td><td><code>assert abs(f(2) - 0.5) &lt; 1e-9</code></td></tr>
+          <tr><td>dictionnaire</td><td><code>d = {'NH4+': 9.2}</code> · <code>d['NH4+']</code></td></tr>
+          <tr><td>ajouter, chercher</td><td><code>d['cle'] = v</code> · <code>'cle' in d</code></td></tr>
+          <tr><td>parcourir</td><td><code>for k, v in d.items():</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="bloc b-cyan">
+        <p class="lab">scipy · attendu de PCSI</p>
+        <table>
+          <tr><td>racine entre a et b</td><td><code>from scipy.optimize import bisect</code><br><code>bisect(f, a, b)</code>, f(a) et f(b) de signes contraires</td></tr>
+          <tr><td>Newton (PCSI chimie)</td><td>x ← x − g(x) / g′(x)<br><code>newton(g, x0, fprime=gp)</code></td></tr>
+          <tr><td>équation différentielle</td><td><code>from scipy.integrate import odeint</code><br><code>sol = odeint(derivee, y0, t)</code></td></tr>
+          <tr><td>ordre de derivee</td><td><code>def derivee(y, t):</code> y d'abord</td></tr>
+          <tr><td>ordre 2</td><td>Y = [θ, ω] → renvoyer [ω, dω/dt]</td></tr>
+          <tr><td>une colonne</td><td><code>sol[:, 0]</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-violet">
+        <p class="lab">Monte-Carlo sur une régression</p>
+        <table>
+          <tr><td>liste vide, ajout</td><td><code>pentes = []</code> · <code>pentes.append(a)</code></td></tr>
+          <tr><td>mesures simulées</td><td><code>y + np.random.normal(0, u, len(y))</code></td></tr>
+          <tr><td>u(pente)</td><td><code>np.std(pentes, ddof=1)</code></td></tr>
+        </table>
+      </div>
+      <div class="bloc b-rouge">
+        <p class="lab">Documentation matplotlib</p>
+        <table>
+          <tr><td>épaisseur, style</td><td><code>linewidth=3</code> · <code>linestyle='--'</code></td></tr>
+          <tr><td>couleur nommée</td><td><code>color='darkorange'</code></td></tr>
+          <tr><td>droite verticale</td><td><code>plt.axvline(x)</code> · <code>plt.axhline(y)</code></td></tr>
+          <tr><td>échelle log</td><td><code>plt.yscale('log')</code></td></tr>
+          <tr><td>2 graphiques empilés</td><td><code>plt.subplot(2, 1, k)</code></td></tr>
+          <tr><td>flèche et texte</td><td><code>plt.annotate('…', xy=…, xytext=…,</code><br><code>arrowprops={'arrowstyle': '-&gt;'})</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="bloc b-cyan" style="margin-top:6px">
+    <p class="lab">Exemple commenté 1 · l'état final d'un acide faible avec bisect</p>
+<pre class="ex" style="--a:var(--cyan)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> scipy.optimize <span class="k">import</span> bisect      <span class="c"># 14 Mo téléchargés la 1re fois</span>
+
+Ka = <span class="n">10</span> ** (-<span class="n">4.8</span>)                       <span class="c"># acide éthanoïque</span>
+C = <span class="n">1.0e-2</span>                              <span class="c"># concentration apportée, en mol/L</span>
+
+<span class="k">def</span> f(x):
+    <span class="s">"""Écart à l'équilibre ; x = [H3O+] en mol/L, 0 &lt;= x &lt; C."""</span>   <span class="c"># la spécification</span>
+    <span class="k">return</span> x**<span class="n">2</span> / (C - x) - Ka
+
+<span class="k">assert</span> f(<span class="n">0</span>) &lt; <span class="n">0</span> <span class="k">and</span> f(<span class="n">0.001</span>) &gt; <span class="n">0</span>          <span class="c"># on vérifie le changement de signe AVANT</span>
+x_f = bisect(f, <span class="n">0</span>, <span class="n">0.001</span>)              <span class="c"># f sans parenthèses : on passe la fonction</span>
+print(<span class="s">'tau ='</span>, round(x_f / C, <span class="n">4</span>), <span class="s">' pH ='</span>, round(-np.log10(x_f), <span class="n">2</span>))</pre>
+    <p class="sortie">tau = 0.039  pH = 3.41</p>
+    <p class="note">Ne pas prendre <i>b</i> = <i>C</i> : <i>C</i> − <i>x</i> s'annulerait (division par zéro).</p>
+  </div>
+
+  <footer><span>Mémo Python · Niveau 4 · Résonance</span><span>1 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 2 ============================ -->
+<section class="feuille">
+  <div class="bloc b-violet">
+    <p class="lab">Exemple commenté 2 · valider une droite, puis l'incertitude sur sa pente</p>
+<pre class="ex" style="--a:var(--violet)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+c = np.array([<span class="n">1.0</span>, <span class="n">2.5</span>, <span class="n">5.0</span>, <span class="n">8.0</span>, <span class="n">10.0</span>])                <span class="c"># TP4, en mmol/L</span>
+sigma = np.array([<span class="n">0.162</span>, <span class="n">0.330</span>, <span class="n">0.605</span>, <span class="n">0.925</span>, <span class="n">1.158</span>])   <span class="c"># en mS/cm</span>
+u_sigma = <span class="n">0.015</span>                                         <span class="c"># incertitude-type sur chaque σ</span>
+
+<span class="c"># 1. régression, puis écart normalisé de chaque point au modèle</span>
+a, b = np.polyfit(c, sigma, <span class="n">1</span>)
+E = (sigma - (a * c + b)) / u_sigma     <span class="c"># tous |E| &lt; 2 et signes mêlés : modèle validé</span>
+print(<span class="s">'E ='</span>, np.round(E, <span class="n">2</span>))                <span class="c"># np.round arrondit tout un tableau</span>
+
+<span class="c"># 2. Monte-Carlo : on refait la régression sur 1000 jeux de mesures simulés</span>
+np.random.seed(<span class="n">1</span>)                       <span class="c"># fixe le hasard : mêmes tirages à chaque exécution</span>
+pentes = []
+<span class="k">for</span> i <span class="k">in</span> range(<span class="n">1000</span>):
+    sigma_sim = sigma + np.random.normal(<span class="n">0</span>, u_sigma, <span class="n">5</span>)   <span class="c"># chaque point bouge au hasard</span>
+    p, o = np.polyfit(c, sigma_sim, <span class="n">1</span>)
+    pentes.append(p)                    <span class="c"># on garde la pente de ce tirage</span>
+print(<span class="s">'a ='</span>, round(a, <span class="n">4</span>), <span class="s">' u(a) ='</span>, round(np.std(pentes, ddof=<span class="n">1</span>), <span class="n">4</span>))
+
+<span class="c"># 3. le graphique « raisonné » : barres d'incertitude + modèle</span>
+plt.errorbar(c, sigma, yerr=u_sigma, fmt=<span class="s">'o'</span>, label=<span class="s">'mesures'</span>)
+plt.plot(c, a * c + b, <span class="s">'r-'</span>, label=<span class="s">'modèle affine'</span>)
+plt.legend()
+plt.show()</pre>
+    <p class="sortie">E = [-0.07  0.13  0.13 -0.53  0.33]
+a = 0.11  u(a) = 0.0019</p>
+    <p class="note">Résultat : <i>a</i> = (0,110 ± 0,002) mS·cm⁻¹ par mmol·L⁻¹. Python écrit <code>0.11</code> : il n'affiche pas les zéros de fin.</p>
+  </div>
+
+  <div class="bloc b-orange">
+    <p class="lab">Exemple commenté 3 · un pendule avec odeint</p>
+<pre class="ex" style="--a:var(--orange)"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy.integrate <span class="k">import</span> odeint
+
+g = <span class="n">9.81</span>
+L = <span class="n">1.0</span>
+
+<span class="k">def</span> derivee(Y, t):                     <span class="c"># Y d'abord, t ensuite : imposé par odeint</span>
+    theta, omega = Y                     <span class="c"># ordre 2 → système de 2 équations d'ordre 1</span>
+    <span class="k">return</span> [omega, -g / L * np.sin(theta)]
+
+t = np.linspace(<span class="n">0</span>, <span class="n">10</span>, <span class="n">2001</span>)
+<span class="k">for</span> deg <span class="k">in</span> [<span class="n">10</span>, <span class="n">90</span>]:
+    sol = odeint(derivee, [deg * np.pi / <span class="n">180</span>, <span class="n">0</span>], t)    <span class="c"># θ(0) en rad, ω(0) = 0</span>
+    plt.plot(t, sol[:, <span class="n">0</span>] * <span class="n">180</span> / np.pi, label=str(deg) + <span class="s">'°'</span>)  <span class="c"># colonne 0 : θ</span>
+
+print(<span class="s">'T0 ='</span>, round(<span class="n">2</span> * np.pi * np.sqrt(L / g), <span class="n">2</span>), <span class="s">'s'</span>)
+plt.xlabel(<span class="s">'t (s)'</span>)
+plt.ylabel(<span class="s">'θ (°)'</span>)
+plt.legend()
+plt.show()</pre>
+    <p class="sortie">T0 = 2.01 s</p>
+    <p class="note">Sur le graphique : <i>T</i> ≈ 2,0 s à 10°, mais ≈ 2,4 s à 90°. Les grandes oscillations ne sont pas isochrones.</p>
+  </div>
+  <footer><span>Mémo Python · Niveau 4 · Résonance</span><span>2 / 3</span></footer>
+</section>
+
+<!-- ============================ PAGE 3 ============================ -->
+<section class="feuille">
+  <div class="bloc b-rouge">
+    <p class="lab">Les pièges</p>
+    <table class="pieges">
+      <tr><td>écarts normalisés</td><td><code>/ u</code></td><td>Sans division par l'incertitude, ce sont des écarts bruts : le seuil 2 n'a plus de sens.</td></tr>
+      <tr><td>hist + Gauss</td><td><code>density=True</code></td><td>Sans lui, l'histogramme compte des effectifs et la courbe de Gauss paraît plate.</td></tr>
+      <tr><td>bisect</td><td>signes contraires</td><td><code>ValueError</code> si f(a) et f(b) ont le même signe : regarder d'abord le graphique.</td></tr>
+      <tr><td>bisect(f, …)</td><td><code>f</code></td><td>On passe la fonction, sans parenthèses ; <code>f(x)</code> serait un nombre.</td></tr>
+      <tr><td>derivee</td><td><code>(y, t)</code></td><td>odeint appelle la fonction avec y d'abord ; l'ordre inverse donne un résultat faux, sans message.</td></tr>
+      <tr><td>sin θ</td><td><code>np.sin(theta)</code></td><td>Remplacer sin θ par θ n'est valable que pour les petits angles.</td></tr>
+      <tr><td>flottants</td><td><code>abs(a - b) &lt; 1e-9</code></td><td><code>abs(2.05 - 2.10) / 0.10</code> vaut <code>0.5000000000000027</code> : jamais de <code>==</code> entre deux nombres à virgule.</td></tr>
+      <tr><td>if / elif</td><td>le plus petit seuil d'abord</td><td>Les conditions sont lues dans l'ordre : la première vraie l'emporte.</td></tr>
+      <tr><td>Monte-Carlo</td><td><code>y + tirage</code></td><td>Tirer le bruit seul, sans l'ajouter aux mesures, donne des pentes nulles.</td></tr>
+      <tr><td>R² = 0,999</td><td>écarts normalisés</td><td>Des points presque alignés peuvent former une courbe : seuls les écarts normalisés le révèlent.</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-violet">
+    <p class="lab">D'où viennent ces attendus</p>
+    <table>
+      <tr><td>CPGE, toutes filières de 1<sup>re</sup> année</td><td>loi normale et intervalle de confiance, écart normalisé, régression validée, Monte-Carlo sur les paramètres (bloc « Mesures et incertitudes »)</td></tr>
+      <tr><td>PCSI, outils numériques</td><td><code>random.normal</code>, <code>hist</code>, <code>polyfit</code>, <code>bisect</code>, <code>odeint</code> ; Newton et état final avec <i>K</i> en chimie</td></tr>
+      <tr><td>informatique commune de CPGE</td><td>spécification, jeux de tests, <code>assert</code>, dictionnaires, précision des flottants</td></tr>
+      <tr><td>BUT Mesures physiques</td><td>test d'un programme (R1.07), représentations graphiques des mesures (SAÉ 1.01)</td></tr>
+      <tr><td>BUT Chimie</td><td>statistiques descriptives et régression linéaire en TP (R1.07)</td></tr>
+      <tr><td>BTS Métiers de la chimie</td><td>incertitude élargie et niveau de confiance</td></tr>
+    </table>
+  </div>
+
+  <div class="bloc b-cyan">
+    <p class="lab">Chercher dans la documentation</p>
+    <p style="margin:0">Une page de fonction se lit toujours ainsi : la <b>signature</b>, puis <b>Parameters</b> (chaque paramètre, ce qu'il attend), <b>Returns</b>, et des <b>Examples</b> à recopier. Point de départ : <span class="mono">matplotlib.org/stable/api/pyplot_summary.html</span>. Vocabulaire : <i>width</i> largeur · <i>dashed</i> tirets · <i>scale</i> échelle · <i>arrow</i> flèche · <i>row</i> ligne.</p>
+  </div>
+
+  <div class="bloc b-vert">
+    <p class="lab">Ce que je sais faire</p>
+    <ul class="bilan">
+      <li>Simuler une loi normale et associer un intervalle de confiance.</li>
+      <li>Superposer une courbe de Gauss à un histogramme normé.</li>
+      <li>Comparer deux mesures par leur écart normalisé.</li>
+      <li>Valider une régression : barres d'incertitude, écarts normalisés.</li>
+      <li>Évaluer par Monte-Carlo l'incertitude sur une pente.</li>
+      <li>Résoudre une équation avec <code>bisect</code> ou Newton.</li>
+      <li>Résoudre une équation différentielle avec <code>odeint</code>.</li>
+      <li>Spécifier, tester, utiliser un dictionnaire.</li>
+      <li>Trouver un paramètre dans la documentation.</li>
+    </ul>
+    <p style="margin:7px 0 2px"><b>Point à revoir :</b></p>
+    <div class="lignes"></div><div class="lignes"></div>
+  </div>
+  <footer><span>© 2026 Loïc Van Hoorde — mise en forme réalisée avec l'aide de Claude (Anthropic)</span><span>3 / 3</span></footer>
+</section>
+</body>
+</html>

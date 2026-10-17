@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Niveau 1 — La boîte à outils de l'ECE</title>
+<link rel="stylesheet" href="parcours.css">
+</head>
+<body class="pp" data-niveau="1">
+
+<header class="pp-head">
+  <p class="pp-invite">&gt;&gt;&gt; python · niveau 1 · terminale spé PC</p>
+  <h1>La boîte à outils de l'ECE</h1>
+  <p class="pp-sous-titre">calculs · variables · numpy · listes · pyplot · erreurs</p>
+  <p class="pp-chapeau">Tout ce qu'il faut savoir faire en Python le jour de l'ECE, appris pas à pas, en révisant le cours de physique-chimie au passage.</p>
+  <a class="pp-retour" href="index.html">← Le parcours Python</a>
+</header>
+
+<div class="pp-statut" aria-live="polite"></div>
+<nav class="pp-sommaire" aria-label="Étapes du niveau 1"></nav>
+
+<main>
+
+<section class="seance" id="mode-emploi" data-titre="Mode d'emploi">
+  <h2>Mode d'emploi</h2>
+  <p class="intro">Ce niveau se travaille seul, à votre rythme, dans l'ordre. Chaque cadre de code est un vrai Python : on y tape du code, on l'exécute avec <b>▶ Exécuter</b> (ou Ctrl + Entrée sur un clavier), le résultat s'affiche juste en dessous.</p>
+  <div class="info">
+    <ul>
+      <li>Rien à installer : Python se télécharge dans la tablette à la première ouverture. Comptez une minute la première fois, quelques secondes ensuite.</li>
+      <li>On ne peut rien casser : <b>↺ Code de départ</b> remet le programme d'origine.</li>
+      <li>Une erreur n'est pas une faute. Python indique la ligne et la raison : apprendre à lire ce message fait partie du travail.</li>
+      <li>Bloqué ? Le bouton <b>💡 Aide</b> donne un indice à la fois. La solution complète s'ouvre après un premier essai.</li>
+      <li>Chaque exercice révise une notion du cours : le bouton <b>ⓘ Rappel de cours</b> la rappelle.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s1" data-titre="Python, une calculatrice">
+  <h2>Python, une calculatrice</h2>
+  <p class="intro">Avant d'écrire des programmes, on utilise Python comme une calculatrice. La <b>console</b> attend une instruction après l'invite <code>&gt;&gt;&gt;</code>, l'exécute et affiche aussitôt le résultat.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Les opérations : <code>+</code> <code>-</code> <code>*</code> (multiplier) <code>/</code> (diviser) et <code>**</code> (puissance) : 2³ s'écrit <code>2 ** 3</code>.</li>
+      <li>La division <code>/</code> donne toujours un nombre à virgule : <code>8 / 2</code> donne <code>4.0</code>.</li>
+      <li>Le séparateur décimal est le <em class="cle">point</em> : 0,68 s'écrit <code>0.68</code>.</li>
+      <li>L'écriture scientifique utilise <code>e</code>, qui se lit « fois 10 puissance » : 3,00 × 10⁸ s'écrit <code>3.00e8</code>, et 1,0 × 10⁻¹² s'écrit <code>1.0e-12</code>.</li>
+      <li>Comme sur la calculatrice, la multiplication passe avant l'addition, et les parenthèses fixent l'ordre des calculs :</li>
+    </ul>
+    <pre class="code">&gt;&gt;&gt; 2 + 3 * 4
+14
+&gt;&gt;&gt; (2 + 3) * 4
+20</pre>
+  </div>
+
+  <article class="exo" id="ex-1-1">
+    <h3><span class="num">1.1</span> Premier contact</h3>
+    <p class="contexte">Tapez des calculs dans la console, validez avec Entrée. Essayez les opérations de l'encadré, puis répondez au quiz : vous pouvez vérifier chaque réponse dans la console.</p>
+    <div class="py" data-mode="console"></div>
+    <div class="quiz">
+      <h4>Que répond Python ?</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>7 / 2</code></p>
+        <button class="opt" data-v="a"><code>3</code></button>
+        <button class="opt" data-v="b"><code>3,5</code></button>
+        <button class="opt" data-v="c"><code>3.5</code></button>
+        <button class="opt" data-v="d"><code>7/2</code></button>
+        <button class="opt" data-v="e"><code>4</code></button>
+        <button class="opt" data-v="f"><code>3.0</code></button>
+        <div class="qcm-expl" hidden>Python affiche <code>3.5</code>, avec un point : c'est la seule notation qu'il comprenne.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>2 ** 3</code></p>
+        <button class="opt" data-v="a"><code>6</code></button>
+        <button class="opt" data-v="b"><code>8</code></button>
+        <button class="opt" data-v="c"><code>9</code></button>
+        <button class="opt" data-v="d"><code>5</code></button>
+        <button class="opt" data-v="e"><code>23</code></button>
+        <button class="opt" data-v="f"><code>8.0</code></button>
+        <div class="qcm-expl" hidden><code>**</code> est la puissance : 2³ = 2 × 2 × 2 = 8. Le résultat est un entier, car aucun des deux nombres n'a de virgule.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q"><code>10 - 4 / 2</code></p>
+        <button class="opt" data-v="a"><code>3.0</code></button>
+        <button class="opt" data-v="b"><code>3</code></button>
+        <button class="opt" data-v="c"><code>8</code></button>
+        <button class="opt" data-v="d"><code>8.0</code></button>
+        <button class="opt" data-v="e"><code>6.0</code></button>
+        <button class="opt" data-v="f"><code>12.0</code></button>
+        <div class="qcm-expl" hidden>La division passe avant la soustraction : 4 / 2 = 2.0, puis 10 − 2.0 = 8.0. Il y a une virgule, car la division donne toujours un nombre à virgule.</div>
+      </div>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q"><code>(10 - 4) / 2</code></p>
+        <button class="opt" data-v="a"><code>3.0</code></button>
+        <button class="opt" data-v="b"><code>3</code></button>
+        <button class="opt" data-v="c"><code>8.0</code></button>
+        <button class="opt" data-v="d"><code>8</code></button>
+        <button class="opt" data-v="e"><code>2.0</code></button>
+        <button class="opt" data-v="f"><code>12.0</code></button>
+        <div class="qcm-expl" hidden>Les parenthèses passent en premier : 10 − 4 = 6, puis 6 / 2 = 3.0.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q"><code>3e2</code></p>
+        <button class="opt" data-v="a"><code>6</code></button>
+        <button class="opt" data-v="b"><code>9</code></button>
+        <button class="opt" data-v="c"><code>32</code></button>
+        <button class="opt" data-v="d"><code>3.2</code></button>
+        <button class="opt" data-v="e"><code>300.0</code></button>
+        <button class="opt" data-v="f"><code>3000.0</code></button>
+        <div class="qcm-expl" hidden><code>3e2</code> se lit « 3 fois 10 puissance 2 », soit 300. Une valeur écrite avec <code>e</code> est toujours un nombre à virgule : <code>300.0</code>.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>10 ** -3</code></p>
+        <button class="opt" data-v="a"><code>-1000</code></button>
+        <button class="opt" data-v="b"><code>0.001</code></button>
+        <button class="opt" data-v="c"><code>-30</code></button>
+        <button class="opt" data-v="d"><code>7</code></button>
+        <button class="opt" data-v="e"><code>0.0001</code></button>
+        <button class="opt" data-v="f"><code>1000.0</code></button>
+        <div class="qcm-expl" hidden>10⁻³ = 1 / 1000 = 0,001. Une puissance négative ne rend pas le nombre négatif : elle le rend petit.</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-1-2">
+    <h3><span class="num">1.2</span> La célérité d'un son</h3>
+    <details class="rappel"><summary>Rappel de cours — Onde périodique</summary>
+      <p>Une onde périodique est caractérisée par sa période <i>T</i> (en s), sa fréquence <i>f</i> (en Hz) et sa longueur d'onde λ (en m), distance parcourue par l'onde pendant une période.</p>
+      <p class="formule">f = <span class="frac"><span class="haut">1</span><span class="bas">T</span></span>      c = <span class="frac"><span class="haut">λ</span><span class="bas">T</span></span> = λ × f</p>
+      <p>Dans l'air à 20 °C, un son se propage à environ 340 m·s⁻¹.</p>
+    </details>
+    <p class="contexte">Au laboratoire, on mesure la longueur d'onde d'un son de fréquence 500 Hz : λ = 0,68 m.</p>
+    <ol class="questions">
+      <li>Calculer dans la console la célérité <i>c</i> de ce son.</li>
+      <li>Calculer sa période <i>T</i>.</li>
+      <li>Un son de 440 Hz se propage à la même célérité. Calculer sa longueur d'onde en une seule ligne, sans recopier le résultat de la question 1.</li>
+    </ol>
+    <div class="py" data-mode="console"></div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">&gt;&gt;&gt; 0.68 * 500
+340.0
+&gt;&gt;&gt; 1 / 500
+0.002
+&gt;&gt;&gt; 0.68 * 500 / 440
+0.7727272727272727</pre>
+      <p><i>c</i> = 340 m·s⁻¹ et <i>T</i> = 0,002 s = 2 ms. Pour la question 3, Python enchaîne les opérations de gauche à droite : <code>0.68 * 500</code>, puis la division par 440. λ ≈ 0,77 m.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-1-3">
+    <h3><span class="num">1.3</span> Des nombres minuscules</h3>
+    <details class="rappel"><summary>Rappel de cours — Intensité sonore</summary>
+      <p>L'intensité sonore <i>I</i> est la puissance sonore reçue par unité de surface, en W·m⁻². L'oreille perçoit des sons à partir de <i>I</i><sub>0</sub> = 1,0 × 10⁻¹² W·m⁻², le seuil d'audibilité.</p>
+    </details>
+    <p class="contexte">Dans une salle de classe bruyante, l'intensité sonore vaut <i>I</i> = 1,0 × 10⁻⁵ W·m⁻².</p>
+    <ol class="questions">
+      <li>Combien de fois l'intensité sonore de la salle dépasse-t-elle le seuil d'audibilité ? Faire le calcul dans la console.</li>
+      <li>Le résultat affiché est-il exactement celui que vous attendiez ? Proposer une explication.</li>
+    </ol>
+    <div class="py" data-mode="console"></div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">&gt;&gt;&gt; 1.0e-5 / 1.0e-12
+10000000.000000002</pre>
+      <p>L'intensité vaut dix millions de fois le seuil d'audibilité (10⁷). Le <code>2</code> tout au bout ne vient pas de vous : Python stocke les nombres en binaire, avec environ 16 chiffres significatifs, et le dernier peut être légèrement faux. En physique, on arrondit de toute façon bien avant.</p>
+      <p>Piège à éviter : <code>10e-12</code> ne vaut pas 10⁻¹², mais 10 × 10⁻¹² = 10⁻¹¹.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s2" data-titre="Ranger des valeurs">
+  <h2>Ranger des valeurs dans des variables</h2>
+  <p class="intro">Retaper 340 à chaque calcul est fastidieux et source d'erreurs. Une <b>variable</b> garde une valeur sous un nom. On passe aussi de la console au <b>script</b> : plusieurs lignes, exécutées de haut en bas, d'un seul coup.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>c = 340</code> <em class="cle">affecte</em> la valeur 340 à la variable <code>c</code>. Le signe <code>=</code> n'est pas une égalité mathématique : il signifie « ranger dans ».</li>
+      <li>Python calcule d'abord ce qui est <b>à droite</b> du <code>=</code>, puis range le résultat dans la variable de gauche.</li>
+      <li>Un nom de variable commence par une lettre, sans espace ni accent : <code>f_E</code>, <code>delta_f</code>, <code>lam</code>. Python distingue majuscules et minuscules : <code>c</code> et <code>C</code> sont deux variables différentes.</li>
+      <li>Une trentaine de <em class="cle">mots réservés</em> du langage ne peuvent pas servir de nom : <code>lambda</code>, <code>if</code>, <code>for</code>, <code>in</code>, <code>def</code>, <code>import</code>… C'est pourquoi on écrit <code>lam</code> pour λ.</li>
+      <li>Dans un script, rien ne s'affiche sans <code>print(...)</code>.</li>
+      <li>Tout ce qui suit <code>#</code> est un <b>commentaire</b>, ignoré par Python : on y note les unités.</li>
+    </ul>
+    <pre class="code">c = 340          # célérité du son dans l'air, en m/s
+f = 500          # fréquence, en Hz
+lam = c / f      # longueur d'onde, en m
+print(lam)</pre>
+  </div>
+
+  <article class="exo" id="ex-2-1">
+    <h3><span class="num">2.1</span> Prédire, puis modifier</h3>
+    <p class="contexte">Une corde de guitare vibre à la fréquence fondamentale <i>f</i> = 500 Hz. Ses harmoniques ont pour fréquences 2<i>f</i>, 3<i>f</i>, 4<i>f</i>…</p>
+    <pre class="code">f = 500
+f = f * 2
+print(f)</pre>
+    <div class="qcm" data-bonne="b">
+      <p class="qcm-q">Qu'affiche ce programme ?</p>
+      <button class="opt" data-v="a"><code>500</code></button>
+      <button class="opt" data-v="b"><code>1000</code></button>
+      <button class="opt" data-v="c">un message d'erreur</button>
+      <button class="opt" data-v="d"><code>f * 2</code></button>
+      <button class="opt" data-v="e"><code>500</code> puis <code>1000</code></button>
+      <div class="qcm-expl" hidden>La deuxième ligne se lit de droite à gauche : Python calcule <code>f * 2</code> avec l'ancienne valeur (500 × 2 = 1000), puis range 1000 dans <code>f</code>. L'ancienne valeur est perdue. En mathématiques, « f = 2f » n'aurait de solution que f = 0 ; en Python, c'est une instruction parfaitement normale. Un seul <code>print</code>, donc un seul affichage.</div>
+    </div>
+    <ol class="questions">
+      <li>Exécuter le programme pour vérifier votre prédiction.</li>
+      <li>Le modifier pour qu'il affiche la fréquence de l'harmonique de rang 3, en ne changeant qu'un seul caractère.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">f = 500
+f = f * 2
+print(f)</textarea>
+      <script type="text/x-python" class="py-check">
+if 'f' in globals() and f == 1500:
+    ok("Question 2 — 3 × 500 = 1500 Hz : l'harmonique de rang 3.")
+elif 'f' in globals() and f == 1000:
+    ok("Question 1 — Python affiche bien 1000.")
+else:
+    indice("L'harmonique de rang 3 a pour fréquence 3 × f.")
+      </script>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-2-2">
+    <h3><span class="num">2.2</span> Le décalage Doppler, avec et sans approximation</h3>
+    <a class="doc" href="fiches/tp/tp5-son.pdf" download>TP5 — Ondes sonores et effet Doppler</a>
+    <details class="rappel"><summary>Rappel de cours — Effet Doppler</summary>
+      <p>L'effet Doppler est la modification de la fréquence perçue lorsque l'émetteur et le récepteur sont en mouvement l'un par rapport à l'autre. Le décalage Doppler vaut Δ<i>f</i> = <i>f</i><sub>R</sub> − <i>f</i><sub>E</sub>.</p>
+      <p>Pour un émetteur qui s'approche, à la vitesse <i>v</i>, d'un récepteur fixe :</p>
+      <p class="formule">f<sub>R</sub> = f<sub>E</sub> × <span class="frac"><span class="haut">c</span><span class="bas">c − v</span></span></p>
+      <p>Si la vitesse <i>v</i> est faible devant la célérité <i>c</i>, on retient l'expression approchée :</p>
+      <p class="formule">Δf ≈ f<sub>E</sub> × <span class="frac"><span class="haut">v</span><span class="bas">c</span></span></p>
+    </details>
+    <p class="contexte">Comme au TP5, un émetteur d'ultrasons de fréquence <i>f</i><sub>E</sub> = 40 000 Hz, fixé sur une petite voiture, roule vers le récepteur à <i>v</i> = 2,0 m·s⁻¹. Les ultrasons se propagent dans l'air à <i>c</i> = 340 m·s⁻¹.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>f_R = ……</code> avec l'expression exacte, puis la ligne <code>delta_f = ……</code>.</li>
+      <li>Compléter la ligne <code>delta_f_approx = ……</code> avec l'expression approchée.</li>
+      <li>Exécuter. L'approximation est-elle justifiée ici ? Remplacer <code>v</code> par 100 m·s⁻¹ et conclure.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">f_E = 40000      # fréquence émise, en Hz
+v = 2.0          # vitesse de la voiture, en m/s
+c = 340          # célérité des ultrasons dans l'air, en m/s
+
+f_R = ……              # fréquence reçue, expression exacte
+delta_f = ……          # décalage Doppler exact
+delta_f_approx = ……   # décalage Doppler approché
+
+print(delta_f)
+print(delta_f_approx)</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+if all(k in g for k in ('f_R', 'delta_f', 'f_E', 'v', 'c')):
+    exact = f_E * c / (c - v) - f_E
+    if abs(delta_f - exact) < 1e-6 * max(1, abs(exact)):
+        ok("Question 1 — Expression exacte : Δf ≈ 236,7 Hz pour v = 2,0 m/s.")
+    else:
+        indice("Question 1 : f_R = f_E * c / (c - v), puis delta_f = f_R - f_E.")
+if 'delta_f_approx' in g and 'f_E' in g:
+    if abs(delta_f_approx - f_E * v / c) < 1e-6 * max(1, abs(f_E * v / c)):
+        ok("Question 2 — Expression approchée : Δf ≈ 235,3 Hz pour v = 2,0 m/s, moins de 1 % d'écart.")
+    else:
+        indice("Question 2 : relisez l'expression approchée du rappel de cours.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">f_R = f_E * c / (c - v)
+delta_f = f_R - f_E
+delta_f_approx = f_E * v / c</pre>
+      <p>Pour <i>v</i> = 2,0 m·s⁻¹ : 236,7 Hz (exact) et 235,3 Hz (approché), moins de 1 % d'écart : l'approximation est justifiée. Pour <i>v</i> = 100 m·s⁻¹ : 16 667 Hz contre 11 765 Hz, près de 30 % d'écart : <i>v</i> n'est plus faible devant <i>c</i>. Intérêt des variables : pour une autre vitesse, on ne change qu'une ligne.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-2-3">
+    <h3><span class="num">2.3</span> Constructives ou destructives ?</h3>
+    <details class="rappel"><summary>Rappel de cours — Interférences</summary>
+      <p>La différence de marche en un point M vaut δ = S<sub>2</sub>M − S<sub>1</sub>M.</p>
+      <p class="rappel-titre">Interférences constructives</p>
+      <p>Ondes en phase, amplitude maximale : δ = k × λ, avec k entier.</p>
+      <p class="rappel-titre">Interférences destructives</p>
+      <p>Ondes en opposition de phase, amplitude minimale : δ = (k + ½) × λ.</p>
+      <p class="rappel-titre">Méthode</p>
+      <p>On calcule <span class="frac"><span class="haut">δ</span><span class="bas">λ</span></span>. Un nombre entier : constructives. Un entier plus un demi : destructives.</p>
+    </details>
+    <p class="contexte">Deux ondes lumineuses de longueur d'onde λ = 500 nm arrivent en un point M. Les distances parcourues sont S<sub>1</sub>M = 2 000 nm et S<sub>2</sub>M = 3 250 nm.</p>
+    <ol class="questions">
+      <li>Écrire un script qui calcule et affiche le rapport δ / λ.</li>
+      <li>Les interférences en M sont-elles constructives ou destructives ?</li>
+      <li>En ne modifiant qu'une ligne, trouver ce qui se passe en un point où S<sub>2</sub>M = 3 000 nm.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Commencez par ranger λ, S<sub>1</sub>M et S<sub>2</sub>M dans trois variables, toutes en nm. Attention : <code>lambda</code> est un mot réservé.</li>
+      <li>Rangez la différence de marche dans une variable, par exemple <code>delta</code>, calculée à partir des deux distances.</li>
+      <li>Le rapport s'obtient en divisant <code>delta</code> par la variable qui contient λ. Rangez-le, par exemple dans <code>rapport</code>, puis affichez-le.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code"># toutes les longueurs en nm
+</textarea>
+      <script type="text/x-python" class="py-check">
+vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, (int, float)) and not isinstance(v, bool)]
+if any(abs(v - 2.5) < 1e-9 for v in vals) and '2.5' in _sortie:
+    ok("Questions 1 et 2 — δ / λ = 2,5 : un entier plus un demi, les interférences sont destructives.")
+elif any(abs(v - 2.0) < 1e-9 for v in vals) and '2.0' in _sortie and any(v == 3000 for v in vals):
+    ok("Question 3 — δ / λ = 2 : un nombre entier, les interférences y sont constructives.")
+elif any(abs(v + 2.5) < 1e-9 for v in vals):
+    indice("Le rapport est négatif : la différence de marche est S2M − S1M, dans cet ordre.")
+elif '2.5' not in _sortie:
+    indice("Affichez le rapport avec print : on attend 2.5.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code"># toutes les longueurs en nm
+lam = 500
+S1M = 2000
+S2M = 3250
+delta = S2M - S1M
+rapport = delta / lam
+print(rapport)</pre>
+      <p>Python affiche <code>2.5</code> : destructives. Avec <code>S2M = 3000</code>, le rapport vaut <code>2.0</code> : constructives. Toutes les longueurs sont dans la même unité, le nm, donc le rapport est juste ; mélanger des m et des nm donnerait un résultat faux, sans aucun message d'erreur.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s3" data-titre="Types et affichage">
+  <h2>Types de valeurs et affichage</h2>
+  <p class="intro">Un nombre seul, c'est peu lisible. Un résultat de physique s'affiche avec son nom, sa valeur arrondie et son unité. Pour y arriver, il faut d'abord distinguer les nombres des textes.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Chaque valeur a un <em class="cle">type</em> : <code>int</code> (entier : <code>340</code>), <code>float</code> (nombre à virgule : <code>340.0</code>), <code>str</code> (texte : <code>'340'</code>). <code>type(x)</code> donne le type de <code>x</code>.</li>
+      <li>Un <b>texte</b> s'écrit entre guillemets, simples ou doubles : <code>'Hz'</code> ou <code>"Hz"</code>. Sans guillemets, Python cherche une variable de ce nom.</li>
+      <li>Deux textes s'ajoutent bout à bout : <code>'40' + '00'</code> donne <code>'4000'</code>. Un texte et un nombre ne s'ajoutent pas : erreur.</li>
+      <li><code>print</code> affiche plusieurs morceaux séparés par des virgules, en mettant une espace entre eux.</li>
+      <li><code>round(x, 2)</code> arrondit <code>x</code> à 2 chiffres après la virgule. Comme <code>print</code> et <code>type</code>, c'est une fonction <b>intégrée</b> à Python : pas besoin de bibliothèque.</li>
+    </ul>
+    <pre class="code">c = 340
+T = 1 / 440
+print('c =', c, 'm/s')            # affiche : c = 340 m/s
+print('T =', round(T, 5), 's')    # affiche : T = 0.00227 s</pre>
+  </div>
+
+  <article class="exo" id="ex-3-1">
+    <h3><span class="num">3.1</span> Les types dans la console</h3>
+    <p class="contexte">Tapez ces instructions une à une dans la console et observez : <code>type(340)</code>, <code>type(340.0)</code>, <code>type('340')</code>, <code>340 + 1</code>, <code>'340' + '1'</code>, puis <code>'340' + 1</code>. La dernière provoque une erreur : lisez la première ligne du message, c'est celui de Python.</p>
+    <div class="py" data-mode="console"></div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p><code>340</code> est un <code>int</code>, <code>340.0</code> un <code>float</code>, <code>'340'</code> un <code>str</code> : ce n'est pas un nombre, mais trois caractères. <code>'340' + '1'</code> colle les deux textes : <code>'3401'</code>. <code>'340' + 1</code> mélange un texte et un nombre : Python répond par une <code>TypeError</code>.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-2">
+    <h3><span class="num">3.2</span> Prédire l'affichage</h3>
+    <p class="contexte">Pour chaque instruction, prédire ce qu'affiche Python. Vérifiez dans la console de l'exercice 3.1 si vous hésitez.</p>
+    <div class="quiz">
+      <h4>Qu'affiche Python ?</h4>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>type(2.5)</code></p>
+        <button class="opt" data-v="a"><code>int</code></button>
+        <button class="opt" data-v="b"><code>float</code></button>
+        <button class="opt" data-v="c"><code>str</code></button>
+        <button class="opt" data-v="d"><code>2.5</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>2.5 a une virgule (un point, en Python) : c'est un <code>float</code>. Python l'écrit <code>&lt;class 'float'&gt;</code>.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>type('2.5')</code></p>
+        <button class="opt" data-v="a"><code>int</code></button>
+        <button class="opt" data-v="b"><code>float</code></button>
+        <button class="opt" data-v="c"><code>str</code></button>
+        <button class="opt" data-v="d"><code>2.5</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>Les guillemets en font un texte, un <code>str</code>, même s'il ressemble à un nombre.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>type(6 / 3)</code></p>
+        <button class="opt" data-v="a"><code>int</code></button>
+        <button class="opt" data-v="b"><code>float</code></button>
+        <button class="opt" data-v="c"><code>str</code></button>
+        <button class="opt" data-v="d"><code>2</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>La division <code>/</code> donne toujours un nombre à virgule : <code>6 / 3</code> vaut <code>2.0</code>, un <code>float</code>.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q"><code>print('f =', 500, 'Hz')</code></p>
+        <button class="opt" data-v="a"><code>'f =', 500, 'Hz'</code></button>
+        <button class="opt" data-v="b"><code>f=500Hz</code></button>
+        <button class="opt" data-v="c"><code>f = 500Hz</code></button>
+        <button class="opt" data-v="d"><code>f = 500 Hz</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden><code>print</code> affiche chaque morceau, sans les guillemets, en plaçant une espace entre deux morceaux.</div>
+      </div>
+      <div class="qcm" data-bonne="a">
+        <p class="qcm-q"><code>round(3.14159, 2)</code></p>
+        <button class="opt" data-v="a"><code>3.14</code></button>
+        <button class="opt" data-v="b"><code>3.1</code></button>
+        <button class="opt" data-v="c"><code>3.15</code></button>
+        <button class="opt" data-v="d"><code>3</code></button>
+        <button class="opt" data-v="e"><code>3.141</code></button>
+        <div class="qcm-expl" hidden>2 chiffres après la virgule : 3.14. Le chiffre suivant, 1, est inférieur à 5 : on arrondit vers le bas.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q"><code>'Hz' + 500</code></p>
+        <button class="opt" data-v="a"><code>Hz500</code></button>
+        <button class="opt" data-v="b"><code>'Hz500'</code></button>
+        <button class="opt" data-v="c"><code>Hz 500</code></button>
+        <button class="opt" data-v="d"><code>500</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>Un texte et un nombre ne s'ajoutent pas : <code>TypeError</code>. Pour afficher les deux, on les sépare par une virgule dans <code>print</code>.</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-3-3">
+    <h3><span class="num">3.3</span> S'entraîner à afficher</h3>
+    <p class="contexte">Le programme calcule la période et la longueur d'onde d'un son de 500 Hz. Ajouter trois lignes <code>print</code> pour qu'il affiche exactement :</p>
+    <pre class="code sortie">f = 500 Hz
+T = 0.002 s
+lambda = 0.68 m</pre>
+    <div class="aide"><ol>
+      <li>Chaque ligne affichée a trois morceaux : un texte, une valeur, une unité.</li>
+      <li>Le texte <code>'f ='</code> s'écrit entre guillemets ; la valeur est le nom de la variable, sans guillemets.</li>
+      <li>Dans un texte entre guillemets, on peut écrire <code>lambda</code> : seul un nom de variable ne le peut pas.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="3">
+      <textarea class="py-code">f = 500         # fréquence, en Hz
+c = 340         # célérité, en m/s
+T = 1 / f       # période, en s
+lam = c / f     # longueur d'onde, en m
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+lignes = [l.strip() for l in _sortie.splitlines()]
+attendues = ('f = 500 Hz', 'T = 0.002 s', 'lambda = 0.68 m')
+for i, l in enumerate(attendues):
+    if l in lignes:
+        ok("Ligne " + str(i + 1) + " — " + l)
+if any(l not in lignes for l in attendues):
+    if any(('=' in l and ' = ' not in l) for l in lignes):
+        indice("Le texte doit être exactement 'f =' : une espace avant et après le signe égal, comme dans l'affichage attendu.")
+    elif 'f = 500 Hz' in lignes:
+        indice("Les lignes manquantes ont la même forme que la première : un texte, une variable, une unité.")
+    else:
+        indice("Exemple pour la première ligne : print('f =', f, 'Hz')")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">print('f =', f, 'Hz')
+print('T =', T, 's')
+print('lambda =', lam, 'm')</pre>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-3-4">
+    <h3><span class="num">3.4</span> Le résultat Doppler, présenté</h3>
+    <p class="contexte">On reprend la voiture de l'exercice 2.2. On veut que le programme affiche exactement :</p>
+    <pre class="code sortie">Décalage Doppler : 236.69 Hz
+Fréquence reçue : 40236.69 Hz</pre>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">f_E = 40000      # Hz
+v = 2.0          # m/s
+c = 340          # m/s
+f_R = f_E * c / (c - v)
+delta_f = f_R - f_E
+
+print(……)
+print(……)</textarea>
+      <script type="text/x-python" class="py-check">
+lignes = [l.strip() for l in _sortie.splitlines()]
+if 'Décalage Doppler : 236.69 Hz' in lignes and 'Fréquence reçue : 40236.69 Hz' in lignes:
+    ok("Résultat lisible : nom, valeur arrondie, unité.")
+elif any('236.686' in l for l in lignes):
+    indice("Arrondissez avec round(delta_f, 2).")
+elif 'Décalage Doppler : 236.69 Hz' in lignes:
+    indice("Le décalage est bien affiché. Reste la fréquence reçue, arrondie elle aussi.")
+else:
+    indice("Même forme qu'à l'exercice 3.3, avec round(…, 2) autour de la variable.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">print('Décalage Doppler :', round(delta_f, 2), 'Hz')
+print('Fréquence reçue :', round(f_R, 2), 'Hz')</pre>
+      <p>Arrondir à deux décimales sert l'affichage. Le nombre de chiffres significatifs d'un résultat de mesure, lui, dépend de son incertitude.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>Toutes les fonctions intégrées de Python, dont <code>round</code>, <code>print</code> et <code>type</code>, avec leurs paramètres : <a href="https://docs.python.org/fr/3/library/functions.html#round" target="_blank" rel="noopener">docs.python.org — Fonctions natives</a>.</p>
+    </aside>
+  </article>
+
+  <article class="exo" id="ex-3-5">
+    <h3><span class="num">3.5</span> La tache de diffraction</h3>
+    <a class="doc" href="fiches/tp/tp1-diffraction.pdf" download>TP1 — Diffraction de la lumière</a>
+    <details class="rappel"><summary>Rappel de cours — Diffraction par une fente</summary>
+      <p>Une fente de largeur <i>a</i>, éclairée par une lumière de longueur d'onde λ, diffracte la lumière. L'angle caractéristique θ (en rad) vérifie, pour de petits angles :</p>
+      <p class="formule">θ ≈ <span class="frac"><span class="haut">λ</span><span class="bas">a</span></span>      θ ≈ <span class="frac"><span class="haut">L</span><span class="bas">2D</span></span></p>
+      <p><i>L</i> : largeur de la tache centrale ; <i>D</i> : distance fente–écran. Toutes les longueurs en mètres.</p>
+    </details>
+    <p class="contexte">Comme au TP1, un laser rouge (λ = 633 nm) éclaire une fente de largeur <i>a</i> = 100 µm ; l'écran est à <i>D</i> = 1,50 m de la fente.</p>
+    <ol class="questions">
+      <li>Écrire un script qui calcule la largeur <i>L</i> de la tache centrale.</li>
+      <li>L'afficher en centimètres, arrondie au dixième, avec son unité.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Toutes les longueurs en mètres, avec la notation <code>e</code> : 633 nm = 633 × 10⁻⁹ m.</li>
+      <li>Calculez d'abord θ à partir de λ et <i>a</i>, puis isolez <i>L</i> dans la deuxième relation.</li>
+      <li>Python n'accepte pas <code>2D</code> : la multiplication s'écrit toujours <code>2 * D</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">D = 1.50         # distance fente-écran, en m
+</textarea>
+      <script type="text/x-python" class="py-check">
+vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, float)]
+if any(abs(v - 0.01899) < 1e-7 for v in vals):
+    if '1.9' in _sortie and 'cm' in _sortie:
+        ok("L ≈ 1,9 cm : une tache bien visible sur l'écran.")
+    else:
+        indice("L ≈ 0,019 m est juste. Affichez-la en cm : multipliez par 100, puis arrondissez au dixième.")
+elif any(abs(v - 6.33) < 0.01 for v in vals):
+    indice("θ = 6,33 rad, c'est plus d'un tour complet : λ et a ne sont pas dans la même unité.")
+elif any(abs(v - 0.00633) < 1e-7 for v in vals):
+    indice("θ est juste. Reste à isoler L.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">D = 1.50
+lam = 633e-9
+a = 100e-6
+theta = lam / a
+L = 2 * D * theta
+print('L =', round(L * 100, 1), 'cm')</pre>
+      <p>θ = 6,33 × 10⁻³ rad et la tache centrale mesure 1,9 cm.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s4" data-titre="La bibliothèque numpy">
+  <h2>La bibliothèque numpy</h2>
+  <p class="intro">Python de base ne connaît ni le logarithme ni la racine carrée. Ces fonctions sont rangées dans des <b>bibliothèques</b>, qu'on charge en début de programme. En physique-chimie, la plus utilisée s'appelle <b>numpy</b> (<i>numerical Python</i>).</p>
+
+  <div class="coulisses">
+    <h4>Derrière le rideau</h4>
+    <p>Une bibliothèque n'a rien de magique : c'est du code écrit par d'autres programmeurs, rangé et partagé pour qu'on n'ait pas à le réécrire. Calculer un logarithme, par exemple, n'est pas une opération que le processeur sait faire directement : il ne connaît que les additions, les multiplications et quelques opérations simples. La fonction <code>log10</code> est donc un petit programme qui approche le résultat par une suite de calculs élémentaires, assez pour obtenir les 16 chiffres significatifs, et assez vite pour traiter des millions de valeurs. Écrire un tel programme juste, rapide et fiable demande beaucoup de travail.</p>
+    <p>Python a été créé en 1991 par Guido van Rossum. numpy est né en 2005-2006, quand Travis Oliphant a réuni deux bibliothèques scientifiques plus anciennes ; matplotlib, celle des graphiques, a été lancée en 2003 par John Hunter, un neurobiologiste qui voulait tracer ses mesures. Les trois sont <em class="cle">libres</em> (<i>open source</i>) : leur code est public et gratuit, et des centaines de bénévoles, de chercheurs et d'ingénieurs du monde entier le corrigent et l'améliorent encore aujourd'hui. Les grands laboratoires de recherche s'en servent, tout comme vous.</p>
+  </div>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>import numpy as np</code>, en première ligne, charge numpy sous le nom court <code>np</code>.</li>
+      <li>On appelle ensuite ses fonctions avec <code>np.</code> devant : <code>np.log10(x)</code> (logarithme décimal, le « log » du cours), <code>np.sqrt(x)</code> (racine carrée), <code>np.pi</code> (le nombre π).</li>
+      <li><b>Piège</b> : <code>np.log(x)</code> calcule le logarithme <em class="cle">népérien</em> ln, pas le log décimal.</li>
+      <li>Dix puissance <i>x</i> s'écrit <code>10 ** x</code> ; pour une puissance négative, des parenthèses évitent les surprises : <code>10 ** (-pH)</code>.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-4-1">
+    <h3><span class="num">4.1</span> Le niveau d'intensité sonore</h3>
+    <details class="rappel"><summary>Rappel de cours — Niveau d'intensité sonore</summary>
+      <p>Le niveau d'intensité sonore <i>L</i>, en décibels (dB), se calcule à partir de l'intensité sonore <i>I</i> (en W·m⁻²) :</p>
+      <p class="formule">L = 10 × log<span class="par">(</span><span class="frac"><span class="haut">I</span><span class="bas">I<sub>0</sub></span></span><span class="par">)</span>   avec   I<sub>0</sub> = 1,0 × 10⁻¹² W·m⁻²</p>
+    </details>
+    <p class="contexte">On reprend la salle de classe de l'exercice 1.3 : <i>I</i> = 1,0 × 10⁻⁵ W·m⁻².</p>
+    <ol class="questions">
+      <li>Compléter le programme pour calculer le niveau d'intensité sonore <code>L</code> de la salle.</li>
+      <li>Remplacer <code>np.log10</code> par <code>np.log</code> et exécuter de nouveau. Le résultat est-il plausible pour une salle de classe ?</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+
+I = 1.0e-5       # intensité sonore, en W/m²
+I0 = 1.0e-12     # seuil d'audibilité, en W/m²
+
+L = ……
+print('L =', round(L, 1), 'dB')</textarea>
+      <script type="text/x-python" class="py-check">
+if 'L' in globals() and abs(L - 70) < 0.01:
+    ok("L = 70 dB : un niveau bruyant, mais courant dans une classe.")
+elif 'L' in globals() and abs(L - 161.18) < 0.1:
+    indice("161 dB, c'est au-delà du décollage d'un avion : np.log est le logarithme népérien. Le log du cours est np.log10.")
+else:
+    indice("Écrivez la formule du rappel, avec np.log10.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">L = 10 * np.log10(I / I0)</pre>
+      <p>Python affiche <code>L = 70.0 dB</code>. Avec <code>np.log</code>, on obtient 161,2 dB : un niveau qui détruirait l'oreille, signe d'une erreur. Python ne signale rien, car le calcul est valide, simplement ce n'est pas le bon. C'est l'une des erreurs les plus fréquentes à l'ECE.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-2">
+    <h3><span class="num">4.2</span> Du pH à la concentration, et retour</h3>
+    <details class="rappel"><summary>Rappel de cours — pH</summary>
+      <p class="formule">pH = −log<span class="par">(</span><span class="frac"><span class="haut">[H<sub>3</sub>O<sup>+</sup>]</span><span class="bas">c<sup>0</sup></span></span><span class="par">)</span>   avec   c<sup>0</sup> = 1 mol·L⁻¹</p>
+      <p>Le pH est sans unité ; [H<sub>3</sub>O<sup>+</sup>] est la concentration en ions oxonium, en mol·L⁻¹. Réciproquement : [H<sub>3</sub>O<sup>+</sup>] = c<sup>0</sup> × 10<sup>−pH</sup>.</p>
+    </details>
+    <div class="qcm" data-bonne="b">
+      <p class="qcm-q">Que renvoie <code>np.log(100)</code> ?</p>
+      <button class="opt" data-v="a"><code>2.0</code></button>
+      <button class="opt" data-v="b"><code>4.605170185988092</code></button>
+      <button class="opt" data-v="c"><code>10.0</code></button>
+      <button class="opt" data-v="d"><code>0.01</code></button>
+      <button class="opt" data-v="e"><code>200.0</code></button>
+      <div class="qcm-expl" hidden><code>np.log</code> est le logarithme népérien : ln(100) ≈ 4,605. C'est <code>np.log10(100)</code> qui vaut 2.</div>
+    </div>
+    <ol class="questions">
+      <li>Une solution a une concentration en ions oxonium de 1,0 × 10⁻² mol·L⁻¹. Compléter la ligne <code>pH = ……</code>.</li>
+      <li>Le jus de citron a un pH de 2,4. Compléter la ligne qui calcule sa concentration <code>h_citron</code> en ions oxonium.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+h = 1.0e-2           # [H3O+] en mol/L
+pH = ……
+print('pH =', round(pH, 2))
+
+pH_citron = 2.4
+h_citron = ……
+print('[H3O+] du citron :', h_citron, 'mol/L')</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+if 'pH' in g and abs(pH - 2.0) < 1e-6:
+    ok("Question 1 — pH = 2,0.")
+elif 'pH' in g and abs(pH + 2.0) < 1e-6:
+    indice("pH négatif : il manque le signe moins devant np.log10.")
+elif 'pH' in g and abs(pH - 4.605) < 0.01:
+    indice("np.log est le logarithme népérien. Utilisez np.log10.")
+if 'h_citron' in g and abs(h_citron - 10 ** (-2.4)) < 1e-9:
+    ok("Question 2 — [H3O+] du citron ≈ 4,0 × 10⁻³ mol/L.")
+elif 'h_citron' in g:
+    indice("Question 2 : relisez la relation réciproque du rappel de cours.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">pH = -np.log10(h)
+h_citron = 10 ** (-pH_citron)</pre>
+      <p>Python affiche <code>pH = 2.0</code> puis <code>0.003981071705534973</code>, soit [H<sub>3</sub>O<sup>+</sup>] ≈ 4,0 × 10⁻³ mol·L⁻¹. Ici c<sup>0</sup> = 1 mol·L⁻¹ : diviser par c<sup>0</sup> ne change pas la valeur, on peut l'omettre.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-4-3">
+    <h3><span class="num">4.3</span> L'incertitude-type d'une moyenne</h3>
+    <details class="rappel"><summary>Rappel de cours — Incertitude de type A</summary>
+      <p>Pour une série de <i>n</i> mesures répétées de la même grandeur, d'écart-type expérimental <i>s</i>(<i>x</i>), l'incertitude-type de la moyenne vaut :</p>
+      <p class="formule">u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
+      <p>Elle s'écrit avec un seul chiffre significatif, arrondi à l'excès.</p>
+    </details>
+    <p class="contexte">La classe a mesuré 15 fois la masse du même cylindre d'aluminium. La calculatrice donne une moyenne de 55,45 g et un écart-type <i>s</i> = 0,02 g.</p>
+    <ol class="questions">
+      <li>Écrire un script qui calcule l'incertitude-type <code>u</code> de la moyenne, avec <code>np.sqrt</code>, et l'affiche.</li>
+      <li>Combien de mesures faudrait-il pour diviser cette incertitude par deux ? Le vérifier en modifiant une seule ligne.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Il faut trois variables : le nombre de mesures, l'écart-type, et l'incertitude.</li>
+      <li>N'oubliez pas <code>import numpy as np</code> en première ligne.</li>
+      <li>Pour la question 2 : <i>u</i> est divisée par √<i>n</i>. Pour diviser <i>u</i> par 2, par combien faut-il multiplier <i>n</i> ?</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+</textarea>
+      <script type="text/x-python" class="py-check">
+vals = [v for k, v in globals().items() if not k.startswith('_') and isinstance(v, (int, float)) and not isinstance(v, bool)]
+if any(abs(v - 0.02 / 15 ** 0.5) < 1e-9 for v in vals):
+    ok("Question 1 — u ≈ 0,0052 g, soit 0,006 g arrondi à l'excès : m = (55,450 ± 0,006) g.")
+elif any(abs(v - 0.02 / 60 ** 0.5) < 1e-9 for v in vals):
+    ok("Question 2 — Avec 60 mesures, quatre fois plus, u ≈ 0,0026 g : deux fois plus petite.")
+elif any(abs(v - 0.02 / 30 ** 0.5) < 1e-9 for v in vals):
+    indice("Avec 30 mesures, u n'est divisée que par √2 ≈ 1,4. Il en faut davantage.")
+elif any(abs(v - 0.02 / 15) < 1e-9 for v in vals):
+    indice("On divise par la racine de n : np.sqrt(n).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">import numpy as np
+
+n = 15           # nombre de mesures
+s = 0.02         # écart-type expérimental, en g
+u = s / np.sqrt(n)
+print('u =', u, 'g')</pre>
+      <p><i>u</i> ≈ 0,0052 g, soit 0,006 g arrondi à l'excès. Pour diviser <i>u</i> par 2, il faut multiplier √<i>n</i> par 2, donc <i>n</i> par 4 : 60 mesures. Mesurer plus améliore la précision, mais de moins en moins vite.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s5" data-titre="Listes et tableaux">
+  <h2>Listes de mesures et tableaux numpy</h2>
+  <p class="intro">En TP, on ne mesure jamais une seule valeur. Une <b>liste</b> range toute une série de mesures sous un seul nom ; un <b>tableau numpy</b> permet de faire le même calcul sur toutes, d'un coup. C'est ce que demande l'ECE dans la plupart des sujets.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Une <em class="cle">liste</em> regroupe des valeurs entre crochets, séparées par des virgules : <code>pH = [2.4, 2.5, 2.9]</code>. C'est là que sert la virgule, jamais comme séparateur décimal.</li>
+      <li><code>len(pH)</code> donne le nombre d'éléments.</li>
+      <li><code>pH[0]</code> est le <b>premier</b> élément : Python compte à partir de 0. <code>pH[2]</code> est donc le troisième.</li>
+      <li>Une liste ne se prête pas au calcul : <code>pH * 2</code> la recopie deux fois. On la convertit en <em class="cle">tableau numpy</em> : <code>pH = np.array(pH)</code>. Ensuite, <code>10 ** (-pH)</code> calcule toutes les valeurs d'un coup.</li>
+    </ul>
+    <pre class="code">import numpy as np
+pH = np.array([2.4, 2.5, 2.9])   # liste convertie en tableau
+h = 10 ** (-pH)                  # trois calculs d'un coup
+print(h)</pre>
+  </div>
+
+  <article class="exo" id="ex-5-1">
+    <h3><span class="num">5.1</span> Manipuler une liste</h3>
+    <p class="contexte">Dans la console, rangez dans <code>pH</code> la liste des pH mesurés au TP6 : 1,03 ; 1,41 ; 1,68 ; 2,08 ; 2,25. Testez ensuite <code>len(pH)</code>, <code>pH[0]</code>, <code>pH[4]</code>, <code>pH[5]</code> et <code>pH * 2</code>. Importez enfin numpy, convertissez la liste en tableau et testez de nouveau <code>pH * 2</code>.</p>
+    <div class="py" data-mode="console"></div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">&gt;&gt;&gt; pH = [1.03, 1.41, 1.68, 2.08, 2.25]
+&gt;&gt;&gt; len(pH)
+5
+&gt;&gt;&gt; pH[0]
+1.03
+&gt;&gt;&gt; pH[4]
+2.25
+&gt;&gt;&gt; pH * 2
+[1.03, 1.41, 1.68, 2.08, 2.25, 1.03, 1.41, 1.68, 2.08, 2.25]
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; pH = np.array(pH)
+&gt;&gt;&gt; pH * 2
+array([2.06, 2.82, 3.36, 4.16, 4.5 ])</pre>
+      <p>Cinq valeurs : la dernière est <code>pH[4]</code>, et <code>pH[5]</code> n'existe pas (<code>IndexError</code>). Une liste multipliée par 2 est recopiée deux fois ; un tableau numpy est multiplié valeur par valeur.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-5-2">
+    <h3><span class="num">5.2</span> Prédire</h3>
+    <pre class="code">import numpy as np
+d = [1000, 1250, 1500]
+lam = 500</pre>
+    <div class="quiz">
+      <h4>Après ces trois lignes, que vaut…</h4>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>len(d)</code></p>
+        <button class="opt" data-v="a"><code>1</code></button>
+        <button class="opt" data-v="b"><code>2</code></button>
+        <button class="opt" data-v="c"><code>3</code></button>
+        <button class="opt" data-v="d"><code>4</code></button>
+        <button class="opt" data-v="e"><code>3750</code></button>
+        <div class="qcm-expl" hidden><code>len</code> compte les éléments : trois.</div>
+      </div>
+      <div class="qcm" data-bonne="b">
+        <p class="qcm-q"><code>d[1]</code></p>
+        <button class="opt" data-v="a"><code>1000</code></button>
+        <button class="opt" data-v="b"><code>1250</code></button>
+        <button class="opt" data-v="c"><code>1500</code></button>
+        <button class="opt" data-v="d"><code>1</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>On compte à partir de 0 : <code>d[0]</code> vaut 1000, <code>d[1]</code> vaut 1250.</div>
+      </div>
+      <div class="qcm" data-bonne="e">
+        <p class="qcm-q"><code>d[3]</code></p>
+        <button class="opt" data-v="a"><code>1000</code></button>
+        <button class="opt" data-v="b"><code>1250</code></button>
+        <button class="opt" data-v="c"><code>1500</code></button>
+        <button class="opt" data-v="d"><code>0</code></button>
+        <button class="opt" data-v="e">un message d'erreur</button>
+        <div class="qcm-expl" hidden>La liste a trois éléments, numérotés 0, 1 et 2 : <code>d[3]</code> n'existe pas, Python répond <code>IndexError</code>.</div>
+      </div>
+      <div class="qcm" data-bonne="d">
+        <p class="qcm-q"><code>np.array(d) / lam</code></p>
+        <button class="opt" data-v="a"><code>[2, 2.5, 3]</code></button>
+        <button class="opt" data-v="b"><code>7.5</code></button>
+        <button class="opt" data-v="c">un message d'erreur</button>
+        <button class="opt" data-v="d"><code>array([2. , 2.5, 3. ])</code></button>
+        <button class="opt" data-v="e"><code>array([1000, 1250, 1500])</code></button>
+        <div class="qcm-expl" hidden>Le tableau est divisé valeur par valeur : 2, 2,5 et 3. Python l'affiche avec le mot <code>array</code>, et des points après les entiers puisque la division donne des nombres à virgule.</div>
+      </div>
+      <div class="qcm" data-bonne="c">
+        <p class="qcm-q"><code>d / lam</code></p>
+        <button class="opt" data-v="a"><code>[2.0, 2.5, 3.0]</code></button>
+        <button class="opt" data-v="b"><code>array([2. , 2.5, 3. ])</code></button>
+        <button class="opt" data-v="c">un message d'erreur</button>
+        <button class="opt" data-v="d"><code>7.5</code></button>
+        <button class="opt" data-v="e"><code>2.0</code></button>
+        <div class="qcm-expl" hidden>Sans <code>np.array</code>, <code>d</code> est une simple liste, qu'on ne peut pas diviser : <code>TypeError</code>. C'est pour cela qu'on convertit les listes avant de calculer.</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="exo" id="ex-5-3">
+    <h3><span class="num">5.3</span> Le pH de liquides courants</h3>
+    <p class="contexte">pH mesurés : jus de citron 2,4 ; soda au cola 2,5 ; vinaigre blanc 2,9 ; café 5,0 ; eau du robinet 7,6 ; eau de mer 8,2.</p>
+    <ol class="questions">
+      <li>Compléter la liste <code>pH</code>, puis la ligne qui calcule le tableau <code>h</code> des concentrations en ions oxonium.</li>
+      <li>Afficher la concentration du café seul, en utilisant son rang dans la liste.</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+noms = ['citron', 'cola', 'vinaigre', 'café', 'robinet', 'eau de mer']
+pH = [……]
+pH = np.array(pH)
+h = ……             # [H3O+] en mol/L
+print(h)
+</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+attendu = 10 ** (-_np.array([2.4, 2.5, 2.9, 5.0, 7.6, 8.2]))
+g = globals()
+if 'h' in g and _np.shape(h) == (6,) and _np.allclose(h, attendu):
+    ok("Question 1 — Six concentrations calculées d'un coup.")
+    if '1e-05' in _sortie:
+        ok("Question 2 — Le café est le 4ᵉ liquide : h[3] = 1,0 × 10⁻⁵ mol/L.")
+    else:
+        indice("Question 2 : le café est le 4ᵉ de la liste, mais on compte à partir de 0.")
+elif 'pH' in g and _np.size(pH) != 6:
+    indice("Il faut six valeurs de pH, séparées par des virgules, avec des points décimaux.")
+else:
+    indice("h se calcule comme dans l'encadré À retenir.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">pH = [2.4, 2.5, 2.9, 5.0, 7.6, 8.2]
+h = 10 ** (-pH)
+print(h[3])</pre>
+      <p>Le café est le quatrième liquide, de rang 3 : <code>h[3]</code> vaut 1,0 × 10⁻⁵ mol·L⁻¹. Python affiche les très petites valeurs en notation scientifique : <code>1e-05</code>.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s6" data-titre="Statistiques">
+  <h2>Moyenne, écart-type, incertitude</h2>
+  <p class="intro">Plus besoin du mode statistique de la calculatrice : numpy calcule la moyenne et l'écart-type d'une série en une ligne. C'est le cœur de nombreux sujets d'ECE.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>np.mean(x)</code> : la moyenne de la série <code>x</code>.</li>
+      <li><code>np.std(x, ddof=1)</code> : l'<em class="cle">écart-type expérimental</em>, celui qui divise par <i>n</i> − 1, comme dans le cours. Sans <code>ddof=1</code>, numpy divise par <i>n</i> : ce n'est pas celui qu'on utilise.</li>
+      <li><code>len(x)</code> donne <i>n</i>, et l'incertitude-type de la moyenne s'écrit <code>np.std(x, ddof=1) / np.sqrt(len(x))</code>.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-6-1">
+    <h3><span class="num">6.1</span> Le cylindre d'aluminium</h3>
+    <details class="rappel"><summary>Rappel de cours — Moyenne et écart-type</summary>
+      <p class="formule">x̄ = <span class="frac"><span class="haut">1</span><span class="bas">n</span></span> ∑ x<sub>i</sub>      u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
+      <p class="formule">s(x) = √<span class="par">(</span><span class="frac"><span class="haut">1</span><span class="bas">n − 1</span></span> ∑ (x<sub>i</sub> − x̄)²<span class="par">)</span></p>
+      <p>La moyenne est la meilleure estimation de la grandeur ; l'écart-type caractérise la dispersion des mesures ; l'incertitude-type de la moyenne, sa fiabilité.</p>
+    </details>
+    <p class="contexte">Voici les 15 masses du cylindre d'aluminium de l'exercice 4.3, cette fois mesure par mesure (valeurs construites d'après la fiche de cours).</p>
+    <ol class="questions">
+      <li>Compléter les lignes qui calculent la moyenne <code>m_moy</code> et l'incertitude-type <code>u</code>.</li>
+      <li>Exécuter, puis retirer <code>ddof=1</code>. L'écart-type change-t-il ? Lequel faut-il utiliser ?</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+
+m = np.array([55.47, 55.43, 55.45, 55.44, 55.48, 55.42, 55.46, 55.45,
+              55.43, 55.47, 55.44, 55.46, 55.42, 55.45, 55.46])   # en g
+
+n = len(m)
+m_moy = ……
+s = np.std(m, ddof=1)
+u = ……
+
+print('n =', n)
+print('moyenne =', m_moy, 'g')
+print('s =', s, 'g')
+print('u =', u, 'g')</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'm' in g and 'u' in g and 'm_moy' in g:
+    ok_m = abs(m_moy - _np.mean(m)) < 1e-9
+    ok_u = abs(u - _np.std(m, ddof=1) / _np.sqrt(len(m))) < 1e-9
+    if ok_m and ok_u:
+        ok("Moyenne 55,449 g, s ≈ 0,018 g, u ≈ 0,005 g : on écrit m = (55,449 ± 0,005) g.")
+    elif ok_m and abs(u - _np.std(m, ddof=1)) < 1e-9:
+        indice("u est l'incertitude-type de la MOYENNE : il faut diviser s par la racine de n.")
+    elif ok_m:
+        indice("La moyenne est juste. Pour u, relisez l'encadré À retenir.")
+    else:
+        indice("La moyenne se calcule avec np.mean.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">m_moy = np.mean(m)
+u = s / np.sqrt(n)</pre>
+      <p>Moyenne 55,449 g, <i>s</i> ≈ 0,018 g, <i>u</i> ≈ 0,0048 g, arrondie à l'excès : 0,005 g. Sans <code>ddof=1</code>, l'écart-type vaut 0,0178 g : un peu plus petit, car numpy divise par <i>n</i>. En physique, on utilise l'écart-type expérimental, avec <code>ddof=1</code>.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s7" data-titre="Tracer avec pyplot">
+  <h2>Tracer un graphique avec pyplot</h2>
+  <p class="intro">Tracer des mesures, comparer à un modèle, lire une valeur : c'est la partie graphique de presque tous les sujets d'ECE. On utilise <b>pyplot</b>, une partie de la bibliothèque matplotlib.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li><code>import matplotlib.pyplot as plt</code> charge pyplot sous le nom court <code>plt</code>.</li>
+      <li><code>plt.plot(x, y, 'b+')</code> place des points (croix bleues) ; <code>plt.plot(x, y, 'r-')</code> trace une ligne rouge. Les deux tableaux <code>x</code> et <code>y</code> doivent avoir <b>la même longueur</b>.</li>
+      <li><code>label='mesures'</code> donne un nom à la série ; <code>plt.legend()</code> affiche ces noms.</li>
+      <li><code>plt.xlabel('…')</code>, <code>plt.ylabel('…')</code> et <code>plt.title('…')</code> légendent le graphique ; <code>plt.grid()</code> ajoute un quadrillage.</li>
+      <li><code>np.linspace(0, 11, 100)</code> crée 100 valeurs régulièrement espacées de 0 à 11 : idéal pour tracer une courbe de modèle bien lisse.</li>
+      <li><code>plt.hist(x, bins=5, edgecolor='black')</code> trace l'histogramme d'une série, en 5 classes.</li>
+      <li><code>plt.show()</code> affiche le graphique.</li>
+    </ul>
+  </div>
+
+  <article class="exo" id="ex-7-1">
+    <h3><span class="num">7.1</span> La courbe d'étalonnage du TP4</h3>
+    <details class="rappel"><summary>Rappel de cours — Loi de Kohlrausch</summary>
+      <p>Pour une solution diluée ne contenant qu'un seul soluté ionique, la conductivité σ est proportionnelle à la concentration <i>c</i> :</p>
+      <p class="formule">σ = k × c</p>
+      <p>Une concentration inconnue se lit sur la droite d'étalonnage, ou se calcule : c = <span class="frac"><span class="haut">σ</span><span class="bas">k</span></span>.</p>
+    </details>
+    <p class="contexte">Au TP4, la gamme étalon de chlorure de sodium a donné les mesures ci-dessous. Le modèle de Kohlrausch s'écrit σ = <i>k</i> × <i>c</i>, avec <i>k</i> = 0,1172 mS·cm⁻¹ par mmol·L⁻¹.</p>
+    <ol class="questions">
+      <li>Exécuter : les mesures s'affichent. Ajouter les légendes des axes et un titre.</li>
+      <li>Compléter <code>sigma_mod = ……</code>, puis ajouter la ligne qui trace le modèle en ligne rouge, avec <code>label='modèle'</code>.</li>
+      <li>Le modèle est-il en accord avec les mesures ?</li>
+    </ol>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])               # en mmol/L
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])  # en mS/cm
+
+k = 0.1172                       # coefficient du modèle
+c_mod = np.linspace(0, 11, 100)  # 100 concentrations de 0 à 11 mmol/L
+sigma_mod = ……                   # modèle de Kohlrausch
+
+plt.plot(c, sigma, 'b+', markersize=12, label='mesures')
+
+plt.legend()
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+try:
+    ax = _figure.axes[0]
+    xl, yl = ax.get_xlabel(), ax.get_ylabel()
+    n_series = len(ax.get_lines())
+except Exception:
+    xl = yl = ''
+    n_series = 0
+if xl and yl:
+    ok("Question 1 — Axes légendés.")
+elif xl or yl:
+    indice("Question 1 : les deux axes doivent être légendés, xlabel et ylabel.")
+if 'sigma_mod' in g and 'c_mod' in g and _np.shape(sigma_mod) == _np.shape(c_mod) and _np.allclose(sigma_mod, 0.1172 * c_mod):
+    if n_series >= 2:
+        ok("Question 2 — Le modèle est calculé et tracé.")
+    else:
+        indice("Le modèle est calculé : reste à le tracer avec plt.plot, avant plt.show().")
+elif 'sigma_mod' in g:
+    indice("Le modèle s'écrit comme la loi de Kohlrausch, avec k et c_mod.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">sigma_mod = k * c_mod
+
+plt.plot(c, sigma, 'b+', markersize=12, label='mesures')
+plt.plot(c_mod, sigma_mod, 'r-', label='modèle')
+plt.xlabel('c (mmol/L)')
+plt.ylabel('σ (mS/cm)')
+plt.title("Courbe d'étalonnage du chlorure de sodium")</pre>
+      <p>Les points sont proches de la droite : le modèle est en accord avec les mesures. Attention : on trace le modèle avec <code>c_mod</code>, pas avec <code>c</code>, sinon les deux tableaux n'ont pas la même longueur. Le titre contient une apostrophe : on l'écrit donc entre guillemets doubles.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-7-2">
+    <h3><span class="num">7.2</span> Lire une concentration</h3>
+    <p class="contexte">Le sérum physiologique dilué du TP4 a une conductivité σ = 0,869 mS·cm⁻¹.</p>
+    <ol class="questions">
+      <li>Calculer sa concentration <code>c_serum</code> à l'aide du modèle, et l'afficher arrondie au centième avec son unité.</li>
+      <li>Placer ce point sur le graphique, avec une autre couleur et un autre marqueur.</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>Isolez <i>c</i> dans σ = <i>k</i> × <i>c</i>.</li>
+      <li>Un seul point se trace comme une série : <code>plt.plot(c_serum, sigma_serum, 'go')</code> trace un rond vert.</li>
+      <li>Le tracé doit être placé avant <code>plt.show()</code>.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.5, 5.0, 8.0, 10.0])
+sigma = np.array([0.162, 0.330, 0.605, 0.925, 1.158])
+k = 0.1172
+c_mod = np.linspace(0, 11, 100)
+sigma_mod = k * c_mod
+
+sigma_serum = 0.869              # en mS/cm
+
+plt.plot(c, sigma, 'b+', markersize=12, label='mesures')
+plt.plot(c_mod, sigma_mod, 'r-', label='modèle')
+plt.xlabel('c (mmol/L)')
+plt.ylabel('σ (mS/cm)')
+plt.legend()
+plt.grid()
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+g = globals()
+vals = [v for k_, v in g.items() if not k_.startswith('_') and isinstance(v, float)]
+if any(abs(v - 0.869 / 0.1172) < 1e-6 for v in vals):
+    if '7.41' in _sortie:
+        ok("Question 1 — c ≈ 7,41 mmol/L.")
+    else:
+        indice("La concentration est juste : affichez-la arrondie au centième, avec son unité.")
+try:
+    n_series = len(_figure.axes[0].get_lines())
+except Exception:
+    n_series = 0
+if n_series >= 3:
+    ok("Question 2 — Le point du sérum est placé sur la droite d'étalonnage.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">c_serum = sigma_serum / k
+print('c =', round(c_serum, 2), 'mmol/L')
+plt.plot(c_serum, sigma_serum, 'go', label='sérum dilué')   # avant plt.show()</pre>
+      <p><i>c</i> ≈ 7,41 mmol·L⁻¹ : le point tombe sur la droite, entre les étalons à 5 et 8 mmol·L⁻¹.</p>
+    </details>
+    <aside class="plus"><h4>Pour aller plus loin</h4>
+      <p>Toutes les couleurs et tous les marqueurs de <code>plt.plot</code> : <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html" target="_blank" rel="noopener">matplotlib.org — pyplot.plot</a> (en anglais).</p>
+    </aside>
+  </article>
+
+  <article class="exo" id="ex-7-3">
+    <h3><span class="num">7.3</span> L'histogramme des masses</h3>
+    <p class="contexte">On reprend les 15 masses du cylindre d'aluminium (exercice 6.1).</p>
+    <ol class="questions">
+      <li>Compléter le programme pour tracer l'histogramme des masses en 5 classes, avec des axes légendés.</li>
+      <li>Autour de quelle valeur les mesures se regroupent-elles ? Le comparer à la moyenne calculée en 6.1.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+m = np.array([55.47, 55.43, 55.45, 55.44, 55.48, 55.42, 55.46, 55.45,
+              55.43, 55.47, 55.44, 55.46, 55.42, 55.45, 55.46])   # en g
+
+……
+plt.xlabel('……')
+plt.ylabel('……')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+try:
+    ax = _figure.axes[0]
+    barres = len(ax.patches)
+    xl, yl = ax.get_xlabel(), ax.get_ylabel()
+except Exception:
+    barres, xl, yl = 0, '', ''
+legende = xl and yl and '…' not in xl + yl
+if barres == 5 and legende:
+    ok("Les mesures se regroupent autour de 55,45 g, la moyenne.")
+elif barres and barres != 5:
+    indice("Il faut 5 classes : bins=5.")
+elif barres == 5:
+    indice("L'histogramme est tracé. Légendez les axes : masse (g) et effectif.")
+else:
+    indice("La fonction de l'histogramme est dans l'encadré À retenir.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">plt.hist(m, bins=5, edgecolor='black')
+plt.xlabel('masse (g)')
+plt.ylabel('effectif')</pre>
+      <p>Les mesures se regroupent autour de 55,45 g, la moyenne calculée en 6.1, et s'étalent de 55,42 à 55,48 g. La largeur de cet étalement, c'est la dispersion que mesure l'écart-type.</p>
+    </details>
+  </article>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="s8" data-titre="Lire un message d'erreur">
+  <h2>Lire un message d'erreur</h2>
+  <p class="intro">Tout programmeur fait des erreurs, tous les jours. Ce qui compte, c'est de savoir lire ce que Python répond. Le message de Python s'affiche en premier, en rouge ; dessous, une explication courte en français.</p>
+
+  <div class="retenir">
+    <h4>À retenir</h4>
+    <ul>
+      <li>Python indique le <b>numéro de la ligne</b> et le <b>type d'erreur</b>. L'erreur est sur cette ligne, ou juste au-dessus.</li>
+      <li><code>SyntaxError</code> : la ligne n'est pas du Python (parenthèse ou guillemet oublié, virgule décimale, mot réservé utilisé comme nom…).</li>
+      <li><code>NameError</code> : nom inconnu (faute de frappe, majuscule, variable pas encore définie, texte sans guillemets).</li>
+      <li><code>TypeError</code> : opération impossible sur ce type de valeur (texte + nombre, calcul sur une liste…).</li>
+      <li><code>ValueError</code> : valeur qui ne convient pas, par exemple deux tableaux de longueurs différentes dans <code>plt.plot</code>.</li>
+      <li>Certaines erreurs <b>ne déclenchent aucun message</b> : le programme tourne, le résultat est faux. Seul un regard critique sur le résultat les révèle.</li>
+    </ul>
+  </div>
+
+  <details class="rappel"><summary>Rappel de cours — Loi de Beer-Lambert</summary>
+    <p>L'absorbance <i>A</i> d'une solution (sans unité) est proportionnelle à la concentration <i>c</i> de l'espèce absorbante :</p>
+    <p class="formule">A = ε × l × c   soit   A = k × c</p>
+    <p>On en déduit la concentration d'une solution inconnue : c = <span class="frac"><span class="haut">A</span><span class="bas">k</span></span>, avec <i>k</i> lu sur la droite d'étalonnage.</p>
+  </details>
+  <p class="contexte">Les programmes de cette étape cherchent la concentration en colorant bleu d'un sirop de menthe dilué, comme au TP3. L'absorbance vaut <i>A</i> = 0,47 ; la droite d'étalonnage donne <i>k</i> = 0,124 L·mg⁻¹ (valeurs construites pour l'exercice). Chaque programme contient <b>une</b> erreur : exécuter, lire le message, corriger.</p>
+
+  <article class="exo" id="ex-8-1">
+    <h3><span class="num">8.1</span> Première erreur</h3>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">A = 0.47            # absorbance
+k = 0.124           # en L/mg
+c = A / k           # concentration, en mg/L
+print('c =', round(c, 2), 'mg/L'</textarea>
+      <script type="text/x-python" class="py-check">
+if '3.79' in _sortie:
+    ok("Corrigé : il manquait la parenthèse fermante du print. c ≈ 3,79 mg/L.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p><code>SyntaxError</code> ligne 4 : la parenthèse ouverte par <code>print(</code> n'est jamais fermée. Ligne corrigée : <code>print('c =', round(c, 2), 'mg/L')</code>. Réflexe : compter les parenthèses ouvrantes et fermantes.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-2">
+    <h3><span class="num">8.2</span> Deuxième erreur</h3>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">A = 0.47
+k = 0.124
+c = A / k
+print('c =', round(C, 2), 'mg/L')</textarea>
+      <script type="text/x-python" class="py-check">
+if '3.79' in _sortie:
+    ok("Corrigé : C majuscule n'existe pas, la variable s'appelle c.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p><code>NameError: name 'C' is not defined</code> : la variable s'appelle <code>c</code> en minuscule, <code>C</code> n'existe pas.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-3">
+    <h3><span class="num">8.3</span> Troisième erreur</h3>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">A = 0.47
+k = 0,124
+c = A / k
+print('c =', round(c, 2), 'mg/L')</textarea>
+      <script type="text/x-python" class="py-check">
+if 'k' in globals() and k == 0.124 and '3.79' in _sortie:
+    ok("Corrigé : avec une virgule, k n'était pas un nombre mais une paire (0, 124).")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p>L'erreur est signalée ligne 3 (<code>TypeError</code>), mais elle est née ligne 2 : <code>0,124</code> n'est pas un nombre pour Python, c'est une paire de deux nombres, 0 et 124, et on ne divise pas par une paire. Ligne corrigée : <code>k = 0.124</code>. La ligne signalée n'est pas toujours celle à corriger : remontez.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-4">
+    <h3><span class="num">8.4</span> Quatrième erreur</h3>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">lambda = 630e-9     # longueur d'onde de travail, en m
+A = 0.47
+k = 0.124
+c = A / k
+print('c =', round(c, 2), 'mg/L')</textarea>
+      <script type="text/x-python" class="py-check">
+if '3.79' in _sortie:
+    ok("Corrigé : lambda est un mot réservé de Python, il ne peut pas servir de nom de variable.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p><code>SyntaxError</code> ligne 1 : <code>lambda</code> est un mot réservé du langage. Ligne corrigée : <code>lam = 630e-9</code>.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-5">
+    <h3><span class="num">8.5</span> L'erreur silencieuse</h3>
+    <p class="contexte">On dilue dix fois une solution mère de concentration 10⁻² mol·L⁻¹. Ce programme s'exécute sans aucun message. Pourtant, il est faux.</p>
+    <ol class="questions">
+      <li>Exécuter. Le résultat est-il possible pour une concentration ?</li>
+      <li>Trouver et corriger l'erreur.</li>
+    </ol>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">c_mere = 10^-2          # concentration de la solution mère, en mol/L
+c_fille = c_mere / 10   # dilution au dixième
+print('c fille =', c_fille, 'mol/L')</textarea>
+      <script type="text/x-python" class="py-check">
+if 'c_fille' in globals() and abs(c_fille - 1e-3) < 1e-12:
+    ok("Corrigé : ^ n'est pas une puissance en Python. 10⁻² s'écrit 1e-2 ou 10 ** -2.")
+elif 'c_fille' in globals() and c_fille < 0:
+    indice("Une concentration négative est impossible. Quel symbole de la ligne 1 n'a pas le sens que vous croyez ?")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p>Le programme affiche −1,2 mol·L⁻¹ : une concentration négative, impossible. En Python, <code>^</code> n'est pas la puissance mais une opération sur les chiffres binaires des nombres entiers, qui donne ici −12. Aucun message, puisque l'opération existe. Ligne corrigée : <code>c_mere = 1e-2</code> ou <code>c_mere = 10 ** -2</code>.</p>
+    </details>
+  </article>
+
+  <article class="exo" id="ex-8-6">
+    <h3><span class="num">8.6</span> L'erreur de l'ECE</h3>
+    <p class="contexte">Un élève a saisi ses mesures d'absorbance pour tracer la courbe d'étalonnage.</p>
+    <div class="py" data-mode="script">
+      <textarea class="py-code">import numpy as np
+import matplotlib.pyplot as plt
+
+c = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])          # en mg/L
+A = np.array([0.125, 0.249, 0.371, 0.497, 0.620])      # absorbances
+
+plt.plot(c, A, 'b+')
+plt.xlabel('c (mg/L)')
+plt.ylabel('A')
+plt.show()</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+g = globals()
+if 'c' in g and 'A' in g and _np.size(c) == _np.size(A):
+    ok("Corrigé : les deux tableaux ont maintenant la même longueur.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <p><code>ValueError: x and y must have same first dimension, but have shapes (6,) and (5,)</code> : six concentrations, mais seulement cinq absorbances. Une mesure a été oubliée à la saisie. À l'ECE, il faut compléter la mesure manquante ; ici, on peut retirer la dernière concentration, <code>6.0</code>.</p>
+    </details>
+  </article>
+
+  <div class="etiquette ece">
+    <p><b>Pas de panique</b> : on ne vous demande jamais d'écrire un programme entier.</p>
+    <p>Le programme est fourni, presque entièrement écrit et commenté. Votre travail tient en trois gestes : <b>saisir</b> vos mesures, <b>exécuter</b>, <b>exploiter</b> ce qui s'affiche.</p>
+    <p class="surtitre">Exemple 1 · d'après ECE PC, banque 2026, sujet n° 38 (loi de Boyle-Mariotte)</p>
+    <pre class="code">V = np.array([1, 1, 1, 1, 1])   # A MODIFIER  Volume (cm³)
+P = np.array([1, 1, 1, 1, 1])   # A MODIFIER  Pression (hPa)
+n = len(V)
+
+k_moy = np.mean(P * V)
+u_k_moy = np.std(P * V, ddof=1) / np.sqrt(n)
+print("Valeur moyenne de k : ", k_moy, " hPa·cm³")</pre>
+    <p>Seules les deux premières lignes sont à modifier : on remplace les 1 par ses mesures. Tout le reste a été vu dans ce niveau : <code>np.array</code> et <code>len</code> à l'étape 5 ; <code>np.mean</code>, <code>np.std(…, ddof=1)</code> et <code>np.sqrt</code> à l'étape 6.</p>
+    <p class="surtitre">Exemple 2 · d'après ECE PC, banque 2026, sujet n° 59 (diffraction par des fils calibrés)</p>
+    <pre class="code">##### À COMPLÉTER PAR LE CANDIDAT #####
+L = []
+a = []
+##### FIN DE LA PARTIE À COMPLÉTER #####
+
+def round_up_sig(x, sig=1):
+    ...                          # une trentaine de lignes suivent</pre>
+    <p>Le programme complet contient des instructions jamais vues ici (<code>def</code>, <code>raise</code>, <code>.format</code>…). Ce n'est pas grave : on ne vous demande que de remplir les deux listes entre les lignes <code>À COMPLÉTER</code>, avec des points décimaux et autant de valeurs dans chacune.</p>
+    <p class="surtitre">Où se perdent les points</p>
+    <p>Une virgule décimale. Deux listes de longueurs différentes. Des unités mélangées. Un graphique tracé mais pas exploité : la question qui suit l'exécution compte autant que le programme.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seance" id="bilan" data-titre="Bilan">
+  <h2>Bilan du niveau 1</h2>
+  <div class="retenir">
+    <h4>Ce que je sais faire</h4>
+    <ul class="bilan">
+      <li>Utiliser la console comme une calculatrice, avec le point décimal et la notation <code>e</code>.</li>
+      <li>Ranger des valeurs dans des variables, sans utiliser de mot réservé comme nom.</li>
+      <li>Distinguer un nombre d'un texte, et afficher un résultat avec son nom, sa valeur arrondie et son unité.</li>
+      <li>Importer numpy et utiliser <code>np.log10</code>, <code>np.sqrt</code> — sans confondre avec <code>np.log</code>.</li>
+      <li>Saisir des mesures dans une liste, la convertir en tableau numpy et calculer sur toutes les valeurs d'un coup.</li>
+      <li>Calculer une moyenne, un écart-type expérimental et une incertitude-type.</li>
+      <li>Tracer des points, un modèle et un histogramme, avec des axes légendés.</li>
+      <li>Lire un message d'erreur, trouver la ligne fautive, et douter d'un résultat aberrant.</li>
+    </ul>
+  </div>
+  <p>Avec ces outils, vous pouvez traiter la partie Python de n'importe quel sujet d'ECE. Le niveau 2 les rassemble dans des mini-projets complets, comme le jour de l'épreuve.</p>
+</section>
+
+<footer class="pp-pied">
+  <p><a class="doc" href="fiches/niveau-1-memo.pdf" download>Mémo du niveau 1 — à imprimer</a></p>
+  <p>© 2026 Loïc Van Hoorde — Choix pédagogiques, conception des activités, relecture : L. Van Hoorde. Mise en forme réalisée avec l'aide de Claude (Anthropic).</p>
+</footer>
+</main>
+
+<script src="parcours.js" type="module"></script>
+<script src="progression-resonance.js" type="module"></script>
+</body>
+</html>
