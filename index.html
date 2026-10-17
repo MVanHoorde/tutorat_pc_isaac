@@ -13,9 +13,8 @@
 <link rel="apple-touch-icon" href="icone-180.png">
 <link rel="icon" type="image/png" href="icone-192.png">
 <title>Résonance — tutorat en physique-chimie</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Polices auto-hébergées (RGPD : aucune requête vers Google Fonts). -->
+<link rel="stylesheet" href="polices/polices.css">
 <style>
 :root{
   --bg:#EDF0F3; --ink:#151B2B; --muted:#5C6679; --sheet:#FFFFFF; --rule:#D6DCE4; --soft:#F4F6F9;
@@ -280,10 +279,36 @@ a.mini{display:inline-block;text-decoration:none}
 #accueil{padding-top:36px}
 #accueil h2{margin-bottom:10px}
 
+/* accueil à trois entrées : chaque rubrique n'affiche que ses propres onglets */
+body:not([data-section="tutorat"]) .tab[data-section="tutorat"],
+body:not([data-section="participation"]) .tab[data-section="participation"],
+body:not([data-section="outils"]) .tab[data-section="outils"]{display:none}
+.tab.maison{font-weight:600}
+.tab.maison::before{content:"⌂";margin-right:7px;font-size:16px}
+.cartes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:860px){.cartes{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.cartes{grid-template-columns:1fr}}
+.carte{position:relative;display:flex;flex-direction:column;background:#fff;border:1px solid var(--rule);border-radius:14px;
+  padding:26px 22px 20px;box-shadow:0 14px 36px rgba(21,27,43,.07);overflow:hidden}
+.carte::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--trait,var(--ink))}
+.carte.tutorat{--trait:linear-gradient(90deg,var(--premiere),var(--terminale))}
+.carte.participation{--trait:var(--match)}
+.carte.outils{--trait:var(--vert)}
+.carte.prof{--trait:var(--deep)}
+.carte h3{margin:0 0 6px;font-size:22px}
+.carte p{color:var(--muted);font-size:14.5px;margin:0 0 16px;flex:1}
+.carte .acts{display:flex;gap:8px;flex-wrap:wrap}
+body:not(.module-participation) .carte.participation{display:none}
+body:not(.role-prof) .carte.prof{display:none}
+a.outil{display:block;text-decoration:none;color:inherit;margin:0 0 14px}
+a.outil:hover h3{text-decoration:underline}
+a.outil:focus-visible{outline:2px solid var(--match);outline-offset:3px;border-radius:14px}
+a.outil h3{margin:0 0 6px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body>
+<body data-section="accueil">
 
 <header class="hero">
   <div class="wrap">
@@ -305,10 +330,12 @@ a.mini{display:inline-block;text-decoration:none}
 
 <nav>
   <div class="wrap" role="tablist" aria-label="Rubriques">
-    <button class="tab" role="tab" aria-selected="true" data-view="demande">Demander de l'aide</button>
-    <button class="tab" role="tab" aria-selected="false" data-view="offre">Proposer son aide</button>
-    <button class="tab module" role="tab" aria-selected="false" data-view="participation">Participation</button>
-    <button class="tab module" role="tab" aria-selected="false" data-view="depots">Dépôts bonus</button>
+    <button class="tab maison" role="tab" aria-selected="true" data-view="accueil">Accueil</button>
+    <button class="tab" role="tab" aria-selected="false" data-section="tutorat" data-view="demande">Demander de l'aide</button>
+    <button class="tab" role="tab" aria-selected="false" data-section="tutorat" data-view="offre">Proposer son aide</button>
+    <button class="tab module" role="tab" aria-selected="false" data-section="participation" data-view="participation">Participation</button>
+    <button class="tab module" role="tab" aria-selected="false" data-section="participation" data-view="depots">Dépôts bonus</button>
+    <button class="tab" role="tab" aria-selected="false" data-section="outils" data-view="outils">Outils</button>
     <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
     <button class="who-btn" id="whoBtn">Se connecter</button>
   </div>
@@ -331,8 +358,61 @@ a.mini{display:inline-block;text-decoration:none}
   </div>
 </section>
 
+<!-- ================= ACCUEIL CONNECTÉ : trois entrées ================= -->
+<section class="view on" id="v-accueil">
+  <h2>Bienvenue sur Résonance</h2>
+  <p class="lede">Choisis une rubrique. Tu reviens ici à tout moment avec « Accueil », en haut.</p>
+  <div class="cartes">
+    <div class="carte tutorat">
+      <h3>Tutorat</h3>
+      <p>Demande de l'aide sur un chapitre, ou propose la tienne. Ton professeur forme les binômes ; les séances ont lieu au CDI.</p>
+      <div class="acts">
+        <button class="mini" data-aller="demande">Demander de l'aide</button>
+        <button class="mini ghost" data-aller="offre">Proposer mon aide</button>
+      </div>
+    </div>
+    <div class="carte participation">
+      <h3>Participation</h3>
+      <p>La participation orale en classe — ton relevé d'observateur et tes points — et les dépôts de ressources pour la classe, avec des points bonus.</p>
+      <div class="acts">
+        <button class="mini" data-aller="participation">Participation</button>
+        <button class="mini ghost" data-aller="depots">Dépôts bonus</button>
+      </div>
+    </div>
+    <div class="carte outils">
+      <h3>Outils</h3>
+      <p>Pour travailler seul, à ton rythme : le parcours Python de terminale. D'autres outils viendront.</p>
+      <div class="acts">
+        <a class="mini" href="outils/python/index.html">Parcours Python</a>
+        <button class="mini ghost" data-aller="outils">Tous les outils</button>
+      </div>
+    </div>
+    <div class="carte prof">
+      <h3>Tableau de bord</h3>
+      <p>Demandes à apparier, séances validées, disponibilités des tuteurs, correspondance des noms, parcours Python de vos élèves.</p>
+      <div class="acts"><button class="mini" data-aller="prof">Ouvrir le tableau de bord</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OUTILS ================= -->
+<section class="view" id="v-outils">
+  <div class="center">
+    <h2>Outils</h2>
+    <p class="lede">Des outils en libre accès, pour travailler seul. Connecté à Résonance sur cet appareil, tes exercices
+    réussis sont enregistrés sur ton compte — jamais ton code — et ton professeur voit où tu en es.</p>
+    <a class="outil card" href="outils/python/index.html">
+      <h3>Parcours Python <span class="badge p0">Terminale spé</span></h3>
+      <p class="note" style="margin:0">Apprendre Python en révisant le cours de physique-chimie, en cinq niveaux, de la boîte à outils de l'ECE
+      jusqu'à ce qui t'attend dans le supérieur. Python tourne dans la tablette : la première ouverture télécharge
+      une vingtaine de mégaoctets, gardés ensuite sur l'appareil.</p>
+    </a>
+    <p class="note">D'autres outils viendront ici.</p>
+  </div>
+</section>
+
 <!-- ================= DEMANDE ================= -->
-<section class="view on" id="v-demande">
+<section class="view" id="v-demande">
   <div class="center">
     <h2>Demander de l'aide</h2>
     <p class="lede">Ta demande arrive chez ton professeur. Elle n'est proposée aux tuteurs que sans ton nom.</p>
@@ -582,6 +662,13 @@ a.mini{display:inline-block;text-decoration:none}
   </table>
   </div>
 
+  <div class="en-ligne-seul">
+    <h3>Parcours Python</h3>
+    <p class="lede" style="margin-bottom:8px">Exercices réussis par élève et par niveau, pour les élèves de vos classes. Le serveur
+    ne connaît que l'identifiant ; les noms viennent de la correspondance chargée sur cet appareil. Le code des élèves n'est jamais enregistré.</p>
+    <div id="pythonProf"><p class="note">Chargement…</p></div>
+  </div>
+
 </section>
 
 </main>
@@ -601,7 +688,7 @@ a.mini{display:inline-block;text-decoration:none}
       <div>
         <h5>Tes données</h5>
         <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
-        propositions d'aide, tes séances. Jamais ton nom.</p>
+        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom.</p>
         <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
         <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
         tout le reste fin août. Effacement sur simple demande.</p>
@@ -653,14 +740,13 @@ a.mini{display:inline-block;text-decoration:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<script src="commun.js"></script>
 <script src="participation.js"></script>
 <script>
 /* ---------- Supabase ---------- */
-// Clé « anon » : publique par conception, les droits réels sont fixés par les règles de la base (supabase/schema.sql).
-const SUPABASE_URL="https://mnqcmjmypkleptbmqtws.supabase.co";
-const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ucWNtam15cGtsZXB0Ym1xdHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3OTg2MzgsImV4cCI6MjEwNTM3NDYzOH0.6D3QDDW4DYm_xErBwCom6xdKeMhOUf1TbUDZPN-Q0bc";
-const DOMAINE_COMPTES="resonance.invalid"; // identique à DOMAINE dans la fonction premiere-connexion
-const sb=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON):null;
+// URL, clé « anon » et client : commun.js, partagé avec les pages Outils (même session).
+const DOMAINE_COMPTES=RESONANCE.DOMAINE_COMPTES; // identique à DOMAINE dans la fonction premiere-connexion
+const sb=RESONANCE.client();
 let session=null; // session Supabase ; null = pas connecté
 const enLigne=()=>!!session;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -756,14 +842,43 @@ function spectreReel(demandes){
 }
 spectreReel([]);
 
-/* ---------- navigation ---------- */
+/* ---------- navigation : accueil à trois entrées, puis les onglets de la rubrique ----------
+   Chaque vue a son adresse (#demande, #outils…) : le bouton retour de Safari fonctionne, et les pages
+   Outils renvoient vers index.html#outils. On passe toujours par le clic sur l'onglet, pour que
+   participation.js recharge ses vues comme avant (il écoute ce clic). */
+const SECTION={accueil:'accueil',demande:'tutorat',offre:'tutorat',participation:'participation',depots:'participation',outils:'outils',prof:'prof'};
 function ouvrirVue(nom){
   document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', x.dataset.view===nom?'true':'false'));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id==='v-'+nom));
+  document.body.dataset.section=SECTION[nom]||'accueil';
+}
+function vueAutorisee(nom){
+  if(!Object.prototype.hasOwnProperty.call(SECTION,nom)) return false;
+  if(nom==='prof') return role==='prof';
+  if(SECTION[nom]==='participation') return document.body.classList.contains('module-participation');
+  return true;
+}
+const vueDeAdresse=()=>decodeURIComponent(location.hash.replace(/^#\/?/,''));
+let adresseRemplacee=false;
+function majAdresse(nom){
+  const cible=nom==='accueil'?location.pathname+location.search:'#'+nom;
+  if(vueDeAdresse()===(nom==='accueil'?'':nom)) return;
+  try{ history[adresseRemplacee?'replaceState':'pushState'](null,'',cible); }catch(e){}
+}
+/* Ouvre une vue comme si l'on touchait son onglet ; une vue interdite ramène à l'accueil. */
+function aller(nom, remplacer){
+  if(!vueAutorisee(nom)) nom='accueil';
+  adresseRemplacee=!!remplacer;
+  try{ document.querySelector('.tab[data-view="'+nom+'"]').click(); }
+  finally{ adresseRemplacee=false; }
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  ouvrirVue(t.dataset.view); window.scrollTo({top:0,behavior:'smooth'});
+  ouvrirVue(t.dataset.view); majAdresse(t.dataset.view); window.scrollTo({top:0,behavior:'smooth'});
 }));
+document.getElementById('v-accueil').addEventListener('click',e=>{
+  const b=e.target.closest('[data-aller]'); if(b) aller(b.dataset.aller);
+});
+window.addEventListener('popstate',()=>{ if(enLigne()) aller(vueDeAdresse()||'accueil',true); });
 
 /* ---------- pop-up connexion ---------- */
 const dlgLogin=document.getElementById('dlgLogin');
@@ -835,7 +950,7 @@ function appliquerRole(r){
   const ident=esc(identifiantDeSession(session));
   if(r==='prof'){
     rolebar.className='rolebar';
-    rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les onglets élèves montrent exactement ce que voient les élèves, '+
+    rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les rubriques Tutorat et Participation montrent exactement ce que voient les élèves, '+
       'mais vous ne pouvez ni déposer une demande, ni vous positionner.</span>';
     whoBtn.innerHTML='Enseignant · <span class="id">'+ident+'</span> · se déconnecter';
   } else if(r==='eleve'){
@@ -846,9 +961,8 @@ function appliquerRole(r){
     whoBtn.textContent='Se connecter';
   }
   rolebar.hidden=!rolebar.innerHTML;
-  const active=document.querySelector('.tab[aria-selected="true"]');
-  if(r==='prof') ouvrirVue('prof');
-  else if(active && active.classList.contains('prof')) ouvrirVue('demande');
+  // Le Tableau de bord n'est jamais laissé ouvert à un compte qui n'est pas enseignant.
+  if(r!=='prof' && document.body.dataset.section==='prof') ouvrirVue('accueil');
 }
 function ouvrirConnexion(){ dlgLogin.returnValue=''; loginErreur.hidden=true; dlgLogin.showModal(); }
 dlgLogin.addEventListener('close',()=>{ if(dlgLogin.returnValue==='login' && session) entrer(); });
@@ -864,12 +978,17 @@ function niveauDeClasse(c){
   return /_P_/i.test(c)||/^(1|p)/i.test(c)?1:/_T_/i.test(c)||/^t/i.test(c)?0:null;
 }
 async function entrer(){
+  const demandee=vueDeAdresse(); // ex. retour d'un outil vers #outils, ou rechargement de la page
   appliquerRole(roleDeSession(session));
   const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
   if(role==='eleve' && n!==null) remplirNiveau(n);
+  aller(demandee||'accueil',true);
   majBlocNotif();
   // Participation et dépôts : à part, une panne ne doit pas bloquer le tutorat.
-  if(window.participationEntrer) participationEntrer().catch(e=>console.error('participation',e));
+  // Le droit de voir la rubrique arrive avec la réponse du serveur : on rouvre alors la vue demandée.
+  if(window.participationEntrer) participationEntrer().then(()=>{
+    if(SECTION[demandee]==='participation' && vueAutorisee(demandee) && document.body.dataset.section==='accueil') aller(demandee,true);
+  }).catch(e=>console.error('participation',e));
   await chargerDonneesReelles();
 }
 
@@ -1078,13 +1197,13 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
     try{ localStorage.setItem(CLE_CORRESP,JSON.stringify(corresp)); }
     catch(err){ alert("Chargée pour cette visite seulement : ce navigateur refuse de la conserver (navigation privée ?)."); }
     majCorrespEtat();
-    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); }
+    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); }
   }catch(err){ alert("Fichier illisible : "+err.message); }
 });
 document.getElementById('correspOublier').addEventListener('click',()=>{
   try{ localStorage.removeItem(CLE_CORRESP); }catch(e){}
   corresp=null; majCorrespEtat();
-  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); }
+  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); }
 });
 
 /* ---------- données réelles (Supabase) ---------- */
@@ -1109,7 +1228,7 @@ async function chargerDonneesReelles(){
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
   afficherDemandes();
   spectreReel(DEMANDES);
-  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements()]);
+  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements(), chargerPython()]);
   if(role==='eleve') await Promise.all([chargerMesDemandes(), chargerMesSeances()]);
 }
 
@@ -1317,6 +1436,49 @@ async function chargerDepots(){
     return '<tr><td>'+nomAffiche(p.identifiant)+'</td><td>'+esc(p.classe)+'</td><td>'+esc(d.chapitre)+'</td><td>Demande</td><td>'+
       besoin+'</td><td><span class="badge '+st[0]+'">'+esc(st[1])+'</span></td></tr>';
   }).join('');
+}
+
+/* ---------- parcours Python (enseignant) : exercices réussis par élève et par niveau ----------
+   Table python_reussites (migration 005) : la base ne renvoie que les élèves des classes de l'enseignant.
+   Ne lève jamais d'erreur : une panne ici ne doit pas bloquer le reste du tableau de bord. */
+async function chargerPython(){
+  const zone=document.getElementById('pythonProf');
+  try{
+    const lignes=[], PAGE=1000;
+    for(let de=0;;de+=PAGE){
+      const {data,error}=await sb.from('python_reussites').select('eleve,niveau,exercice,reussi_le,profils(identifiant,classe)')
+        .order('eleve').order('niveau').order('exercice').range(de,de+PAGE-1);
+      if(error){
+        zone.innerHTML='<p class="note">'+(/python_reussites|does not exist|schema cache/i.test(error.message)
+          ? 'Pas encore activé : la migration <code>005_python.sql</code> n\'a pas été collée dans Supabase (étape 8 de <code>supabase/MISE_EN_PLACE.md</code>).'
+          : 'Erreur : '+esc(error.message))+'</p>';
+        return;
+      }
+      lignes.push(...data);
+      if(data.length<PAGE) break;
+    }
+    if(!lignes.length){
+      zone.innerHTML='<p class="note">Aucun exercice réussi par les élèves de vos classes pour l\'instant. '+
+        'Si vos élèves ont pourtant travaillé, vérifiez que vos classes sont bien rattachées à votre compte (voir <code>docs/plan-test-refonte.md</code>).</p>';
+      return;
+    }
+    const parEleve={};
+    lignes.forEach(l=>{
+      const p=l.profils||{}, e=parEleve[l.eleve]=parEleve[l.eleve]||{id:p.identifiant||'?',classe:p.classe||'',n:{1:[],2:[],3:[],4:[],5:[]},dernier:''};
+      (e.n[l.niveau]=e.n[l.niveau]||[]).push(l.exercice);
+      if(l.reussi_le>e.dernier) e.dernier=l.reussi_le;
+    });
+    const nom=e=>(corresp && corresp.eleves[e.id])||'';
+    const eleves=Object.values(parEleve).sort((a,b)=>a.classe.localeCompare(b.classe,'fr')||(nom(a)||a.id).localeCompare(nom(b)||b.id,'fr'));
+    const niveaux=[1,2,3,4,5].filter(n=>eleves.some(e=>e.n[n].length));
+    const cellule=ex=>ex.length?'<td><details><summary style="cursor:pointer"><b>'+ex.length+'</b></summary><span class="hint">'+esc(ex.join(', '))+'</span></details></td>':'<td class="hint">—</td>';
+    zone.innerHTML='<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Classe</th>'+
+      niveaux.map(n=>'<th>Niveau '+n+'</th>').join('')+'<th>Dernière réussite</th></tr></thead><tbody>'+
+      eleves.map(e=>'<tr><td>'+nomAffiche(e.id)+'</td><td>'+esc(e.classe)+'</td>'+niveaux.map(n=>cellule(e.n[n])).join('')+
+        '<td>'+dateCourte(e.dernier)+'</td></tr>').join('')+
+      '</tbody></table></div><p class="note">Nombre d\'exercices réussis (touchez un nombre pour voir lesquels) — '+
+      eleves.length+' élève'+(eleves.length>1?'s':'')+'. La réussite est constatée sur la tablette de l\'élève : c\'est un repère de travail, pas une note.</p>';
+  }catch(e){ zone.innerHTML='<p class="note">Erreur : '+esc(e.message)+'</p>'; }
 }
 
 /* ---------- notifications sur l'appareil (Web Push) ----------
