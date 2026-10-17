@@ -71,6 +71,7 @@ Chromium, serveur local, Supabase remplacé par un faux client : 51 vérificatio
 | D5 | Enseignant : passer au Tableau de bord puis revenir à Participation pendant une séance ouverte | La séance est toujours là (le cadre n'est pas rechargé) |
 | D6 | Élève : Dépôts bonus → déposer un lien | « Envoyé à ton professeur » ; validation côté enseignant, puis visible dans « Ressources de la classe » |
 | D7 | Élève d'une classe **non** ouverte | Pas de carte Participation ; `#participation` ramène à l'accueil |
+| D8 | Élève de **première** (n'importe quel coupon de 1re) | Accueil avec la seule carte Tutorat ; ni onglet Participation ni Outils ; `#outils` et `#participation` ramènent à l'accueil |
 
 ## E. Parcours Python relié
 

@@ -14,7 +14,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Le site : page unique branchée sur Supabase, connexion obligatoire. Après connexion, un accueil à trois entrées (Tutorat, Participation, Outils) et, pour les enseignants, le Tableau de bord ; chaque rubrique a son adresse (`#demande`, `#offre`, `#participation`, `#depots`, `#outils`, `#prof`) |
-| `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle. Même origine, donc même session |
+| `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle, règle des espaces (terminale complète, première Tutorat seulement). Même origine, donc même session |
 | `polices/` | Polices auto-hébergées (Bricolage Grotesque, IBM Plex Sans et Mono, Spectral, STIX Two Text ; licence OFL) : copie à l'identique de `outils/python/polices/`. Plus aucun appel à Google Fonts |
 | `analyser_trombi.py` | Relève la mise en page d'un trombinoscope PDF, avec le texte masqué par défaut |
 | `generer_identifiants.py` | Trombinoscopes PDF → identifiants, coupons, registre de correspondance et fichier serveur |
@@ -86,7 +86,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Python tourne dans la tablette (Pyodide dans un worker, sans accès au jeton de connexion), messages d'erreur courts en français, correction automatique par indices, solution après un premier essai.
   - Libre accès. Sans connexion à Résonance, rien n'est enregistré ni envoyé.
 - **Accueil à trois entrées** (17/10/2026), branche `refonte-accueil`, **pas encore en ligne** (plan de test : `docs/plan-test-refonte.md`).
-  - Après connexion : trois cartes, Tutorat (demander / proposer de l'aide), Participation (classes ouvertes seulement), Outils ; une quatrième, Tableau de bord, pour les enseignants. Dans une rubrique, la barre ne montre que ses onglets et « Accueil » ; l'onglet Tableau de bord reste visible partout pour l'enseignant.
+  - Après connexion : trois cartes, Tutorat (demander / proposer de l'aide), Participation (classes ouvertes seulement), Outils ; une quatrième, Tableau de bord, pour les enseignants. **Les premières n'ont que le Tutorat** : Participation et Outils forment l'espace de terminale (règle `espaceComplet` de `commun.js`, lue d'après la classe du compte : `_T_` terminale, `_P_` première ; classe inconnue : Tutorat seulement). Dans une rubrique, la barre ne montre que ses onglets et « Accueil » ; l'onglet Tableau de bord reste visible partout pour l'enseignant.
   - Choix : des vues dans `index.html`, et non des pages séparées. `participation.js` vit des variables de la page et garde en mémoire la séance ouverte et le cadre de participation : changer de page couperait une séance en cours. Seuls les Outils sont des pages à part (charte propre, moteur Python lourd), reliées par `commun.js`.
   - Chaque vue a son adresse : rechargement, bouton retour de Safari et retour depuis les Outils (`index.html#outils`) ramènent au bon endroit.
   - Polices auto-hébergées (`polices/`) : plus aucune requête vers Google.
