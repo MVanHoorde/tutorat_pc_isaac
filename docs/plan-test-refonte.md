@@ -1,7 +1,7 @@
 # Plan de test — accueil à trois entrées, parcours Python relié, signalements, périodes
 
 Sections A à G : accueil, parcours Python et signalements (en ligne depuis le 17/10/2026). Section H : périodes et
-bilan de période, branche `periodes`, à dérouler **avant** de la fusionner dans `main` (tout push sur `main` est en ligne aussitôt).
+bilan de période (en ligne depuis le 17/10/2026), à dérouler avec de vrais comptes, de préférence sur la classe TEST avant la clôture réelle de P1.
 Durée : une vingtaine de minutes. Matériel : un ordinateur, et si possible un iPad avec Résonance sur l'écran d'accueil.
 Comptes : `PR-TEST1` (enseignant) et `PC-TEST1` (élève, classe « TEST »), déjà dans la base.
 
@@ -122,11 +122,11 @@ Préalable : migration `006` collée (étape 9 de `supabase/MISE_EN_PLACE.md`), 
 
 Après les essais : « Supprimer » sur chaque carte, ou `delete from public.signalements where eleve in (select id from public.profils where classe = 'TEST');`.
 
-## H. Périodes et bilan de période (branche `periodes`)
+## H. Périodes et bilan de période
 
 Déjà vérifié automatiquement : migration `007` rejouée dans des transactions annulées sur la vraie base (bilan de la classe : participation /10, tutorat proposé, droits de l'autre enseignant ; clôture de 21 élèves ; note cachée à l'élève avant la clôture ; dépôt à 2 points refusé ; cinquième +0,5 refusé) ; application de participation seule (16 contrôles) ; Résonance dans Chromium avec une base simulée (27 contrôles : saisie, refus de 12/10, recalcul et plafond de 20, export CSV, clôture de la base et de l'application, vue élève).
 
-Préalable : migration `007` collée (étape 10 de `supabase/MISE_EN_PLACE.md`), branches `periodes` servies en local (Résonance et `Appli_part_spe` côte à côte, serveur lancé depuis le Bureau), ou publiées. **Exporter une sauvegarde de l'application de participation avant tout.**
+Préalable : migration `007` collée (fait le 17/10/2026). **Exporter une sauvegarde de l'application de participation avant tout.**
 
 | # | Geste | Attendu |
 |---|---|---|
