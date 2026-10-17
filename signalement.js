@@ -1,4 +1,4 @@
-/* Résonance — « J'ai vu un bug » et le « +0,5 au prochain contrôle » (17/10/2026).
+/* Résonance — « J'ai vu un bug » et le « +0,5 sur la note de participation » (17/10/2026).
    Repris du site pédagogique de M. Van Hoorde (bouton des pages de cours, 03/10 et 11/10/2026).
    Script classique, sans dépendance, partagé par index.html et les pages du parcours Python
    (chargé par outils/python/progression-resonance.js). Il ne fait rien par lui-même : la page appelle
@@ -162,7 +162,7 @@ function installer(opts){
   });
 }
 
-/* La fenêtre « 🎁 +0,5 au prochain contrôle » : une fois, puis « vu » enregistré EN BASE (tous appareils ;
+/* La fenêtre « 🎁 +0,5 sur ta note de participation » : une fois, puis « vu » enregistré EN BASE (tous appareils ;
    l'enseignant voit que l'élève l'a lue). Jamais par-dessus ce que l'élève est en train de faire :
    occupe() dit quand attendre ; on réessaie toutes les trois secondes. */
 async function annoncerBonus(opts){
@@ -183,7 +183,7 @@ async function annoncerBonus(opts){
     style();
     const n = l.length;
     const d = fenetre('rs-bonus', 'rs-bonus-titre',
-      '<h2 id="rs-bonus-titre">🎁 +' + String(n * 0.5).replace('.', ',') + ' au prochain contrôle</h2>' +
+      '<h2 id="rs-bonus-titre">🎁 +' + String(n * 0.5).replace('.', ',') + ' sur ta note de participation</h2>' +
       '<div>' + l.map(x => {
         let ex = String(x.extrait || '').trim();
         if (ex.length > 100) ex = ex.slice(0, 97) + '…';

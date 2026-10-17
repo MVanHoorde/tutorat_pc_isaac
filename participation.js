@@ -267,19 +267,36 @@ setInterval(() => {
   if(role === 'prof' && seanceCourante && document.visibilityState === 'visible') recupererReleves();
 }, 10000);
 
+/* Publie la période en cours de l'application dans la période ouverte en base (migration 007).
+   Les deux doivent porter le même numéro : sinon rien n'est écrit, pour ne jamais verser les points
+   d'une période dans une autre. Rend true si quelque chose a été publié. */
 async function publierSuivi(cls, silencieux){
   const app = appProf();
-  if(!app){ if(!silencieux) alert("Ouvrez d'abord l'application de participation."); return; }
+  if(!app){ if(!silencieux) alert("Ouvrez d'abord l'application de participation."); return false; }
   const liens = lireLiens()[cls] || {}, lignes = app.suivi(cls).filter(l => liens[l.nom]);
-  if(!lignes.length){ if(!silencieux) alert('Aucun élève de « '+cls+' » n\'est relié à un compte Résonance.'); return; }
-  const {data:profils, error} = await sb.from('profils').select('id,identifiant').in('identifiant', lignes.map(l => liens[l.nom]));
-  if(error){ alert('Suivi non publié : '+error.message); return; }
-  const parIdent = Object.fromEntries(profils.map(p => [p.identifiant, p.id])), maj = new Date().toISOString();
-  const rows = lignes.filter(l => parIdent[liens[l.nom]]).map(l => ({eleve:parIdent[liens[l.nom]], points:l.points, objectif:l.objectif,
-    seances:l.seances, presences:l.presences, roles:l.roles, bilan:l.bilan, maj_le:maj}));
-  const r = await sb.from('participation_suivi').upsert(rows);
-  if(r.error){ alert('Suivi non publié : '+r.error.message); return; }
-  if(!silencieux) alert('Suivi publié : chaque élève voit maintenant ses points ('+rows.length+' élèves).');
+  if(!lignes.length){ if(!silencieux) alert('Aucun élève de « '+cls+' » n\'est relié à un compte Résonance.'); return false; }
+  const {data:profils, error} = await sb.from('profils').select('id,identifiant,classe').in('identifiant', lignes.map(l => liens[l.nom]));
+  if(error){ alert('Suivi non publié : '+error.message); return false; }
+  const classesRes = [...new Set(profils.map(p => p.classe).filter(Boolean))];
+  const po = await sb.from('periodes').select('classe,numero').in('classe', classesRes).is('fin', null);
+  if(po.error){ alert('Suivi non publié : '+po.error.message); return false; }
+  const ouverte = Object.fromEntries(po.data.map(p => [p.classe, p.numero]));
+  const parIdent = Object.fromEntries(profils.map(p => [p.identifiant, p])), maj = new Date().toISOString();
+  const nApp = lignes[0].periode || 1, decalees = new Set(), rows = [];
+  lignes.forEach(l => {
+    const p = parIdent[liens[l.nom]]; if(!p) return;
+    if(ouverte[p.classe] !== nApp){ decalees.add(p.classe+' ('+(ouverte[p.classe] ? 'période '+ouverte[p.classe]+' en base' : 'aucune période ouverte')+')'); return; }
+    rows.push({eleve:p.id, periode:nApp, points:l.points, objectif:l.objectif, participation:l.participation,
+      seances:l.seances, presences:l.presences, roles:l.roles, tirages:l.tirages || 0, bilan:l.bilan, maj_le:maj});
+  });
+  if(decalees.size) alert('Suivi non publié pour '+[...decalees].join(', ')+' : l\'application de participation est en période '+nApp+
+    '. Clôturez la période depuis le Bilan de période, pour que la base et l\'application avancent ensemble.');
+  if(!rows.length) return false;
+  const r = await sb.from('participation_suivi').upsert(rows, {onConflict:'eleve,periode'});
+  if(r.error){ alert('Suivi non publié : '+r.error.message); return false; }
+  if(!silencieux) alert('Suivi de la période '+nApp+' publié : chaque élève voit maintenant ses points ('+rows.length+' élèves).');
+  if(vueOuverte('participation')) chargerBilanPeriode(true).catch(e => console.error(e));
+  return true;
 }
 
 /* ---- Pont : ce que l'application de participation appelle depuis son cadre ---- */
@@ -382,7 +399,11 @@ async function ouvrirOnglets(){
   if(!confirm('Ouvrir les onglets Participation et Dépôts aux élèves de : '+classes.join(', ')+' ?')) return;
   const r = await sb.from('classes_participation').upsert(classes.map(c => ({classe:c, prof:uid()})));
   if(r.error){ alert('Erreur : '+r.error.message+(/duplicate|violates/.test(r.error.message) ? ' (classe déjà ouverte par un autre enseignant ?)' : '')); return; }
+  // Première ouverture : la période 1 commence aujourd'hui (sans effet si la classe a déjà ses périodes).
+  const p = await sb.from('periodes').upsert(classes.map(c => ({classe:c, numero:1})), {onConflict:'classe,numero', ignoreDuplicates:true});
+  if(p.error) console.error(p.error);
   afficherClassesOuvertes();
+  chargerBilanPeriode().catch(e => console.error(e));
 }
 
 function initVueProf(){
@@ -393,6 +414,7 @@ function initVueProf(){
     f.addEventListener('load', afficherLiens);
   }
   afficherLiens(); afficherCle(); afficherClassesOuvertes();
+  chargerBilanPeriode(true).catch(e => console.error(e));
 }
 
 /* =====================================================================
@@ -463,29 +485,45 @@ setInterval(() => {
   if(role === 'eleve' && moduleActif() && document.visibilityState === 'visible') chargerObservation().catch(() => {});
 }, 20000);
 
-/* ---- Où j'en suis ---- */
+/* ---- Où j'en suis : une carte par période (mon_bilan, migration 007) ----
+   La prise de notes et la note de période n'arrivent qu'à la clôture : la base les cache avant. */
+const fr1 = v => (Math.round(Number(v || 0)*10)/10).toLocaleString('fr-FR');
+const pl = (n, mot) => n+' '+mot+(n>1?'s':'');
+function lignesBonus(d){
+  const st = d.seances_tuteur || 0, sa = d.seances_tutore || 0;
+  const tut = [st ? pl(st, 'séance')+' comme tuteur' : '', sa ? pl(sa, 'séance')+' en étant aidé' : ''].filter(Boolean).join(', ');
+  return '<table class="t" style="margin-top:4px"><tbody>'+
+    '<tr><td>Dépôts bonus</td><td>'+(d.nb_depots ? pl(d.nb_depots, 'dépôt')+' retenu'+(d.nb_depots>1?'s':'') : 'aucun pour l\'instant')+'</td><td><b>+'+fr1(d.depots)+'</b></td></tr>'+
+    '<tr><td>Tutorat <span class="hint">5 au plus</span></td><td>'+(tut || 'aucune séance pour l\'instant')+'</td><td><b>+'+fr1(d.tutorat)+'</b></td></tr>'+
+    '<tr><td>Signalements <span class="hint">2 au plus</span></td><td>'+(d.nb_signalements ? pl(d.nb_signalements, 'signalement')+' retenu'+(d.nb_signalements>1?'s':'') : 'aucun pour l\'instant')+'</td><td><b>+'+fr1(d.signalements)+'</b></td></tr>'+
+    '</tbody></table>';
+}
 async function chargerSuivi(){
   const zone = $('#pSuivi');
-  const [s, b] = await Promise.all([
-    sb.from('participation_suivi').select('*').eq('eleve', uid()).maybeSingle(),
-    sb.from('depots').select('points_bonus').eq('auteur', uid()).eq('statut', 'valide')
-  ]);
-  const bonus = (b.data || []).reduce((t, d) => t + Number(d.points_bonus || 0), 0);
-  const ligneBonus = '<p style="margin:14px 0 0"><b>Points bonus (dépôts validés) :</b> '+String(bonus).replace('.', ',')+'</p>';
-  const d = s.data;
-  if(!d || !d.seances){
-    zone.innerHTML = '<p class="note" style="margin:0">Aucune séance de participation validée pour l\'instant.</p>'+ligneBonus;
-    return;
+  const {data, error} = await sb.rpc('mon_bilan');
+  if(error){ zone.innerHTML = '<p class="note" style="margin:0">Ton suivi n\'est pas disponible pour l\'instant.</p>'; console.error(error); return; }
+  if(!data.length){ zone.innerHTML = '<p class="note" style="margin:0">Les périodes de ta classe ne sont pas encore ouvertes.</p>'; return; }
+  const d = data.find(p => !p.fin), closes = data.filter(p => p.fin).reverse();
+  let h = '';
+  if(d){
+    h += '<p style="margin:0 0 10px;font-weight:600">Période '+d.periode+' · en cours</p>';
+    if(d.seances){
+      const pct = d.objectif ? Math.min(100, Math.round(100*d.points/d.objectif)) : 0;
+      h += '<p style="margin:0 0 6px;font-size:15px"><b style="font-family:var(--disp);font-size:30px">'+d.points+'</b> point'+(d.points>1?'s':'')+
+          (d.objectif ? ' sur un objectif de <b>'+d.objectif+'</b>' : '')+(d.participation !== null ? ' · participation <b>'+fr1(d.participation)+'/10</b>' : '')+'</p>'+
+        (d.objectif ? '<div style="height:10px;background:#E7EAEF;border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--vert)"></div></div>' : '')+
+        '<p class="note">'+pl(d.seances, 'séance')+' observée'+(d.seances>1?'s':'')+(d.presences < d.seances ? ' · '+pl(d.seances-d.presences, 'absence')+' (neutralisée'+(d.seances-d.presences>1?'s':'')+')' : '')+
+          ' · observateur '+d.roles+' fois'+
+          '<br>L\'objectif est fixe : il ne dépend pas des autres élèves. Une hypothèse fausse compte autant qu\'un raisonnement abouti. Mis à jour le '+esc(dateCourte(d.maj_le))+'.</p>';
+    } else h += '<p class="note" style="margin:0 0 8px">Aucune séance de participation validée pour l\'instant dans cette période.</p>';
+    h += lignesBonus(d)+
+      '<p class="note" style="margin-top:10px">Ta note de période sur 20 : participation /10 + prise de notes /10 + bonus, 20 au plus. '+
+      'La prise de notes et la note sont publiées à la clôture de la période.</p>';
   }
-  const pct = d.objectif ? Math.min(100, Math.round(100*d.points/d.objectif)) : 0;
-  zone.innerHTML =
-    '<p style="margin:0 0 6px;font-size:15px"><b style="font-family:var(--disp);font-size:30px">'+d.points+'</b> point'+(d.points>1?'s':'')+
-      (d.objectif ? ' sur un objectif de <b>'+d.objectif+'</b>' : '')+'</p>'+
-    (d.objectif ? '<div style="height:10px;background:#E7EAEF;border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--vert)"></div></div>' : '')+
-    '<p class="note">'+d.seances+' séance'+(d.seances>1?'s':'')+' observée'+(d.seances>1?'s':'')+(d.presences < d.seances ? ' · '+(d.seances-d.presences)+' absence'+(d.seances-d.presences>1?'s':'')+' (neutralisée'+(d.seances-d.presences>1?'s':'')+')' : '')+
-      ' · observateur '+d.roles+' fois'+(d.bilan ? ' · bilan : <b>'+esc(d.bilan)+'</b>' : '')+
-      '<br>L\'objectif est fixe : il ne dépend pas des autres élèves. Une hypothèse fausse compte autant qu\'un raisonnement abouti. Mis à jour le '+esc(dateCourte(d.maj_le))+'.</p>'+
-    ligneBonus;
+  h += closes.map(c => '<details class="info" style="margin-top:12px"'+(!d && c === closes[0] ? ' open' : '')+'><summary>Période '+c.periode+' · <b>'+(c.note !== null ? fr1(c.note)+'/20' : '—')+'</b></summary>'+
+    '<p style="margin:8px 0 4px">Participation <b>'+(c.participation !== null ? fr1(c.participation) : '0')+'/10</b> · prise de notes <b>'+(c.notes !== null ? fr1(c.notes) : '—')+'/10</b></p>'+
+    lignesBonus(c)+'<p class="note" style="margin-top:8px">Période close le '+esc(dateCourte(c.fin))+'.</p></details>').join('');
+  zone.innerHTML = h;
 }
 
 /* =====================================================================
@@ -556,6 +594,11 @@ async function chargerDepotsEleve(){
         (d.description ? '<p class="q">'+esc(d.description)+'</p>' : '')+
         '<div class="acts">'+liensDepot(d, urls)+'</div></article>').join('');
 }
+/* Bonus d'un dépôt : 0 · 0,5 · 1 · 1,5 (décision du 17/10/2026 ; la base refuse toute autre valeur). */
+const PTS_DEPOT = [0, 0.5, 1, 1.5];
+const ptsDepot = v => PTS_DEPOT.includes(+v) ? +v : 0;
+const choixPts = (cls, v, id) => '<select class="'+cls+'"'+(id !== undefined ? ' data-id="'+id+'"' : '')+' style="width:auto;padding:6px 8px" aria-label="Points bonus">'+
+  PTS_DEPOT.map(p => '<option value="'+p+'"'+(Number(v) === p ? ' selected' : '')+'>'+(p ? '+'+String(p).replace('.', ',') : '0')+'</option>').join('')+'</select>';
 async function chargerDepotsProf(){
   const {data, error} = await sb.from('depots')
     .select('id,titre,description,lien,fichier,fichier_nom,statut,points_bonus,commentaire,classe,cree_le,valide_le,profils!depots_auteur_fkey(identifiant)')
@@ -570,13 +613,14 @@ async function chargerDepotsProf(){
     (d.description ? '<p class="ligne">'+esc(d.description)+'</p>' : '')+
     '<div class="acts">'+liensDepot(d, urls)+'</div>'+
     '<div class="valider"><div class="champs">'+
-      '<label>Points bonus<input type="number" class="dPts" min="0" max="20" step="0.5" value="0"></label>'+
+      '<label>Points bonus'+choixPts('dPts', 0)+'</label>'+
       '<label style="flex:1">Commentaire pour l\'élève (facultatif)<input type="text" class="dCom" maxlength="400"></label></div>'+
       '<div class="acts" style="margin:0"><button class="mini dOk">Valider et partager à la classe</button><button class="mini ghost dNon">Ne pas retenir</button></div></div></div>'
   ).join('') : '<p class="note">Aucun dépôt en attente.</p>';
   const valides = data.filter(d => d.statut === 'valide');
   zV.innerHTML = valides.length ? '<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Ressource</th><th>Bonus</th><th></th></tr></thead><tbody>'+
-    valides.map(d => '<tr><td>'+qui(d)+'</td><td>'+esc(d.titre)+'<br>'+liensDepot(d, urls)+'</td><td>'+String(d.points_bonus).replace('.', ',')+'</td>'+
+    valides.map(d => '<tr><td>'+qui(d)+'</td><td>'+esc(d.titre)+'<br>'+liensDepot(d, urls)+'<br><span class="hint">validé le '+dateCourte(d.valide_le)+'</span></td>'+
+      '<td>'+choixPts('dPtsV', d.points_bonus, d.id)+'</td>'+
       '<td><button class="mini ghost dRetirerP" data-id="'+d.id+'">Retirer de la classe</button></td></tr>').join('')+'</tbody></table></div>'
     : '<p class="note">Aucune ressource validée.</p>';
   // Points bonus par élève : dépôts validés + signalements « J'ai vu un bug » retenus (+0,5 chacun, terminales).
@@ -599,15 +643,191 @@ async function chargerDepotsProf(){
       if(error){ alert('Erreur : '+error.message); return; }
       chargerDepotsProf();
     };
-    carte.querySelector('.dOk').addEventListener('click', () => maj({statut:'valide', points_bonus:Math.max(0, Math.min(20, +carte.querySelector('.dPts').value || 0)),
+    carte.querySelector('.dOk').addEventListener('click', () => maj({statut:'valide', points_bonus:ptsDepot(carte.querySelector('.dPts').value),
       commentaire:carte.querySelector('.dCom').value.trim(), valide_le:new Date().toISOString()}));
     carte.querySelector('.dNon').addEventListener('click', () => maj({statut:'refuse', points_bonus:0, commentaire:carte.querySelector('.dCom').value.trim(), valide_le:new Date().toISOString()}));
   });
+  zV.querySelectorAll('.dPtsV').forEach(s => s.addEventListener('change', async () => {
+    s.disabled = true;
+    const {error} = await sb.from('depots').update({points_bonus:ptsDepot(s.value)}).eq('id', +s.dataset.id);
+    if(error) alert('Erreur : '+error.message);
+    chargerDepotsProf();
+  }));
   zV.querySelectorAll('.dRetirerP').forEach(b => b.addEventListener('click', async () => {
     if(!confirm('Retirer cette ressource ? La classe ne la verra plus et ses points bonus sont annulés.')) return;
     await sb.from('depots').update({statut:'refuse', points_bonus:0}).eq('id', +b.dataset.id);
     chargerDepotsProf();
   }));
+}
+
+/* =====================================================================
+   Bilan de période (migration 007) : prise de notes, bonus, clôture
+   La base calcule (bilan_classe) ; ici on saisit la prise de notes et le curseur du tutorat,
+   on exporte avec les noms (sur l'appareil) et on clôture la base et l'application ensemble.
+   ===================================================================== */
+const bp = {classe:null, numero:null, periodes:[], lignes:[]};
+const nomSimple = id => (corresp && corresp.eleves[id]) || id || '?';
+const nombre = s => { const v = parseFloat(String(s).replace(',', '.')); return isNaN(v) ? null : v; };
+const vide = v => v === null || v === undefined;
+/* Même formule que bilan_periode_calcul (migration 007), pour mettre la ligne à jour sans tout recharger. */
+const noteDe = l => Math.min(20, Math.round(10*(Number(l.participation || 0) + Number(l.notes || 0) + Number(l.depots || 0) +
+  Number(l.signalements || 0) + Number(vide(l.tutorat_curseur) ? l.tutorat_propose : l.tutorat_curseur)))/10);
+
+async function chargerBilanPeriode(garderPeriode){
+  const zone = $('#bpTable'), selC = $('#bpClasse'), selP = $('#bpPeriode'), btn = $('#bpCloturer');
+  if(!zone || role !== 'prof') return;
+  const c = await sb.from('classes_participation').select('classe').eq('prof', uid()).order('classe');
+  if(c.error){ zone.innerHTML = '<p class="note">Erreur : '+esc(c.error.message)+'</p>'; return; }
+  if(!c.data.length){
+    zone.innerHTML = '<p class="note">Ouvrez d\'abord la participation à une classe (« Ouvrir les onglets à cette classe », ci-dessus).</p>';
+    selC.hidden = selP.hidden = btn.hidden = true; bp.lignes = []; return;
+  }
+  const avant = selC.value;
+  selC.innerHTML = c.data.map(x => '<option>'+esc(x.classe)+'</option>').join('');
+  if(c.data.some(x => x.classe === avant)) selC.value = avant;
+  selC.hidden = false;
+  if(bp.classe !== selC.value){ bp.classe = selC.value; garderPeriode = false; }
+  let p = await sb.from('periodes').select('numero,debut,fin').eq('classe', bp.classe).order('numero');
+  if(p.error){
+    zone.innerHTML = /periodes|does not exist|schema cache/i.test(p.error.message)
+      ? '<p class="note">Pas encore activé : la migration <code>007_periodes.sql</code> n\'a pas été collée dans Supabase (étape 10 de <code>supabase/MISE_EN_PLACE.md</code>).</p>'
+      : '<p class="note">Erreur : '+esc(p.error.message)+'</p>';
+    selP.hidden = btn.hidden = true; return;
+  }
+  if(!p.data.length){      // classe ouverte avant la migration 007 sans période : la P1 commence aujourd'hui
+    await sb.from('periodes').upsert([{classe:bp.classe, numero:1}], {onConflict:'classe,numero', ignoreDuplicates:true});
+    p = await sb.from('periodes').select('numero,debut,fin').eq('classe', bp.classe).order('numero');
+    if(p.error || !p.data.length){ zone.innerHTML = '<p class="note">Aucune période pour cette classe.</p>'; return; }
+  }
+  bp.periodes = p.data;
+  const ouverte = bp.periodes.find(x => !x.fin);
+  if(!garderPeriode || !bp.periodes.some(x => x.numero === bp.numero)) bp.numero = (ouverte || bp.periodes[bp.periodes.length-1]).numero;
+  selP.innerHTML = bp.periodes.map(x => '<option value="'+x.numero+'"'+(x.numero === bp.numero ? ' selected' : '')+'>Période '+x.numero+
+    (x.fin ? ' · close le '+esc(dateCourte(x.fin)) : ' · en cours')+'</option>').join('');
+  selP.hidden = false;
+  const b = await sb.rpc('bilan_classe', {p_classe:bp.classe, p_numero:bp.numero});
+  if(b.error){ zone.innerHTML = '<p class="note">Erreur : '+esc(b.error.message)+'</p>'; return; }
+  bp.lignes = b.data.slice().sort((x, y) => nomSimple(x.identifiant).localeCompare(nomSimple(y.identifiant), 'fr'));
+  rendreBilan();
+}
+function rendreBilan(){
+  const per = bp.periodes.find(x => x.numero === bp.numero), close = !!(per && per.fin), btn = $('#bpCloturer');
+  btn.hidden = close; btn.textContent = 'Clôturer la période '+bp.numero;
+  const L = bp.lignes;
+  if(!L.length){ $('#bpTable').innerHTML = '<p class="note">Aucun élève dans cette classe.</p>'; return; }
+  const v = x => vide(x) ? '—' : fr1(x);
+  const champ = (cls, val, plh, nom, max) => '<input class="'+cls+'" inputmode="decimal" autocomplete="off" value="'+(vide(val) ? '' : fr1(val))+'"'+
+    (plh !== undefined ? ' placeholder="'+fr1(plh)+'"' : '')+' aria-label="'+esc(nom)+'" style="width:64px;padding:6px 8px;font-size:14px" data-max="'+max+'">';
+  $('#bpTable').innerHTML = '<p class="note" id="bpManque" style="margin:10px 0 0"></p>'+
+    '<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Participation /10</th><th>Roue</th><th>Prise de notes /10</th>'+
+    '<th>Dépôts</th><th>Tutorat <span class="hint">≤ 5</span></th><th>Signalements <span class="hint">≤ 2</span></th><th>Note /20</th></tr></thead><tbody>'+
+    L.map((l, i) => {
+      const st = l.seances_tuteur || 0, sa = l.seances_tutore || 0, nom = nomSimple(l.identifiant);
+      return '<tr data-i="'+i+'"><td>'+nomAffiche(l.identifiant)+'</td>'+
+        '<td>'+v(l.participation)+(l.seances ? '<br><span class="hint">'+l.points+' pts / '+l.objectif+' · '+pl(l.seances, 'séance')+'</span>' : '')+'</td>'+
+        '<td>'+(l.tirages || 0)+'</td>'+
+        '<td>'+champ('bpNotes', l.notes, undefined, 'Prise de notes sur 10 de '+nom, 10)+'</td>'+
+        '<td>+'+v(l.depots)+(l.nb_depots ? '<br><span class="hint">'+pl(l.nb_depots, 'dépôt')+'</span>' : '')+'</td>'+
+        '<td>'+champ('bpTut', l.tutorat_curseur, l.tutorat_propose, 'Tutorat de '+nom+' (proposé : '+fr1(l.tutorat_propose)+')', 5)+
+          '<br><span class="hint">proposé '+fr1(l.tutorat_propose)+(st || sa ? ' · '+[st ? st+' tuteur' : '', sa ? sa+' aidé' : ''].filter(Boolean).join(', ') : '')+'</span></td>'+
+        '<td>+'+v(l.signalements)+(l.nb_signalements ? '<br><span class="hint">'+pl(l.nb_signalements, 'retenu')+'</span>' : '')+'</td>'+
+        '<td><b class="bpNote">'+v(l.note)+'</b></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  majManque();
+}
+function majManque(){
+  const n = bp.lignes.filter(l => vide(l.notes)).length, z = $('#bpManque');
+  if(!z) return;
+  z.hidden = !n;
+  z.textContent = n ? pl(n, 'élève')+' sans note de prise de notes (compté 0 dans la note).' : '';
+}
+/* Une case vidée rend la main : prise de notes non saisie, ou tutorat revenu à la proposition. */
+async function saisirBilan(inp){
+  const tr = inp.closest('tr'), l = bp.lignes[+tr.dataset.i], estNotes = inp.classList.contains('bpNotes');
+  const cle = estNotes ? 'notes' : 'tutorat_curseur', max = +inp.dataset.max, etat = $('#bpEtat');
+  const brut = inp.value.trim();
+  let val = brut === '' ? null : nombre(brut);
+  if(brut !== '' && (val === null || val < 0 || val > max)){
+    etat.textContent = 'Valeur refusée : un nombre entre 0 et '+max+' (virgule ou point).';
+    inp.value = vide(l[cle]) ? '' : fr1(l[cle]); return;
+  }
+  if(val !== null) val = Math.round(val*10)/10;
+  inp.disabled = true;
+  const {error} = await sb.from('participation_suivi').upsert({eleve:l.eleve, periode:bp.numero, [estNotes ? 'notes' : 'tutorat']:val}, {onConflict:'eleve,periode'});
+  inp.disabled = false;
+  if(error){ etat.textContent = 'Non enregistré : '+error.message; inp.value = vide(l[cle]) ? '' : fr1(l[cle]); return; }
+  l[cle] = val;
+  if(!estNotes) l.tutorat = vide(val) ? l.tutorat_propose : val;
+  l.note = noteDe(l);
+  inp.value = vide(val) ? '' : fr1(val);
+  tr.querySelector('.bpNote').textContent = fr1(l.note);
+  etat.textContent = 'Enregistré : '+nomSimple(l.identifiant)+'.';
+  majManque();
+}
+function exporterBilan(sansQuestion){
+  if(!bp.lignes.length) return;
+  if(!corresp && !sansQuestion && !confirm('La correspondance n\'est pas chargée sur cet appareil : le fichier n\'aura que les identifiants. Continuer ?')) return;
+  const n = x => vide(x) ? '' : String(Math.round(Number(x)*10)/10).replace('.', ',');
+  const cellule = x => { const s = String(x ?? ''); return /[;"\n]/.test(s) ? '"'+s.replace(/"/g, '""')+'"' : s; };
+  const per = bp.periodes.find(x => x.numero === bp.numero);
+  const lignes = [['Nom', 'Identifiant', 'Participation /10', 'Points', 'Objectif', 'Séances', 'Passages à la roue', 'Prise de notes /10',
+                   'Dépôts', 'Tutorat', 'Signalements', 'Note /20']]
+    .concat(bp.lignes.map(l => [corresp ? nomSimple(l.identifiant) : '', l.identifiant, n(l.participation), l.points, l.objectif, l.seances,
+                                l.tirages, n(l.notes), n(l.depots), n(l.tutorat), n(l.signalements), n(l.note)]));
+  const txt = '﻿'+'Bilan de période — '+bp.classe+' — période '+bp.numero+(per && per.fin ? ' (close le '+dateCourte(per.fin)+')' : ' (en cours)')+'\r\n'+
+    lignes.map(r => r.map(cellule).join(';')).join('\r\n')+'\r\n';
+  const url = URL.createObjectURL(new Blob([txt], {type:'text/csv;charset=utf-8'}));
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'bilan-'+bp.classe.replace(/[^A-Za-z0-9_-]+/g, '-')+'-P'+bp.numero+'-'+new Date().toISOString().slice(0, 10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+/* La classe de l'application reliée à une classe Résonance : celle dont le plus d'élèves y ont leur compte. */
+async function classeAppliDe(classeRes){
+  const app = appProf(); if(!app) return null;
+  const liens = lireLiens(), noms = app.classes().map(c => c.nom);
+  const ids = [...new Set(noms.flatMap(n => Object.values(liens[n] || {})))];
+  if(!ids.length) return null;
+  const {data} = await sb.from('profils').select('identifiant,classe').in('identifiant', ids);
+  const classeDe = Object.fromEntries((data || []).map(p => [p.identifiant, p.classe]));
+  let choix = null, max = 0;
+  noms.forEach(n => { const k = Object.values(liens[n] || {}).filter(id => classeDe[id] === classeRes).length; if(k > max){ max = k; choix = n; } });
+  return choix;
+}
+async function cloturerBilan(){
+  const per = bp.periodes.find(x => x.numero === bp.numero), btn = $('#bpCloturer'), etat = $('#bpEtat');
+  if(!per || per.fin) return;
+  let app = appProf();
+  if(app && typeof app.periode !== 'function') app = null;     // application d'avant les périodes : pas de pont de clôture
+  const appliCls = app ? await classeAppliDe(bp.classe) : null;
+  const appPer = app && appliCls ? app.periode(appliCls) : null;
+  const avecAppli = !!(appPer && appPer.n === bp.numero && !appPer.fin);
+  const avert = [], sans = bp.lignes.filter(l => vide(l.notes)).length;
+  if(sans) avert.push(pl(sans, 'élève')+' sans note de prise de notes (compté 0 ; modifiable après la clôture).');
+  if(!app) avert.push('L\'application de participation n\'est pas chargée (ou pas à jour) : la roue ne sera pas remise à zéro.');
+  else if(!appliCls) avert.push('Aucune classe de l\'application n\'est reliée à '+bp.classe+' : la roue ne sera pas remise à zéro.');
+  else if(!avecAppli) avert.push('L\'application est en période '+(appPer ? appPer.n : '?')+(appPer && appPer.fin ? ' (close)' : '')+' : elle ne sera pas clôturée.');
+  const suite = bp.numero < 5 ? ', la période '+(bp.numero+1)+' s\'ouvre' : ' (c\'est la dernière de l\'année)';
+  if(!confirm('Clôturer la période '+bp.numero+' de '+bp.classe+' ?\n\nLes bonus de dépôts et de signalements sont figés, le tutorat est fixé, '+
+    'la note est publiée aux élèves'+suite+(avecAppli ? ' et la roue repart à zéro' : '')+'.\n'+
+    'Deux fichiers sont téléchargés sur cet appareil : la sauvegarde de l\'application et le bilan avec les noms.'+
+    (avert.length ? '\n\n⚠ '+avert.join('\n⚠ ') : ''))) return;
+  btn.disabled = true; etat.textContent = 'Clôture en cours…';
+  try{
+    if(avecAppli) await publierSuivi(appliCls, true);          // la participation la plus récente d'abord
+    const {error} = await sb.rpc('cloturer_periode', {p_classe:bp.classe, p_numero:bp.numero});
+    if(error) throw error;
+    let msgApp = '';
+    if(avecAppli){
+      const r = app.cloturer(appliCls, bp.numero);
+      msgApp = r && r.erreur ? ' ⚠ Application non clôturée : '+r.erreur+'.' : ' Roue remise à zéro ; sauvegarde de l\'application téléchargée.';
+    }
+    const close = bp.numero;
+    await chargerBilanPeriode(true);                            // reste sur la période close : valeurs figées
+    exporterBilan(true);
+    etat.textContent = 'Période '+close+' close : les élèves voient leur note.'+msgApp+' Bilan exporté : rangez les fichiers dans OneDrive.';
+  }catch(e){ etat.textContent = 'Clôture impossible : '+e.message; }
+  finally{ btn.disabled = false; }
 }
 
 /* =====================================================================
@@ -636,7 +856,13 @@ document.addEventListener('click', e => {
   else if(b.id === 'pPublier') publierSuivi($('#pLiensClasse').value);
   else if(b.id === 'pSauverCle') sauverCle();
   else if(b.id === 'dEnvoyer') deposer();
+  else if(b.id === 'bpRecharger') chargerBilanPeriode(true).catch(e => console.error(e));
+  else if(b.id === 'bpExporter') exporterBilan();
+  else if(b.id === 'bpCloturer') cloturerBilan();
 });
+document.getElementById('bpClasse').addEventListener('change', () => chargerBilanPeriode(false).catch(e => console.error(e)));
+document.getElementById('bpPeriode').addEventListener('change', e => { bp.numero = +e.target.value; chargerBilanPeriode(true).catch(err => console.error(err)); });
+document.getElementById('bpTable').addEventListener('change', e => { const i = e.target.closest('input.bpNotes, input.bpTut'); if(i) saisirBilan(i); });
 document.getElementById('pLiensClasse').addEventListener('change', afficherLiens);
 document.getElementById('pRestaurerCle').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if(f) restaurerCle(f); });
 

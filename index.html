@@ -596,7 +596,30 @@ a.outil h3{margin:0 0 6px}
         <button class="mini ghost" id="pPublier">Publier le suivi aux élèves</button>
       </div>
       <p class="note" id="pClasses"></p>
-      <p class="note">Le suivi est publié automatiquement à chaque séance validée. Chaque élève ne voit que sa propre ligne.</p>
+      <p class="note">Le suivi de la période en cours est publié automatiquement à chaque séance validée. Chaque élève ne voit que sa propre ligne.</p>
+    </div>
+
+    <!-- Bilan de période (participation.js, migration 007) -->
+    <h3 id="bilan-periode">Bilan de période</h3>
+    <p class="lede" style="margin-bottom:8px">Note sur 20, plafonnée à 20 : participation /10 + prise de notes /10 + bonus
+    (dépôts 0,5 à 1,5 chacun ; tutorat 5 au plus, proposé à +1 par séance comme tuteur et +0,5 comme tutoré ;
+    signalements +0,5 chacun, 2 au plus). Saisissez la prise de notes, réglez le tutorat si besoin, puis clôturez :
+    la note est publiée aux élèves, la période suivante s'ouvre et la roue repart à zéro.</p>
+    <div class="card">
+      <div class="barre" style="margin-top:0">
+        <select id="bpClasse" style="width:auto"></select>
+        <select id="bpPeriode" style="width:auto"></select>
+        <button class="mini ghost" id="bpRecharger">Recharger</button>
+      </div>
+      <div id="bpTable"><p class="note">Chargement…</p></div>
+      <div class="barre">
+        <button class="mini ghost" id="bpExporter">Exporter le bilan (avec les noms, sur cet appareil)</button>
+        <button class="mini" id="bpCloturer" hidden>Clôturer la période</button>
+      </div>
+      <p class="note" id="bpEtat"></p>
+      <p class="note">Les dépôts se notent dans la rubrique <a href="#depots">Dépôts</a>, les signalements dans le
+      <a href="#prof">Tableau de bord</a> ; le bilan se met à jour tout seul. Les noms viennent de la correspondance chargée
+      sur cet appareil : ils ne partent jamais en ligne. Le fichier exporté contient les noms : à ranger dans OneDrive.</p>
     </div>
 
     <h3>Clé de chiffrement de cet appareil</h3>
@@ -641,7 +664,8 @@ a.outil h3{margin:0 0 6px}
     <div id="dAValider"></div>
     <h3>Ressources validées</h3>
     <div id="dValides"></div>
-    <h3>Points bonus par élève</h3>
+    <h3>Points bonus par élève, depuis la rentrée</h3>
+    <p class="note">Le détail par période, tutorat compris, est dans <a href="#participation">Participation → Bilan de période</a>.</p>
     <div id="dBonus"></div>
   </div>
 </section>
@@ -670,8 +694,8 @@ a.outil h3{margin:0 0 6px}
     <h3 id="signalements">Signalements <span class="sig-n" id="sigN" hidden></span></h3>
     <p class="lede" style="margin-bottom:8px">Envoyés par les élèves avec le bouton 🐞 « J'ai vu un bug », sur Résonance et dans le
     parcours Python. Chacun dit où l'élève était et sur quel appareil ; l'élève est reconnu par son compte (bouton réservé aux terminales).
-    Le +0,5 au prochain contrôle ne s'accorde qu'aux élèves de terminale : il marque le signalement traité, et l'élève en est
-    prévenu une fois, à sa prochaine ouverture de Résonance.</p>
+    Le +0,5 sur la note de participation ne s'accorde qu'aux élèves de terminale, 2 points au plus par période : il marque le
+    signalement traité, compte dans le bilan de la période, et l'élève en est prévenu une fois, à sa prochaine ouverture de Résonance.</p>
     <div class="barre" style="margin:0 0 12px">
       <label class="coche" style="margin:0"><input type="checkbox" id="sigTout"> montrer aussi les signalements traités</label>
       <button class="mini ghost" id="sigRecharger">Recharger</button>
@@ -728,7 +752,8 @@ a.outil h3{margin:0 0 6px}
       <div>
         <h5>Tes données</h5>
         <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
-        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom.</p>
+        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code) ; en terminale, tes points et
+        tes notes de participation par période. Jamais ton nom.</p>
         <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
         <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
         tout le reste fin août. Effacement sur simple demande.</p>
@@ -1594,7 +1619,7 @@ function rendreSignalements(){
         (python?'<a class="mini ghost" href="outils/python/'+encodeURIComponent(x.page||'index.html')+'" target="_blank" rel="noopener">Ouvrir la page</a>':'')+
         '<button class="mini'+(x.traite?' ghost':'')+'" data-sig-traite="'+(x.traite?'0':'1')+'">'+(x.traite?'Remettre à traiter':'✓ Traité')+'</button>'+
         (x.bonus_le?'<button class="mini ghost" data-sig-bonus="0">Retirer le +0,5</button>'
-          :tle?'<button class="mini ghost" data-sig-bonus="1" title="Signalement retenu : +0,5 au prochain contrôle. Il passe en traité ; l\'élève est prévenu à sa prochaine ouverture de Résonance.">Accorder +0,5</button>':'')+
+          :tle?'<button class="mini ghost" data-sig-bonus="1" title="Signalement retenu : +0,5 sur la note de participation (2 points au plus par période). Il passe en traité ; l\'élève est prévenu à sa prochaine ouverture de Résonance.">Accorder +0,5</button>':'')+
         '<button class="mini ghost" data-sig-suppr>Supprimer</button>'+
       '</div></div>';
   }).join('');
@@ -1620,7 +1645,9 @@ document.getElementById('sigListe').addEventListener('click',async e=>{
   const {error}=await requete;
   if(error){
     b.disabled=false;
-    etat.textContent=/BONUS_TERMINALE/.test(error.message)?'Refusé : le +0,5 ne s\'accorde qu\'aux élèves de terminale.':'Échec : '+error.message;
+    etat.textContent=/BONUS_TERMINALE/.test(error.message)?'Refusé : le +0,5 ne s\'accorde qu\'aux élèves de terminale.'
+      :/PLAFOND_BONUS_PERIODE/.test(error.message)?'Refusé : cet élève a déjà 2 points de signalements sur la période (quatre +0,5). Vous pouvez marquer le signalement traité.'
+      :'Échec : '+error.message;
     return;
   }
   await chargerSignalements();

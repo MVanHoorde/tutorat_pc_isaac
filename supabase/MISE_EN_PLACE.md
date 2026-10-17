@@ -109,7 +109,27 @@ Règles posées par la base :
 - accorder le bonus marque le signalement traité, à la date du serveur ; le retirer efface aussi « vu » ;
 - l'élève n'obtient que ses bonus pas encore vus (`mes_bonus_signalement()`), et ne peut marquer « vus » que les siens (`bonus_signalement_vus()`).
 
-Le formulaire ne demande ni nom ni prénom : l'élève est reconnu par son compte. Seuls les élèves de terminale ont le bouton. Un +0,5 accordé s'ajoute aux points bonus de l'élève (tableau « Points bonus » de la rubrique Dépôts). Effacement en fin d'année avec le reste : `delete from public.signalements;`.
+Le formulaire ne demande ni nom ni prénom : l'élève est reconnu par son compte. Seuls les élèves de terminale ont le bouton. Un +0,5 accordé compte sur la note de participation de la période, 2 points au plus (plafond posé par la migration `007`, étape 10). Effacement en fin d'année avec le reste : `delete from public.signalements;`.
+
+## 10. Périodes de participation et note de période (octobre 2026)
+
+Suppose les étapes 7 à 9 faites (migrations 004 à 006). Modifie deux tables existantes : `participation_suivi` (une ligne par élève **et par période**) et `depots` (bonus limité à 0, 0,5, 1 ou 1,5).
+
+1. **SQL Editor → New query** : collez `supabase/migrations/007_periodes.sql`, puis **Run**. Vous devez voir « Success. No rows returned ». La migration peut être relancée sans dommage.
+2. Vérification : collez les requêtes du bloc « Vérification » en fin de fichier. Attendu :
+   - `B1_T_3_PH-CH_VANHOORDE | 1 | 2026-08-31 22:00:00+00 | null` (la période 1 commence le 1er septembre, heure de Paris) ;
+   - toutes les lignes de suivi en période 1 ;
+   - quatre fonctions : `bilan_classe`, `bilan_periode_calcul`, `cloturer_periode`, `mon_bilan`.
+3. **Juste après**, publiez la branche `periodes` de `participation_terminale`, puis celle de Résonance : l'ancienne page de Résonance lit le suivi d'une façon que la migration retire (l'élève y verrait « aucune séance »).
+
+Règles posées par la base :
+- une période appartient à une classe, va de `debut` à `fin` (exclue), une seule ouverte à la fois ; l'enseignant ouvre la période 1 (« Ouvrir les onglets à cette classe »), les suivantes s'ouvrent à la clôture ;
+- un dépôt compte dans la période de sa validation, un signalement dans celle de son +0,5, une séance de tutorat dans celle de son jour (le jour de la clôture compte déjà pour la suivante) ;
+- `cloturer_periode()` fige les bonus de dépôts et de signalements et fixe le curseur du tutorat ; prise de notes et tutorat restent modifiables ensuite ;
+- l'enseignant ne lit et ne modifie que les élèves de ses classes ; l'élève lit ses périodes par `mon_bilan()` seulement, qui cache prise de notes et note avant la clôture ;
+- quatre +0,5 de signalements au plus par période : la base répond `PLAFOND_BONUS_PERIODE` au cinquième.
+
+Fin d'année : `delete from public.participation_suivi; delete from public.periodes;`.
 
 ## Où sont les données
 
@@ -121,7 +141,8 @@ Le formulaire ne demande ni nom ni prénom : l'élève est reconnu par son compt
 | Noms et prénoms | Le fichier Excel dans OneDrive, et la mémoire de l'appareil de l'enseignant qui l'a chargé |
 | Listes de noms des séances et relevés des observateurs | Chiffrés sur la tablette : Supabase ne stocke que des boîtes illisibles, effacées à la validation de la séance |
 | Liens noms ↔ identifiants de la participation | La mémoire de l'appareil de l'enseignant |
-| Points de participation (par identifiant), dépôts et fichiers déposés | Supabase (Paris) |
+| Points de participation, prise de notes et note de période (par identifiant et par période), dépôts et fichiers déposés | Supabase (Paris) |
+| Bilan de période exporté (avec les noms) | L'appareil de l'enseignant, puis OneDrive ; jamais en ligne ni dans le dépôt |
 | Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |
 | Exercices réussis du parcours Python (identifiant, niveau, exercice, date ; jamais le code) | Supabase (Paris) |
 | Signalements « J'ai vu un bug » (identifiant, rubrique, page, étape, appareil résumé, message, +0,5 et « vu » ; aucun nom) | Supabase (Paris) |
