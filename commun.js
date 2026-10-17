@@ -47,7 +47,12 @@ window.RESONANCE = {
     const r = this.role(s);
     if (r === 'prof') return true;
     if (r !== 'eleve') return false;
-    const c = String((s.user.app_metadata && s.user.app_metadata.classe) || '').trim();
+    return this.classeTerminale(s.user.app_metadata && s.user.app_metadata.classe);
+  },
+  /* Classe de terminale ? Même règle en base, classe_terminale() (migration 006), qui réserve le +0,5
+     des signalements aux terminales. */
+  classeTerminale(c){
+    c = String(c || '').trim();
     return /_T_/i.test(c) || /^t/i.test(c);
   },
   esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))

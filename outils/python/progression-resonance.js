@@ -10,21 +10,24 @@
 //   · à chaque événement pp:reussi, enregistre { niveau, exercice } dans python_reussites (migration 005).
 //     Jamais le code tapé. Hors ligne, la réussite attend en mémoire et part au retour du réseau.
 // - Enseignant connecté : rien n'est enregistré ; seul le lien de retour vers Résonance est ajouté.
+// - Tout élève connecté (premières comprises) : bouton « J'ai vu un bug » (../../signalement.js, migration 006),
+//   qui envoie la rubrique (python-nN), le fichier et l'exercice à l'écran.
 // Les tables et les droits sont dans supabase/migrations/005_python.sql.
 
 const COMMUN = new URL('../../commun.js', import.meta.url).href;
 const RESONANCE_URL = new URL('../../index.html#outils', import.meta.url).href;
+const SIGNALEMENT = new URL('../../signalement.js', import.meta.url).href;
 
 function sessionPresente() {
   // Même nom de clé que commun.js ; lu sans rien charger, pour ne rien faire du tout hors connexion.
   try { return !!localStorage.getItem('sb-mnqcmjmypkleptbmqtws-auth-token'); } catch (e) { return false; }
 }
 
-function chargerScript(src) {
+function chargerScript(src, dejaLa = () => !!window.RESONANCE) {
   return new Promise((ok, ko) => {
-    if (window.RESONANCE) return ok();
+    if (dejaLa()) return ok();
     const s = document.createElement('script');
-    s.src = src; s.onload = ok; s.onerror = () => ko(new Error('commun.js introuvable'));
+    s.src = src; s.onload = ok; s.onerror = () => ko(new Error(src.split('/').pop() + ' introuvable'));
     document.head.appendChild(s);
   });
 }
@@ -46,6 +49,37 @@ const niveauDeLaPage = () => {
   return Number.isInteger(n) && n >= 1 && n <= 5 ? n : null;
 };
 const exerciceValide = (id) => typeof id === 'string' && /^[a-z0-9][a-z0-9-]{0,39}$/.test(id);
+
+// « J'ai vu un bug » : où était l'élève quand il a touché le bouton. L'étape et l'exercice dont le haut
+// a passé le milieu de l'écran ; « Étape 3 · Types de valeurs et affichage — 3.2 Prédire l'affichage ».
+function contextePython() {
+  const n = niveauDeLaPage();
+  const page = decodeURIComponent(location.pathname.split('/').pop() || 'index.html');
+  const mi = window.innerHeight / 2, vu = (x) => { const r = x.getBoundingClientRect(); return r.height && r.top < mi && r.bottom > 0; };
+  let seance = null, exo = null;
+  for (const s of document.querySelectorAll('.seance')) if (vu(s)) seance = s;
+  for (const a of document.querySelectorAll('article.exo')) if (vu(a)) exo = a;
+  const propre = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+  let etape = '';
+  if (seance) {
+    const num = propre(seance.querySelector('.pp-snum') && seance.querySelector('.pp-snum').textContent);
+    const titre = propre(seance.dataset.titre);
+    etape = /^Étape/.test(num) ? num + (titre ? ' · ' + titre : '') : titre;
+  }
+  if (exo && (!seance || seance.contains(exo))) {
+    const h = exo.querySelector('h3');
+    etape += (etape ? ' — ' : '') + (h ? propre(h.textContent) : exo.id);
+  }
+  const rubrique = n ? 'Parcours Python, niveau ' + n : 'Parcours Python';
+  return { cle: n ? 'python-n' + n : 'python', page, etape: etape.slice(0, 120), ou: rubrique + (etape ? ' · ' + etape : '') };
+}
+
+async function installerSignalement(sb) {
+  try {
+    await chargerScript(SIGNALEMENT, () => !!window.RESONANCE_SIGNALEMENT);
+    window.RESONANCE_SIGNALEMENT.installer({ sb, contexte: contextePython });
+  } catch (e) { console.warn('Bouton « J’ai vu un bug » indisponible :', e.message || e); }
+}
 
 // Bandeau discret : dit à l'élève ce qui est enregistré, et le ramène à Résonance.
 function bandeau(texte) {
@@ -87,6 +121,7 @@ async function demarrer() {
   }
   if (!session) return;
   const R = window.RESONANCE, role = R.role(session), ident = R.identifiant(session);
+  if (role === 'eleve') installerSignalement(sb);
 
   if (role !== 'eleve') {
     bandeau(role === 'prof' ? 'Vue enseignant : vos essais ne sont pas enregistrés.' : '');

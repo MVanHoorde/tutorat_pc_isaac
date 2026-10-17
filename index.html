@@ -308,6 +308,20 @@ a.outil:hover h3{text-decoration:underline}
 a.outil:focus-visible{outline:2px solid var(--match);outline-offset:3px;border-radius:14px}
 a.outil h3{margin:0 0 6px}
 
+/* signalements « J'ai vu un bug » (Tableau de bord ; le bouton et le formulaire élève sont dans signalement.js) */
+.sig-n{display:inline-block;min-width:18px;padding:0 6px;margin-left:6px;border-radius:999px;background:#C0392B;color:#fff;
+  font-family:var(--sans);font-size:11.5px;font-weight:600;line-height:18px;text-align:center;vertical-align:2px}
+.sig{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.sig.traite .sig-tete,.sig.traite .sig-msg{opacity:.6}
+.sig-tete{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;font-size:13px;color:var(--muted)}
+.sig-tete b{color:var(--ink);font-size:14.5px;font-weight:600}
+.sig-classe{padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--ink);font-weight:600}
+.sig-msg{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0;font-size:14.5px}
+.sig-bonus{font-size:13px;color:var(--muted);margin:0 0 8px}
+.sig-bonus b{color:var(--vert);font-weight:600}
+.sig .acts{display:flex;gap:8px;flex-wrap:wrap}
+.sig .acts .mini{padding:6px 12px;font-size:13.5px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -339,7 +353,7 @@ a.outil h3{margin:0 0 6px}
     <button class="tab module" role="tab" aria-selected="false" data-section="participation" data-view="participation">Participation</button>
     <button class="tab module" role="tab" aria-selected="false" data-section="participation" data-view="depots">Dépôts bonus</button>
     <button class="tab" role="tab" aria-selected="false" data-section="outils" data-view="outils">Outils</button>
-    <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord</button>
+    <button class="tab prof" role="tab" aria-selected="false" data-view="prof">Tableau de bord<span class="sig-n" id="sigNTab" title="Signalements à traiter" hidden></span></button>
     <button class="who-btn" id="whoBtn">Se connecter</button>
   </div>
 </nav>
@@ -651,6 +665,19 @@ a.outil h3{margin:0 0 6px}
 
     <h3>Disponibilités déclarées par les tuteurs</h3>
     <div id="dispoTuteurs"><p class="note">Chargement…</p></div>
+
+    <!-- « J'ai vu un bug » (migration 006) : la base ne rend que les signalements des élèves de vos classes. -->
+    <h3 id="signalements">Signalements <span class="sig-n" id="sigN" hidden></span></h3>
+    <p class="lede" style="margin-bottom:8px">Envoyés par les élèves avec le bouton 🐞 « J'ai vu un bug », sur Résonance et dans le
+    parcours Python. Chacun dit où l'élève était et sur quel appareil ; l'élève écrit son nom et son prénom en tête du message.
+    Le +0,5 au prochain contrôle ne s'accorde qu'aux élèves de terminale : il marque le signalement traité, et l'élève en est
+    prévenu une fois, à sa prochaine ouverture de Résonance.</p>
+    <div class="barre" style="margin:0 0 12px">
+      <label class="coche" style="margin:0"><input type="checkbox" id="sigTout"> montrer aussi les signalements traités</label>
+      <button class="mini ghost" id="sigRecharger">Recharger</button>
+      <span class="note" id="sigEtat" role="status" style="margin:0"></span>
+    </div>
+    <div id="sigListe"><p class="note">Chargement…</p></div>
     <div style="height:44px"></div>
   </div>
 
@@ -701,7 +728,8 @@ a.outil h3{margin:0 0 6px}
       <div>
         <h5>Tes données</h5>
         <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
-        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom.</p>
+        propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code). Jamais ton nom,
+        sauf si tu l'écris toi-même dans un signalement « J'ai vu un bug ».</p>
         <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
         <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
         tout le reste fin août. Effacement sur simple demande.</p>
@@ -746,7 +774,7 @@ a.outil h3{margin:0 0 6px}
     <details class="info">
       <summary>Pourquoi un identifiant et pas mon nom</summary>
       <p>Ton nom n'est écrit nulle part en ligne : le serveur ne connaît que ton identifiant, la correspondance
-      reste sur les ordinateurs des professeurs.</p>
+      reste sur les ordinateurs des professeurs. Seule exception : un signalement « J'ai vu un bug », où tu l'écris toi-même.</p>
     </details>
   </form>
 </dialog>
@@ -754,6 +782,7 @@ a.outil h3{margin:0 0 6px}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <script src="commun.js"></script>
+<script src="signalement.js"></script>
 <script src="participation.js"></script>
 <script>
 /* ---------- Supabase ---------- */
@@ -1000,6 +1029,7 @@ async function entrer(){
   if(role==='eleve' && n!==null) remplirNiveau(n);
   aller(demandee||'accueil',true);
   majBlocNotif();
+  if(role==='eleve') installerSignalement();
   // Participation et dépôts : à part, une panne ne doit pas bloquer le tutorat.
   // Le droit de voir la rubrique arrive avec la réponse du serveur : on rouvre alors la vue demandée.
   if(window.participationEntrer) participationEntrer().then(()=>{
@@ -1213,13 +1243,13 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
     try{ localStorage.setItem(CLE_CORRESP,JSON.stringify(corresp)); }
     catch(err){ alert("Chargée pour cette visite seulement : ce navigateur refuse de la conserver (navigation privée ?)."); }
     majCorrespEtat();
-    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); }
+    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); }
   }catch(err){ alert("Fichier illisible : "+err.message); }
 });
 document.getElementById('correspOublier').addEventListener('click',()=>{
   try{ localStorage.removeItem(CLE_CORRESP); }catch(e){}
   corresp=null; majCorrespEtat();
-  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); }
+  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); }
 });
 
 /* ---------- données réelles (Supabase) ---------- */
@@ -1244,7 +1274,7 @@ async function chargerDonneesReelles(){
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
   afficherDemandes();
   spectreReel(DEMANDES);
-  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements(), chargerPython()]);
+  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements(), chargerPython(), chargerSignalements()]);
   if(role==='eleve') await Promise.all([chargerMesDemandes(), chargerMesSeances()]);
 }
 
@@ -1496,6 +1526,108 @@ async function chargerPython(){
       eleves.length+' élève'+(eleves.length>1?'s':'')+'. La réussite est constatée sur la tablette de l\'élève : c\'est un repère de travail, pas une note.</p>';
   }catch(e){ zone.innerHTML='<p class="note">Erreur : '+esc(e.message)+'</p>'; }
 }
+
+/* ---------- « J'ai vu un bug » (migration 006, signalement.js) ----------
+   Élève connecté, premières comprises : le bouton sur toutes les vues ; la rubrique part dans « cle »,
+   la vue dans « etape ». Puis, à l'accueil seulement, la fenêtre 🎁 d'un +0,5 accordé, une fois. */
+const LIB_RUBRIQUE={accueil:'Accueil',tutorat:'Tutorat',participation:'Participation',outils:'Outils',python:'Parcours Python'};
+const libRubrique=c=>{ const m=/^python-n([1-5])$/.exec(c||''); return m?'Parcours Python, niveau '+m[1]:(LIB_RUBRIQUE[c]||c||'?'); };
+function contexteVue(){
+  const v=document.querySelector('.view.on'), nom=v?v.id.replace(/^v-/,''):'accueil';
+  const tab=document.querySelector('.tab[data-view="'+nom+'"]'), lib=tab?tab.firstChild.textContent.trim():nom;
+  const cle=SECTION[nom]||'accueil';
+  return {cle, page:'index.html', etape:'#'+nom+' · '+lib, ou:cle==='accueil'?'Accueil':libRubrique(cle)+' · '+lib};
+}
+/* Jamais par-dessus ce que l'élève fait : hors de l'accueil, cadre en plein écran, relevé d'observateur ouvert. */
+function eleveOccupe(){
+  return document.body.dataset.section!=='accueil' || document.body.classList.contains('cadre-plein')
+    || !!document.getElementById('pCadreObs') || !document.getElementById('pAvisObs').hidden;
+}
+function installerSignalement(){
+  const S=window.RESONANCE_SIGNALEMENT; if(!S || !sb) return;
+  S.installer({sb, contexte:contexteVue});
+  S.annoncerBonus({sb, occupe:eleveOccupe});
+}
+
+/* Tableau de bord : les signalements des élèves de vos classes (la base ne rend que ceux-là). */
+let SIGNALEMENTS=[];
+const quandSig=s=>s?new Date(s).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(' ',' à '):'';
+async function chargerSignalements(){
+  const etat=document.getElementById('sigEtat');
+  try{
+    const {data,error}=await sb.from('signalements')
+      .select('id,cle,page,etape,message,appareil,traite,cree_le,bonus_le,bonus_vu_le,profils(identifiant,classe)')
+      .order('cree_le',{ascending:false}).limit(300);
+    if(error){
+      SIGNALEMENTS=null;
+      etat.innerHTML=/signalements|does not exist|schema cache/i.test(error.message)
+        ? 'Pas encore activé : la migration <code>006_signalements.sql</code> n\'a pas été collée dans Supabase (étape 9 de <code>supabase/MISE_EN_PLACE.md</code>).'
+        : 'Erreur : '+esc(error.message);
+    } else { SIGNALEMENTS=data||[]; etat.textContent=''; }
+  }catch(e){ SIGNALEMENTS=null; etat.textContent='Erreur : '+e.message; }
+  rendreSignalements();
+}
+function rendreSignalements(){
+  const zone=document.getElementById('sigListe');
+  const tous=SIGNALEMENTS||[], aTraiter=tous.filter(x=>!x.traite).length;
+  ['sigN','sigNTab'].forEach(id=>{ const n=document.getElementById(id); n.hidden=!aTraiter; n.textContent=aTraiter; });
+  if(SIGNALEMENTS===null){ zone.innerHTML=''; return; }
+  const tout=document.getElementById('sigTout').checked;
+  const liste=tout?tous:tous.filter(x=>!x.traite);
+  if(!liste.length){
+    zone.innerHTML='<p class="note">Aucun signalement'+(tout?'':' à traiter')+'. Les élèves en envoient avec le bouton 🐞 en bas de l\'écran.</p>';
+    return;
+  }
+  zone.innerHTML=liste.map(x=>{
+    const p=x.profils||{}, tle=RESONANCE.classeTerminale(p.classe);
+    const python=/^python/.test(x.cle||'');
+    const ou=libRubrique(x.cle)+(x.page && x.page!=='index.html'?' · '+x.page:'')+(x.etape?' · '+x.etape:'');
+    return '<div class="sig'+(x.traite?' traite':'')+(x.bonus_le?' bonus':'')+'" data-id="'+esc(x.id)+'">'+
+      '<div class="sig-tete"><b>'+nomAffiche(p.identifiant)+'</b>'+
+        (p.classe?'<span class="sig-classe">'+esc(p.classe)+'</span>':'')+
+        '<span>'+esc(quandSig(x.cree_le))+'</span><span>'+esc(ou)+'</span>'+
+        (x.appareil?'<span>'+esc(x.appareil)+'</span>':'')+'</div>'+
+      '<div class="sig-msg">'+esc(x.message)+'</div>'+
+      (x.bonus_le?'<p class="sig-bonus"><b>+0,5 accordé</b> le '+esc(quandSig(x.bonus_le))+' · '+
+        (x.bonus_vu_le?'✓ vu par l\'élève le '+esc(quandSig(x.bonus_vu_le)):'l\'élève le verra à sa prochaine ouverture de Résonance')+'</p>':'')+
+      '<div class="acts">'+
+        (python?'<a class="mini ghost" href="outils/python/'+encodeURIComponent(x.page||'index.html')+'" target="_blank" rel="noopener">Ouvrir la page</a>':'')+
+        '<button class="mini'+(x.traite?' ghost':'')+'" data-sig-traite="'+(x.traite?'0':'1')+'">'+(x.traite?'Remettre à traiter':'✓ Traité')+'</button>'+
+        (x.bonus_le?'<button class="mini ghost" data-sig-bonus="0">Retirer le +0,5</button>'
+          :tle?'<button class="mini ghost" data-sig-bonus="1" title="Signalement retenu : +0,5 au prochain contrôle. Il passe en traité ; l\'élève est prévenu à sa prochaine ouverture de Résonance.">Accorder +0,5</button>':'')+
+        '<button class="mini ghost" data-sig-suppr>Supprimer</button>'+
+      '</div></div>';
+  }).join('');
+}
+document.getElementById('sigListe').addEventListener('click',async e=>{
+  const carte=e.target.closest('.sig'), b=e.target.closest('button'); if(!carte || !b) return;
+  const id=carte.dataset.id, etat=document.getElementById('sigEtat');
+  let requete=null, apres='';
+  if(b.dataset.sigTraite) requete=sb.from('signalements').update({traite:b.dataset.sigTraite==='1'}).eq('id',id);
+  else if(b.dataset.sigBonus){
+    const donner=b.dataset.sigBonus==='1';
+    if(!donner && !confirm('Retirer le +0,5 de ce signalement ?')) return;
+    // La base date le bonus elle-même et marque le signalement traité (migration 006).
+    requete=sb.from('signalements').update({bonus_le:donner?new Date().toISOString():null}).eq('id',id);
+    if(donner) apres='+0,5 enregistré : le signalement est passé dans les traités.';
+  } else if(b.hasAttribute('data-sig-suppr')){
+    if(!confirm('Supprimer ce signalement ? Il ne pourra pas être récupéré.'+
+      (carte.classList.contains('bonus')?'\nSon +0,5 disparaît avec lui (l\'élève n\'en sera pas prévenu s\'il ne l\'a pas encore vu).':''))) return;
+    requete=sb.from('signalements').delete().eq('id',id);
+  }
+  if(!requete) return;
+  b.disabled=true;
+  const {error}=await requete;
+  if(error){
+    b.disabled=false;
+    etat.textContent=/BONUS_TERMINALE/.test(error.message)?'Refusé : le +0,5 ne s\'accorde qu\'aux élèves de terminale.':'Échec : '+error.message;
+    return;
+  }
+  await chargerSignalements();
+  if(apres) etat.textContent=apres;
+});
+document.getElementById('sigTout').addEventListener('change',rendreSignalements);
+document.getElementById('sigRecharger').addEventListener('click',chargerSignalements);
 
 /* ---------- notifications sur l'appareil (Web Push) ----------
    Sur iPad, elles ne marchent que si Résonance est ouvert depuis son icône de l'écran d'accueil (iPadOS 16.4 ou plus).

@@ -8,8 +8,9 @@
      Rien n'est préchargé : un fichier n'entre dans le cache que quand une page le demande (scipy compris).
    - outils/ (pages, moteur, mémos) : « réseau d'abord », le cache ne sert que hors ligne. Une page
      corrigée arrive donc dès la visite suivante, sans changer de version.
-   - Tout le reste — index.html, participation.js, commun.js, ce fichier — n'est JAMAIS mis en cache :
-     l'application elle-même ne peut pas rester bloquée sur une vieille version.
+   - Tout le reste — index.html, participation.js, commun.js, signalement.js, ce fichier — n'est JAMAIS mis
+     en cache : l'application elle-même ne peut pas rester bloquée sur une vieille version. (Hors ligne, le
+     bouton « J'ai vu un bug » manque donc dans le parcours Python : il ne pourrait de toute façon rien envoyer.)
    - Jamais : une autre origine (Supabase, CDN), une requête autre que GET, une réponse partielle ou en erreur. */
 const VERSION_VENDOR = 'pyodide-314.0.7-1';  // à changer à chaque mise à jour de vendor/ ou de polices/
 const VERSION_OUTILS = 'outils-1';           // à changer seulement pour vider le cache hors ligne des outils
