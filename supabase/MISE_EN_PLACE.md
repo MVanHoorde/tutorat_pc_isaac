@@ -90,6 +90,27 @@ Uniquement des ajouts. Suppose l'étape 7 faite (la migration 005 lit `classes_p
 
 Ce qui est enregistré : l'identifiant du compte, le niveau, l'identifiant de l'exercice (« ex-2-3 ») et la date. Jamais le code tapé par l'élève. La réussite est constatée sur la tablette : c'est un repère de travail, pas une note. Effacement en fin d'année avec le reste : `delete from public.python_reussites;`.
 
+## 9. Signalements « J'ai vu un bug » et +0,5 (octobre 2026)
+
+Uniquement des ajouts. Suppose l'étape 8 faite (la migration 006 utilise `mes_classes_prof()`).
+
+1. **SQL Editor → New query** : collez `supabase/migrations/006_signalements.sql`, puis **Run**. Vous devez voir « Success. No rows returned ». La migration peut être relancée sans dommage.
+2. Vérification : collez les requêtes du bloc « Vérification » en fin de fichier. Attendu :
+   - `signalements | true | 4` (la table, ses règles d'accès actives, quatre règles) ;
+   - deux déclencheurs, `signalements_bonus` et `signalements_plafond` ;
+   - cinq fonctions : `bonus_signalement_vus`, `classe_terminale`, `mes_bonus_signalement`, `signalements_bonus`, `signalements_plafond` ;
+   - `classe_terminale` : `true | true | false | false` pour `B1_T_3_PH-CH_VANHOORDE`, `TEST`, `B2_P_3_PH-CH_HUSSON`, vide.
+3. Comme pour le parcours Python, un enseignant ne lit que les signalements des élèves de **ses** classes (colonne `classes` de son profil, et classes où il a ouvert la Participation ; voir l'étape 8). Les signalements des premières n'arrivent que si leur classe est rattachée à un compte enseignant.
+4. Essai : section G de `docs/plan-test-refonte.md`.
+
+Règles posées par la base :
+- l'élève connecté envoie ses signalements (vingt par jour au plus) et ne les relit pas ; il ne peut ni les marquer traités ni s'accorder un bonus ;
+- **le +0,5 ne s'accorde qu'aux élèves de terminale** (classe « …\_T\_… » ou commençant par « T », comme `espaceComplet` dans `commun.js`) : pour une autre classe, la base répond `BONUS_TERMINALE` ;
+- accorder le bonus marque le signalement traité, à la date du serveur ; le retirer efface aussi « vu » ;
+- l'élève n'obtient que ses bonus pas encore vus (`mes_bonus_signalement()`), et ne peut marquer « vus » que les siens (`bonus_signalement_vus()`).
+
+Seul endroit de la base où figure un nom : le message, que l'élève commence par son nom et son prénom (champs obligatoires du formulaire). Effacement en fin d'année avec le reste : `delete from public.signalements;`.
+
 ## Où sont les données
 
 | Donnée | Emplacement |
@@ -103,4 +124,5 @@ Ce qui est enregistré : l'identifiant du compte, le niveau, l'identifiant de l'
 | Points de participation (par identifiant), dépôts et fichiers déposés | Supabase (Paris) |
 | Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |
 | Exercices réussis du parcours Python (identifiant, niveau, exercice, date ; jamais le code) | Supabase (Paris) |
+| Signalements « J'ai vu un bug » (identifiant, rubrique, page, étape, appareil résumé, message **commençant par le nom et le prénom écrits par l'élève**, +0,5 et « vu ») | Supabase (Paris) |
 | Python lui-même (Pyodide, ~20 Mo) | Le cache de l'appareil, après la première ouverture d'un niveau |

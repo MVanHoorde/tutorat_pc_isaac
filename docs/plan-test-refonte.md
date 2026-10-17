@@ -1,12 +1,13 @@
-# Plan de test — accueil à trois entrées et parcours Python relié
+# Plan de test — accueil à trois entrées, parcours Python relié, signalements
 
-Branche `refonte-accueil`. À dérouler **avant** de fusionner dans `main` (tout push sur `main` est en ligne aussitôt).
+Sections A à F : accueil et parcours Python (en ligne depuis le 17/10/2026). Section G : signalements, branche
+`signalements`, à dérouler **avant** de la fusionner dans `main` (tout push sur `main` est en ligne aussitôt).
 Durée : une vingtaine de minutes. Matériel : un ordinateur, et si possible un iPad avec Résonance sur l'écran d'accueil.
 Comptes : `PR-TEST1` (enseignant) et `PC-TEST1` (élève, classe « TEST »), déjà dans la base.
 
 ## Déjà vérifié automatiquement (sans Supabase)
 
-Chromium, serveur local, Supabase remplacé par un faux client : 51 vérifications.
+Chromium, serveur local, Supabase remplacé par un faux client : 99 vérifications.
 
 - Sans connexion : seule la boîte de connexion s'affiche, aucune erreur JS, **aucune requête vers Google**, polices chargées depuis `polices/`.
 - Élève connecté : l'accueil montre Tutorat, Participation (si sa classe est ouverte), Outils ; jamais le Tableau de bord.
@@ -15,7 +16,8 @@ Chromium, serveur local, Supabase remplacé par un faux client : 51 vérificatio
 - Enseignant : carte et onglet Tableau de bord partout ; vue « Parcours Python » remplie (une ligne par élève, un nombre par niveau).
 - Parcours Python sans connexion : `progression-resonance.js` ne charge rien et ne change rien.
 - Parcours Python, élève connecté : bandeau « ← Résonance », réussites relues et cochées, chaque réussite envoyée sous la forme `{niveau, exercice}` seulement.
-- Service worker : Pyodide et ses paquets mis en cache au premier chargement ; scipy seulement s'il est importé ; second chargement servi par le cache (2 s) ; `index.html`, `commun.js`, `participation.js` jamais mis en cache.
+- Service worker : Pyodide et ses paquets mis en cache au premier chargement ; scipy seulement s'il est importé ; second chargement servi par le cache (2 s) ; `index.html`, `commun.js`, `participation.js`, `signalement.js` jamais mis en cache.
+- Signalements : pas de bouton sans connexion ni pour l'enseignant (Résonance et parcours) ; bouton pour une première (accueil, Tutorat) et une terminale (accueil, pages du parcours) ; dialogue modal, focus sur le nom, Échap ferme et rend le focus ; nom ou prénom vide refusé ; envoi avec « 👤 Nom Prénom » en tête, `cle` et `etape` justes (`tutorat` / `#demande`, `python-n1` / « Étape 2 · … — 2.2 … »), sans compte ni statut envoyés ; plafond et panne réseau expliqués ; fenêtre 🎁 seulement à l'accueil, une seule fois, « vu » envoyé ; Tableau de bord : cartes récentes d'abord, « Accorder +0,5 » pour la terminale seulement, Traité, Supprimer ; migration absente signalée sans erreur.
 
 ## Préalable
 
@@ -95,6 +97,28 @@ Chromium, serveur local, Supabase remplacé par un faux client : 51 vérificatio
 | F2 | Fermer, rouvrir le niveau | « Python est prêt » en quelques secondes |
 | F3 | Modifier un texte d'`index.html`, publier, rouvrir Résonance | Le nouveau texte s'affiche tout de suite (l'application n'est jamais servie depuis le cache) |
 | F4 | Notifications : « Envoyer un essai » | La notification arrive ; la toucher ouvre Résonance |
+
+## G. Signalements « J'ai vu un bug » (branche `signalements`)
+
+Préalable : migration `006` collée (étape 9 de `supabase/MISE_EN_PLACE.md`), classe TEST rattachée à `PR-TEST1` (voir le préalable ci-dessus), branche servie en local.
+
+| # | Geste | Attendu |
+|---|---|---|
+| G1 | Visiteur, puis `PR-TEST1` | Aucun bouton 🐞, ni sur Résonance ni dans le parcours Python |
+| G2 | `PC-TEST1` : accueil, Tutorat, Outils, une page du parcours | Le bouton 🐞 « J'ai vu un bug » en bas à droite partout ; il ne masque rien d'important (iPad, portrait et paysage) |
+| G3 | Toucher le bouton, laisser le nom vide, envoyer | « Écris ton nom. » ; rien n'est envoyé. Échap (ou Annuler) ferme |
+| G4 | Nom, prénom, message depuis « Demander de l'aide » | « ✅ Merci, c'est transmis à ton professeur. », le formulaire se ferme |
+| G5 | Même chose depuis le niveau 1 du parcours, exercice 2.2 à l'écran | Idem |
+| G6 | Supabase → Table editor → `signalements` | Deux lignes ; `message` commence par « 👤 Nom Prénom » ; `cle` = `tutorat` puis `python-n1` ; `etape` = `#demande · Demander de l'aide` puis « Étape 2 · … — 2.2 … » ; `appareil` court |
+| G7 | `PR-TEST1` : Tableau de bord → Signalements | Les deux cartes, la plus récente d'abord ; pastille « 2 » sur l'onglet ; nom de l'élève si la correspondance est chargée |
+| G8 | « Accorder +0,5 » sur une carte | « +0,5 enregistré » ; la carte passe dans les traités (cocher « montrer aussi… ») avec « l'élève le verra à sa prochaine ouverture » |
+| G9 | `PC-TEST1` : rouvrir Résonance sur `#demande`, puis revenir à l'accueil | Pas de fenêtre sur le formulaire ; à l'accueil, « 🎁 +0,5 au prochain contrôle » ; « Super ! » ferme. Recharger : elle ne revient pas |
+| G10 | `PR-TEST1` : Recharger les signalements | « ✓ vu par l'élève le … » sur la carte |
+| G11 | « Retirer le +0,5 », puis « Supprimer » | Confirmation, puis la carte disparaît |
+| G12 | Un compte de **première** rattaché à `PR-TEST1` envoie un signalement | La carte apparaît, **sans** bouton +0,5. En SQL Editor, `update public.signalements set bonus_le = now() where id = '…';` (l'id de cette carte) est refusé : `BONUS_TERMINALE` (le déclencheur vaut pour tous, éditeur SQL compris) |
+| G13 | Envoyer 21 signalements dans la journée avec le même compte | Au 21ᵉ : « Tu as déjà envoyé beaucoup de signalements aujourd'hui… » |
+
+Après les essais : « Supprimer » sur chaque carte, ou `delete from public.signalements where eleve in (select id from public.profils where classe = 'TEST');`.
 
 ## Si quelque chose ne va pas
 

@@ -14,7 +14,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Le site : page unique branchée sur Supabase, connexion obligatoire. Après connexion, un accueil à trois entrées (Tutorat, Participation, Outils) et, pour les enseignants, le Tableau de bord ; chaque rubrique a son adresse (`#demande`, `#offre`, `#participation`, `#depots`, `#outils`, `#prof`) |
-| `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle, règle des espaces (terminale complète, première Tutorat seulement). Même origine, donc même session |
+| `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle, règle des espaces (terminale complète, première Tutorat seulement ; `classeTerminale`). Même origine, donc même session |
+| `signalement.js` | Bouton « J'ai vu un bug » et son formulaire (élève connecté), fenêtre 🎁 du +0,5 ; partagé par `index.html` et les pages du parcours Python (chargé par `progression-resonance.js`) |
 | `polices/` | Polices auto-hébergées (Bricolage Grotesque, IBM Plex Sans et Mono, Spectral, STIX Two Text ; licence OFL) : copie à l'identique de `outils/python/polices/`. Plus aucun appel à Google Fonts |
 | `analyser_trombi.py` | Relève la mise en page d'un trombinoscope PDF, avec le texte masqué par défaut |
 | `generer_identifiants.py` | Trombinoscopes PDF → identifiants, coupons, registre de correspondance et fichier serveur |
@@ -22,13 +23,14 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `supabase/schema.sql` | Tables et règles d'accès de la base (élève / enseignant) |
 | `supabase/functions/premiere-connexion/` | Fonction Supabase : première connexion avec le mot de passe du coupon |
 | `supabase/MISE_EN_PLACE.md` | Les étapes à suivre dans Supabase, dans l'ordre |
-| `sw.js`, `manifest.webmanifest`, `icone-*.png` | Résonance sur l'écran d'accueil de l'iPad, réception des notifications, et cache des Outils : `vendor/` et `polices/` en « cache d'abord » (nom de cache `VERSION_VENDOR`, à changer à chaque mise à jour de Pyodide), `outils/` en « réseau d'abord » ; l'application elle-même (`index.html`, `commun.js`, `participation.js`) n'est jamais mise en cache |
+| `sw.js`, `manifest.webmanifest`, `icone-*.png` | Résonance sur l'écran d'accueil de l'iPad, réception des notifications, et cache des Outils : `vendor/` et `polices/` en « cache d'abord » (nom de cache `VERSION_VENDOR`, à changer à chaque mise à jour de Pyodide), `outils/` en « réseau d'abord » ; l'application elle-même (`index.html`, `commun.js`, `participation.js`, `signalement.js`) n'est jamais mise en cache |
 | `supabase/functions/notifier/` | Fonction Supabase : envoie les notifications (séance validée ou annulée, essai) |
 | `supabase/migrations/` | Modifications de la base à coller dans Supabase, dans l'ordre |
 | `participation.js` | Rubrique Participation (onglets Participation et Dépôts bonus) : chiffrement de bout en bout, liens noms ↔ comptes, envoi des séances, réception des relevés, suivi, dépôts |
 | `supabase/migrations/004_participation.sql` | Tables de la participation et des dépôts, stockage `depots` |
 | `supabase/migrations/005_python.sql` | Table `python_reussites` (compte, niveau, exercice, date ; jamais le code) ; l'enseignant ne lit que ses classes |
-| `docs/plan-test-refonte.md` | Plan de test manuel de l'accueil à trois entrées et du parcours Python relié |
+| `supabase/migrations/006_signalements.sql` | Table `signalements` (« J'ai vu un bug ») : l'élève écrit les siens sans les relire, vingt par jour au plus ; l'enseignant lit, traite, supprime ceux de ses classes ; +0,5 réservé aux terminales ; deux fonctions rendent à l'élève ses bonus non vus |
+| `docs/plan-test-refonte.md` | Plan de test manuel de l'accueil à trois entrées, du parcours Python relié et des signalements |
 | `outils/python/` | Parcours Python de terminale (rubrique Outils) : `index.html` (les 5 niveaux), `niveau-1.html` à `niveau-5.html` (le 3 se génère depuis `sources/niveau-3/`), moteur `parcours.js` + `py-worker.js` + `py-prelude.py`, `parcours.css`, `polices/` auto-hébergées, `fiches/` (mémos PDF), `PARCOURS.md` (structure des niveaux), `A-VALIDER.md` (points de fond à trancher), `progression-resonance.js` (enregistre les réussites de l'élève connecté) |
 | `vendor/pyodide/`, `vendor/codemirror/` | Python dans le navigateur (Pyodide 314.0.7 : numpy, matplotlib, friendly-traceback) et l'éditeur de code, auto-hébergés ; voir leur `LISEZMOI.md` |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public. Exceptions, par leur propre `.gitignore` : `outils/python/fiches/*.pdf` et `vendor/pyodide/pyodide-lock.json` |
@@ -92,6 +94,12 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Polices auto-hébergées (`polices/`) : plus aucune requête vers Google.
   - Parcours Python relié : même connexion ; l'élève connecté voit « ← Résonance » et ce qui est enregistré ; ses réussites vont dans `python_reussites` (migration 005) et reviennent cochées sur tout appareil. Tableau de bord : vue « Parcours Python », exercices réussis par élève et par niveau, noms tirés de la correspondance chargée sur l'appareil.
   - `sw.js` garde Pyodide (environ 20 Mo, scipy à la demande) dans l'appareil après la première ouverture.
+- **« J'ai vu un bug » et +0,5** (17/10/2026), sur la branche locale `signalements`, **pas encore en ligne** : coller la migration `006` (étape 9 de `supabase/MISE_EN_PLACE.md`), dérouler la section G de `docs/plan-test-refonte.md`, puis fusionner dans `main`. Repris du site pédagogique de M. Van Hoorde.
+  - Tout élève connecté, premières comprises, a un bouton discret 🐞 « J'ai vu un bug » en bas à droite : sur toutes les vues de Résonance et toutes les pages du parcours Python. Ni visiteur ni enseignant.
+  - Le formulaire demande le **nom et le prénom** (obligatoires), écrits en tête du message, puis le problème. Il envoie la rubrique (`cle` : `accueil`, `tutorat`, `participation`, `outils`, `python`, `python-n1` à `python-n5`), le fichier, la vue ou l'exercice à l'écran, et un résumé court de l'appareil (« iPad · Safari · 1024×768 »). Vingt signalements par élève et par jour au plus. L'élève ne relit pas ses signalements.
+  - Tableau de bord, section **Signalements** (pastille du nombre à traiter sur l'onglet) : cartes récentes d'abord, à traiter seulement ou toutes ; identifiant (et nom si la correspondance est chargée), classe, rubrique, page, étape, appareil, message ; **Traité**, **Supprimer**, **Accorder +0,5** / **Retirer le +0,5**, et « vu par l'élève ». L'enseignant ne voit que les élèves de ses classes (`mes_classes_prof()`) : les signalements de premières n'arrivent que si leur classe est rattachée à un compte enseignant.
+  - **Le +0,5 ne s'accorde qu'aux élèves de terminale** (règle de M. Van Hoorde : ses élèves). Le bouton n'apparaît que pour eux, et la base refuse le bonus pour toute autre classe (`classe_terminale()`, même règle que `espaceComplet`). Accorder marque traité ; la date est celle du serveur.
+  - L'élève en est prévenu **une fois** par une fenêtre « 🎁 +0,5 au prochain contrôle », à l'accueil de Résonance, jamais par-dessus un formulaire, un relevé de participation ou un cadre en plein écran. « Vu » est enregistré en base.
 
 ## Horaires et lieu (CDI, septembre 2026)
 
@@ -102,7 +110,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Principes de protection des données
 
-- Aucun nom d'élève en ligne. Le serveur ne connaît que l'identifiant et la classe.
+- Aucun nom d'élève en ligne, avec une seule exception : le message d'un signalement « J'ai vu un bug », où l'élève écrit lui-même son nom et son prénom (décision de M. Van Hoorde, reprise du site pédagogique, alerte RGPD donnée ; ils servent à retrouver l'élève pour le +0,5). Pour le reste, le serveur ne connaît que l'identifiant et la classe.
 - Parcours Python : seuls l'identifiant de l'exercice réussi, son niveau et la date sont enregistrés, jamais le code tapé ; rien du tout sans connexion.
 - Aucune police ni aucun script de Google : polices dans `polices/`.
 - La correspondance entre noms et identifiants (`correspondance_resonance.xlsx`) reste dans OneDrive, réservée aux professeurs.
@@ -149,12 +157,16 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [x] Accueil à trois entrées, espaces terminale / première, connexion commune, progression dans Supabase, cache de Pyodide, polices auto-hébergées : en ligne (17/10/2026).
 - [x] Migration `005` collée et vérifiée (table, 3 règles, fonction) ; compte enseignant rattaché à `B1_T_3_PH-CH_VANHOORDE`, compte de test à `TEST` (17/10/2026).
 - [ ] Refonte : dérouler `docs/plan-test-refonte.md` avec de vrais comptes (connexion, tutorat, participation, parcours relié, iPad).
+- [ ] Signalements : coller la migration `006` (étape 9 de `MISE_EN_PLACE.md`), dérouler la section G de `docs/plan-test-refonte.md`, fusionner la branche `signalements` dans `main`.
+- [ ] Signalements de premières : rattacher leurs classes à un compte enseignant (`profils.classes`), sinon personne ne les lit.
+- [ ] Signalements : mentionner au DPO les noms et prénoms écrits dans les messages (seul nom de la base).
 - [ ] Polices en double (`polices/` et `outils/python/polices/`) : faire importer `../../polices/polices.css` par `parcours.css`, puis supprimer la copie du parcours.
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.
 
 ## Journal
 
+- **17/10/2026** — « J'ai vu un bug » et +0,5 des terminales (migration `006`, `signalement.js`), sur la branche `signalements`.
 - **17/10/2026** — Mise en ligne : accueil à trois entrées (Tutorat, Participation, Outils ; premières limitées au Tutorat), banque d'outils (Labo Lycée), `commun.js`, polices auto-hébergées, parcours Python en cinq niveaux relié à Supabase (migration `005`), cache de Pyodide dans `sw.js`.
 - **11/10/2026** — Participation orale (sans QR code, chiffrée de bout en bout) et dépôts bonus, sur la branche `participation`.
 
