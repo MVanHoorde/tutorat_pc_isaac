@@ -72,6 +72,24 @@ Uniquement des ajouts : les tables du tutorat ne sont pas touchées.
    - Touchez **Sauvegarder ma clé** et rangez le fichier hors des dépôts.
 4. Facultatif, pour verrouiller : recopiez l'empreinte affichée dans `EMPREINTES_PROF` en haut de `participation.js`. Les élèves refuseront alors toute autre clé.
 
+## 8. Parcours Python : progression des élèves (octobre 2026)
+
+Uniquement des ajouts. Suppose l'étape 7 faite (la migration 005 lit `classes_participation`).
+
+1. **SQL Editor → New query** : collez `supabase/migrations/005_python.sql`, puis **Run**. Vous devez voir « Success. No rows returned ». La migration peut être relancée sans dommage.
+2. Vérifiez que chaque compte enseignant connaît ses classes : c'est ce qui lui donne accès aux réussites de ses élèves, et à elles seules.
+   ```sql
+   select identifiant, classes from public.profils where role = 'prof';
+   select distinct classe from public.profils where role = 'eleve' order by 1;
+   ```
+   Un enseignant voit les élèves des classes de sa colonne `classes`, **et** de celles où il a ouvert la Participation. Si sa colonne est vide et qu'il n'a ouvert la Participation nulle part, il ne voit personne. Pour la remplir (noms de classe recopiés exactement depuis la seconde requête) :
+   ```sql
+   update public.profils set classes = array['B1_T_3_PH-CH_VANHOORDE'] where identifiant = 'PR-XXXXX';
+   ```
+3. Essai : suivez `docs/plan-test-refonte.md` (deux comptes de test, une dizaine de minutes).
+
+Ce qui est enregistré : l'identifiant du compte, le niveau, l'identifiant de l'exercice (« ex-2-3 ») et la date. Jamais le code tapé par l'élève. La réussite est constatée sur la tablette : c'est un repère de travail, pas une note. Effacement en fin d'année avec le reste : `delete from public.python_reussites;`.
+
 ## Où sont les données
 
 | Donnée | Emplacement |
@@ -84,3 +102,5 @@ Uniquement des ajouts : les tables du tutorat ne sont pas touchées.
 | Liens noms ↔ identifiants de la participation | La mémoire de l'appareil de l'enseignant |
 | Points de participation (par identifiant), dépôts et fichiers déposés | Supabase (Paris) |
 | Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |
+| Exercices réussis du parcours Python (identifiant, niveau, exercice, date ; jamais le code) | Supabase (Paris) |
+| Python lui-même (Pyodide, ~20 Mo) | Le cache de l'appareil, après la première ouverture d'un niveau |
