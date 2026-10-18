@@ -608,10 +608,12 @@ def executer(src, mode, cle):
         return {'erreur': rap}
 
 
-def verifier(check, sortie):
-    """Exécute le check de l'auteur dans l'espace de noms du dernier script.
+def verifier(check, sortie, cle=''):
+    """Exécute le check de l'auteur dans l'espace de noms du dernier script ou, avec une clé,
+    dans une COPIE de celui de la console : les variables du check ne doivent pas se mêler
+    à celles que l'élève retrouvera à la ligne suivante.
     Ne remonte JAMAIS d'erreur : en cas de problème, pas de verdict."""
-    ns = _dernier_ns
+    ns = dict(_consoles[cle]) if cle and cle in _consoles else (None if cle else _dernier_ns)
     if ns is None:
         return None
     # Correction à plusieurs étapes : ok() peut être appelé plusieurs fois (un par question),

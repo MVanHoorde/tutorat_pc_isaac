@@ -127,8 +127,9 @@
   <article class="exo" id="ex-1-2">
     <h3><span class="num">1.2</span> La célérité d'un son</h3>
     <details class="rappel"><summary>Rappel de cours — Onde périodique</summary>
-      <p>Une onde périodique est caractérisée par sa période <i>T</i> (en s), sa fréquence <i>f</i> (en Hz) et sa longueur d'onde λ (en m), distance parcourue par l'onde pendant une période.</p>
-      <p class="formule">f = <span class="frac"><span class="haut">1</span><span class="bas">T</span></span>      c = <span class="frac"><span class="haut">λ</span><span class="bas">T</span></span> = λ × f</p>
+      <p>Une onde périodique se reproduit identique à elle-même à intervalles de temps réguliers.</p>
+      <p class="formule tex">f = \dfrac{1}{T} \qquad\qquad c = \dfrac{\lambda}{T} = \lambda \times f</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">T</span></td><td>période : durée d'un motif</td><td>s</td></tr><tr><td><span class="tex">f</span></td><td>fréquence : nombre de motifs par seconde</td><td>Hz</td></tr><tr><td><span class="tex">\lambda</span></td><td>longueur d'onde : distance parcourue par l'onde pendant une période</td><td>m</td></tr><tr><td><span class="tex">c</span></td><td>célérité : vitesse de propagation de l'onde</td><td>m·s⁻¹</td></tr></tbody></table>
       <p>Dans l'air à 20 °C, un son se propage à environ 340 m·s⁻¹.</p>
     </details>
     <p class="contexte">Au laboratoire, on mesure la longueur d'onde d'un son de fréquence 500 Hz : λ = 0,68 m.</p>
@@ -137,7 +138,17 @@
       <li>Calculer sa période <i>T</i>.</li>
       <li>Un son de 440 Hz se propage à la même célérité. Calculer sa longueur d'onde en une seule ligne, sans recopier le résultat de la question 1.</li>
     </ol>
-    <div class="py" data-mode="console"></div>
+    <div class="py" data-mode="console" data-attendus="3">
+      <script type="text/x-python" class="py-check">
+_v = [x for x in globals().values() if type(x) in (int, float)]
+if any(abs(x - 340) < 0.01 for x in _v):
+    ok("Question 1 — c = 340 m·s⁻¹.")
+if any(abs(x - 0.002) < 1e-9 for x in _v):
+    ok("Question 2 — T = 0,002 s, soit 2 ms.")
+if any(abs(x - 340 / 440) < 1e-4 for x in _v):
+    ok("Question 3 — λ ≈ 0,77 m.")
+      </script>
+    </div>
     <details class="solution"><summary>Voir une solution</summary>
       <pre class="code">&gt;&gt;&gt; 0.68 * 500
 340.0
@@ -152,14 +163,25 @@
   <article class="exo" id="ex-1-3">
     <h3><span class="num">1.3</span> Des nombres minuscules</h3>
     <details class="rappel"><summary>Rappel de cours — Intensité sonore</summary>
-      <p>L'intensité sonore <i>I</i> est la puissance sonore reçue par unité de surface, en W·m⁻². L'oreille perçoit des sons à partir de <i>I</i><sub>0</sub> = 1,0 × 10⁻¹² W·m⁻², le seuil d'audibilité.</p>
+      <p>L'intensité sonore est la puissance sonore reçue par unité de surface :</p>
+      <p class="formule tex">I = \dfrac{P}{S}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">I</span></td><td>intensité sonore</td><td>W·m⁻²</td></tr><tr><td><span class="tex">P</span></td><td>puissance sonore reçue</td><td>W</td></tr><tr><td><span class="tex">S</span></td><td>aire de la surface qui reçoit le son</td><td>m²</td></tr></tbody></table>
+      <p>L'oreille perçoit des sons à partir de <span class="tex">I_0 = 1{,}0 \times 10^{-12}\ \mathrm{W\cdot m^{-2}}</span>, le <b>seuil d'audibilité</b>.</p>
     </details>
     <p class="contexte">Dans une salle de classe bruyante, l'intensité sonore vaut <i>I</i> = 1,0 × 10⁻⁵ W·m⁻².</p>
     <ol class="questions">
       <li>Combien de fois l'intensité sonore de la salle dépasse-t-elle le seuil d'audibilité ? Faire le calcul dans la console.</li>
       <li>Le résultat affiché est-il exactement celui que vous attendiez ? Proposer une explication.</li>
     </ol>
-    <div class="py" data-mode="console"></div>
+    <div class="py" data-mode="console" data-attendus="1">
+      <script type="text/x-python" class="py-check">
+_v = [x for x in globals().values() if type(x) in (int, float)]
+if any(abs(x - 1e7) < 1 for x in _v):
+    ok("Question 1 — I / I0 = 10⁷ : dix millions de fois le seuil d'audibilité.")
+elif any(abs(x - 1e6) < 0.1 for x in _v):
+    indice("10e-12 vaut 10 × 10⁻¹², soit 10⁻¹¹ : pour 10⁻¹², écrivez 1e-12 ou 1.0e-12.")
+      </script>
+    </div>
     <details class="solution"><summary>Voir une solution</summary>
       <pre class="code">&gt;&gt;&gt; 1.0e-5 / 1.0e-12
 10000000.000000002</pre>
@@ -228,11 +250,13 @@ else:
     <h3><span class="num">2.2</span> Le décalage Doppler, avec et sans approximation</h3>
     <a class="doc" href="fiches/tp/tp5-son.pdf" download>TP5 — Ondes sonores et effet Doppler</a>
     <details class="rappel"><summary>Rappel de cours — Effet Doppler</summary>
-      <p>L'effet Doppler est la modification de la fréquence perçue lorsque l'émetteur et le récepteur sont en mouvement l'un par rapport à l'autre. Le décalage Doppler vaut Δ<i>f</i> = <i>f</i><sub>R</sub> − <i>f</i><sub>E</sub>.</p>
+      <p>L'effet Doppler est la modification de la fréquence perçue lorsque l'émetteur et le récepteur sont en mouvement l'un par rapport à l'autre. Le <b>décalage Doppler</b> est l'écart entre la fréquence reçue et la fréquence émise :</p>
+      <p class="formule tex">\Delta f = f_R - f_E</p>
       <p>Pour un émetteur qui s'approche, à la vitesse <i>v</i>, d'un récepteur fixe :</p>
-      <p class="formule">f<sub>R</sub> = f<sub>E</sub> × <span class="frac"><span class="haut">c</span><span class="bas">c − v</span></span></p>
+      <p class="formule tex">f_R = f_E \times \dfrac{c}{c - v}</p>
       <p>Si la vitesse <i>v</i> est faible devant la célérité <i>c</i>, on retient l'expression approchée :</p>
-      <p class="formule">Δf ≈ f<sub>E</sub> × <span class="frac"><span class="haut">v</span><span class="bas">c</span></span></p>
+      <p class="formule tex">\Delta f \approx f_E \times \dfrac{v}{c}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">f_E</span></td><td>fréquence émise</td><td>Hz</td></tr><tr><td><span class="tex">f_R</span></td><td>fréquence reçue</td><td>Hz</td></tr><tr><td><span class="tex">\Delta f</span></td><td>décalage Doppler</td><td>Hz</td></tr><tr><td><span class="tex">v</span></td><td>vitesse de l'émetteur par rapport au récepteur</td><td>m·s⁻¹</td></tr><tr><td><span class="tex">c</span></td><td>célérité de l'onde</td><td>m·s⁻¹</td></tr></tbody></table>
     </details>
     <p class="contexte">Comme au TP5, un émetteur d'ultrasons de fréquence <i>f</i><sub>E</sub> = 40 000 Hz, fixé sur une petite voiture, roule vers le récepteur à <i>v</i> = 2,0 m·s⁻¹. Les ultrasons se propagent dans l'air à <i>c</i> = 340 m·s⁻¹.</p>
     <ol class="questions">
@@ -277,13 +301,15 @@ delta_f_approx = f_E * v / c</pre>
   <article class="exo" id="ex-2-3">
     <h3><span class="num">2.3</span> Constructives ou destructives ?</h3>
     <details class="rappel"><summary>Rappel de cours — Interférences</summary>
-      <p>La différence de marche en un point M vaut δ = S<sub>2</sub>M − S<sub>1</sub>M.</p>
+      <p>Deux sources <i>S</i><sub>1</sub> et <i>S</i><sub>2</sub> émettent des ondes de même fréquence. En un point M, la <b>différence de marche</b> est l'écart entre les distances parcourues par les deux ondes :</p>
+      <p class="formule tex">\delta = S_2M - S_1M</p>
       <p class="rappel-titre">Interférences constructives</p>
-      <p>Ondes en phase, amplitude maximale : δ = k × λ, avec k entier.</p>
+      <p>Ondes en phase, amplitude maximale : <span class="tex">\delta = k \times \lambda</span>, avec <i>k</i> entier.</p>
       <p class="rappel-titre">Interférences destructives</p>
-      <p>Ondes en opposition de phase, amplitude minimale : δ = (k + ½) × λ.</p>
+      <p>Ondes en opposition de phase, amplitude minimale : <span class="tex">\delta = \left(k + \tfrac{1}{2}\right) \times \lambda</span>.</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\delta</span></td><td>différence de marche au point M</td><td>m</td></tr><tr><td><span class="tex">\lambda</span></td><td>longueur d'onde</td><td>m</td></tr><tr><td><span class="tex">k</span></td><td>nombre entier (positif, négatif ou nul)</td><td>sans unité</td></tr></tbody></table>
       <p class="rappel-titre">Méthode</p>
-      <p>On calcule <span class="frac"><span class="haut">δ</span><span class="bas">λ</span></span>. Un nombre entier : constructives. Un entier plus un demi : destructives.</p>
+      <p>On calcule <span class="tex">\dfrac{\delta}{\lambda}</span>. Un nombre entier : constructives. Un entier plus un demi : destructives.</p>
     </details>
     <p class="contexte">Deux ondes lumineuses de longueur d'onde λ = 500 nm arrivent en un point M. Les distances parcourues sont S<sub>1</sub>M = 2 000 nm et S<sub>2</sub>M = 3 250 nm.</p>
     <ol class="questions">
@@ -495,9 +521,10 @@ print('Fréquence reçue :', round(f_R, 2), 'Hz')</pre>
     <h3><span class="num">3.5</span> La tache de diffraction</h3>
     <a class="doc" href="fiches/tp/tp1-diffraction.pdf" download>TP1 — Diffraction de la lumière</a>
     <details class="rappel"><summary>Rappel de cours — Diffraction par une fente</summary>
-      <p>Une fente de largeur <i>a</i>, éclairée par une lumière de longueur d'onde λ, diffracte la lumière. L'angle caractéristique θ (en rad) vérifie, pour de petits angles :</p>
-      <p class="formule">θ ≈ <span class="frac"><span class="haut">λ</span><span class="bas">a</span></span>      θ ≈ <span class="frac"><span class="haut">L</span><span class="bas">2D</span></span></p>
-      <p><i>L</i> : largeur de la tache centrale ; <i>D</i> : distance fente–écran. Toutes les longueurs en mètres.</p>
+      <p>Une fente de largeur <i>a</i> (ou un fil de diamètre <i>a</i>), éclairée par une lumière de longueur d'onde λ, diffracte la lumière. Pour de petits angles, l'écart angulaire θ vérifie :</p>
+      <p class="formule tex">\theta \approx \dfrac{\lambda}{a} \qquad\qquad \theta \approx \dfrac{L}{2D}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\theta</span></td><td>écart angulaire, entre le milieu de la tache centrale et la première extinction</td><td>rad</td></tr><tr><td><span class="tex">\lambda</span></td><td>longueur d'onde de la lumière</td><td>m</td></tr><tr><td><span class="tex">a</span></td><td>largeur de la fente, ou diamètre du fil</td><td>m</td></tr><tr><td><span class="tex">L</span></td><td>largeur de la tache centrale</td><td>m</td></tr><tr><td><span class="tex">D</span></td><td>distance entre la fente et l'écran</td><td>m</td></tr></tbody></table>
+      <p>Toutes les longueurs s'expriment dans la même unité, le mètre.</p>
     </details>
     <p class="contexte">Comme au TP1, un laser rouge (λ = 633 nm) éclaire une fente de largeur <i>a</i> = 100 µm ; l'écran est à <i>D</i> = 1,50 m de la fente.</p>
     <ol class="questions">
@@ -555,14 +582,17 @@ print('L =', round(L * 100, 1), 'cm')</pre>
       <li>On appelle ensuite ses fonctions avec <code>np.</code> devant : <code>np.log10(x)</code> (logarithme décimal, le « log » du cours), <code>np.sqrt(x)</code> (racine carrée), <code>np.pi</code> (le nombre π).</li>
       <li><b>Piège</b> : <code>np.log(x)</code> calcule le logarithme <em class="cle">népérien</em> ln, pas le log décimal.</li>
       <li>Dix puissance <i>x</i> s'écrit <code>10 ** x</code> ; pour une puissance négative, des parenthèses évitent les surprises : <code>10 ** (-pH)</code>.</li>
+      <li><b>À quoi ça sert</b> : <code>np.log10</code> calcule un pH ou un niveau d'intensité sonore, <code>10 ** (-pH)</code> revient à la concentration, <code>np.sqrt</code> donne une incertitude-type.</li>
+      <li>Chaque fonction a sa page dans la documentation officielle (en anglais), avec des exemples : <a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.log10.html" target="_blank" rel="noopener">np.log10 ↗</a> · <a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.sqrt.html" target="_blank" rel="noopener">np.sqrt ↗</a>. Y aller voir est un réflexe de programmeur.</li>
     </ul>
   </div>
 
   <article class="exo" id="ex-4-1">
     <h3><span class="num">4.1</span> Le niveau d'intensité sonore</h3>
     <details class="rappel"><summary>Rappel de cours — Niveau d'intensité sonore</summary>
-      <p>Le niveau d'intensité sonore <i>L</i>, en décibels (dB), se calcule à partir de l'intensité sonore <i>I</i> (en W·m⁻²) :</p>
-      <p class="formule">L = 10 × log<span class="par">(</span><span class="frac"><span class="haut">I</span><span class="bas">I<sub>0</sub></span></span><span class="par">)</span>   avec   I<sub>0</sub> = 1,0 × 10⁻¹² W·m⁻²</p>
+      <p>Le niveau d'intensité sonore se calcule à partir de l'intensité sonore, avec le logarithme décimal :</p>
+      <p class="formule tex">L = 10 \times \log\left(\dfrac{I}{I_0}\right)</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">L</span></td><td>niveau d'intensité sonore</td><td>dB (décibel)</td></tr><tr><td><span class="tex">I</span></td><td>intensité sonore</td><td>W·m⁻²</td></tr><tr><td><span class="tex">I_0</span></td><td>seuil d'audibilité : 1,0 × 10⁻¹²</td><td>W·m⁻²</td></tr></tbody></table>
     </details>
     <p class="contexte">On reprend la salle de classe de l'exercice 1.3 : <i>I</i> = 1,0 × 10⁻⁵ W·m⁻².</p>
     <ol class="questions">
@@ -595,8 +625,9 @@ else:
   <article class="exo" id="ex-4-2">
     <h3><span class="num">4.2</span> Du pH à la concentration, et retour</h3>
     <details class="rappel"><summary>Rappel de cours — pH</summary>
-      <p class="formule">pH = −log<span class="par">(</span><span class="frac"><span class="haut">[H<sub>3</sub>O<sup>+</sup>]</span><span class="bas">c<sup>0</sup></span></span><span class="par">)</span>   avec   c<sup>0</sup> = 1 mol·L⁻¹</p>
-      <p>Le pH est sans unité ; [H<sub>3</sub>O<sup>+</sup>] est la concentration en ions oxonium, en mol·L⁻¹. Réciproquement : [H<sub>3</sub>O<sup>+</sup>] = c<sup>0</sup> × 10<sup>−pH</sup>.</p>
+      <p>Le pH d'une solution aqueuse se calcule à partir de la concentration en ions oxonium :</p>
+      <p class="formule tex">\mathrm{pH} = -\log\left(\dfrac{[\mathrm{H_3O^+}]}{c^0}\right) \qquad\qquad [\mathrm{H_3O^+}] = c^0 \times 10^{-\mathrm{pH}}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\mathrm{pH}</span></td><td>pH de la solution</td><td>sans unité</td></tr><tr><td><span class="tex">[\mathrm{H_3O^+}]</span></td><td>concentration en ions oxonium</td><td>mol·L⁻¹</td></tr><tr><td><span class="tex">c^0</span></td><td>concentration standard : 1 mol·L⁻¹</td><td>mol·L⁻¹</td></tr></tbody></table>
     </details>
     <div class="qcm" data-bonne="b">
       <p class="qcm-q">Que renvoie <code>np.log(100)</code> ?</p>
@@ -645,9 +676,10 @@ h_citron = 10 ** (-pH_citron)</pre>
   <article class="exo" id="ex-4-3">
     <h3><span class="num">4.3</span> L'incertitude-type d'une moyenne</h3>
     <details class="rappel"><summary>Rappel de cours — Incertitude de type A</summary>
-      <p>Pour une série de <i>n</i> mesures répétées de la même grandeur, d'écart-type expérimental <i>s</i>(<i>x</i>), l'incertitude-type de la moyenne vaut :</p>
-      <p class="formule">u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
-      <p>Elle s'écrit avec un seul chiffre significatif, arrondi à l'excès.</p>
+      <p>Pour une série de <i>n</i> mesures répétées de la même grandeur <i>x</i>, l'incertitude-type de la moyenne vaut :</p>
+      <p class="formule tex">u(\bar{x}) = \dfrac{s(x)}{\sqrt{n}}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">n</span></td><td>nombre de mesures</td><td>sans unité</td></tr><tr><td><span class="tex">\bar{x}</span></td><td>moyenne des mesures</td><td>celle de x</td></tr><tr><td><span class="tex">s(x)</span></td><td>écart-type expérimental de la série</td><td>celle de x</td></tr><tr><td><span class="tex">u(\bar{x})</span></td><td>incertitude-type de la moyenne</td><td>celle de x</td></tr></tbody></table>
+      <p>L'incertitude-type s'écrit avec <b>un seul chiffre significatif</b>, arrondi à l'excès ; la moyenne s'arrondit <b>au même rang</b>.</p>
     </details>
     <p class="contexte">La classe a mesuré 15 fois la masse du même cylindre d'aluminium. La calculatrice donne une moyenne de 55,45 g et un écart-type <i>s</i> = 0,02 g.</p>
     <ol class="questions">
@@ -698,18 +730,37 @@ print('u =', u, 'g')</pre>
       <li>Une <em class="cle">liste</em> regroupe des valeurs entre crochets, séparées par des virgules : <code>pH = [2.4, 2.5, 2.9]</code>. C'est là que sert la virgule, jamais comme séparateur décimal.</li>
       <li><code>len(pH)</code> donne le nombre d'éléments.</li>
       <li><code>pH[0]</code> est le <b>premier</b> élément : Python compte à partir de 0. <code>pH[2]</code> est donc le troisième.</li>
-      <li>Une liste ne se prête pas au calcul : <code>pH * 2</code> la recopie deux fois. On la convertit en <em class="cle">tableau numpy</em> : <code>pH = np.array(pH)</code>. Ensuite, <code>10 ** (-pH)</code> calcule toutes les valeurs d'un coup.</li>
+      <li>Une liste ne se prête pas au calcul : <code>pH * 2</code> la recopie deux fois. On la convertit en <em class="cle">tableau numpy</em> : <code>pH = np.array(pH)</code> (<a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html" target="_blank" rel="noopener">doc ↗</a>).</li>
+      <li>Un calcul sur un tableau agit sur <b>chaque valeur</b> et donne un <b>nouveau tableau</b>, de même longueur : une valeur calculée par mesure. Deux tableaux de même longueur se combinent valeur par valeur : <code>pH - pH_th</code> donne l'écart pour chaque solution.</li>
+      <li><b>À quoi ça sert</b> : dès qu'on exploite une série de mesures. Les pH théoriques de toute une gamme de solutions (<code>pH_th = -np.log10(c)</code>, TP6), les concentrations qui correspondent à des pH (<code>h = 10 ** (-pH)</code>), des largeurs converties en mètres (<code>a = a * 1e-6</code>, TP1), l'écart entre les mesures et le modèle.</li>
     </ul>
     <pre class="code">import numpy as np
-pH = np.array([2.4, 2.5, 2.9])   # liste convertie en tableau
-h = 10 ** (-pH)                  # trois calculs d'un coup
-print(h)</pre>
+pH = np.array([2.4, 2.5, 2.9])         # liste convertie en tableau
+h = 10 ** (-pH)                        # trois calculs d'un coup
+print(h)
+
+c = np.array([0.100, 0.010, 0.001])    # concentrations, en mol/L
+pH_th = -np.log10(c)                   # trois pH théoriques d'un coup
+print(pH_th)                           # affiche [1. 2. 3.]</pre>
   </div>
 
   <article class="exo" id="ex-5-1">
     <h3><span class="num">5.1</span> Manipuler une liste</h3>
+    <a class="doc" href="fiches/tp/tp6-ph.pdf" download>TP6 — pH d'une solution aqueuse</a>
     <p class="contexte">Dans la console, rangez dans <code>pH</code> la liste des pH mesurés au TP6 : 1,03 ; 1,41 ; 1,68 ; 2,08 ; 2,25. Testez ensuite <code>len(pH)</code>, <code>pH[0]</code>, <code>pH[4]</code>, <code>pH[5]</code> et <code>pH * 2</code>. Importez enfin numpy, convertissez la liste en tableau et testez de nouveau <code>pH * 2</code>.</p>
-    <div class="py" data-mode="console"></div>
+    <div class="py" data-mode="console" data-attendus="2">
+      <script type="text/x-python" class="py-check">
+_p = globals().get('pH')
+try:
+    _l = [float(x) for x in _p]
+except Exception:
+    _l = None
+if _l is not None and len(_l) == 5 and all(abs(a - b) < 1e-9 for a, b in zip(_l, [1.03, 1.41, 1.68, 2.08, 2.25])):
+    ok("pH contient les cinq mesures du TP6.")
+    if type(_p).__name__ == 'ndarray':
+        ok("pH est devenu un tableau numpy : pH * 2 double chaque valeur.")
+      </script>
+    </div>
     <details class="solution"><summary>Voir une solution</summary>
       <pre class="code">&gt;&gt;&gt; pH = [1.03, 1.41, 1.68, 2.08, 2.25]
 &gt;&gt;&gt; len(pH)
@@ -785,6 +836,11 @@ lam = 500</pre>
 
   <article class="exo" id="ex-5-3">
     <h3><span class="num">5.3</span> Le pH de liquides courants</h3>
+    <details class="rappel"><summary>Rappel de cours — pH</summary>
+      <p>Le pH d'une solution aqueuse se calcule à partir de la concentration en ions oxonium :</p>
+      <p class="formule tex">\mathrm{pH} = -\log\left(\dfrac{[\mathrm{H_3O^+}]}{c^0}\right) \qquad\qquad [\mathrm{H_3O^+}] = c^0 \times 10^{-\mathrm{pH}}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\mathrm{pH}</span></td><td>pH de la solution</td><td>sans unité</td></tr><tr><td><span class="tex">[\mathrm{H_3O^+}]</span></td><td>concentration en ions oxonium</td><td>mol·L⁻¹</td></tr><tr><td><span class="tex">c^0</span></td><td>concentration standard : 1 mol·L⁻¹</td><td>mol·L⁻¹</td></tr></tbody></table>
+    </details>
     <p class="contexte">pH mesurés : jus de citron 2,4 ; soda au cola 2,5 ; vinaigre blanc 2,9 ; café 5,0 ; eau du robinet 7,6 ; eau de mer 8,2.</p>
     <ol class="questions">
       <li>Compléter la liste <code>pH</code>, puis la ligne qui calcule le tableau <code>h</code> des concentrations en ions oxonium.</li>
@@ -822,6 +878,61 @@ print(h[3])</pre>
       <p>Le café est le quatrième liquide, de rang 3 : <code>h[3]</code> vaut 1,0 × 10⁻⁵ mol·L⁻¹. Python affiche les très petites valeurs en notation scientifique : <code>1e-05</code>.</p>
     </details>
   </article>
+
+  <article class="exo" id="ex-5-4">
+    <h3><span class="num">5.4</span> Le pH théorique du TP6</h3>
+    <a class="doc" href="fiches/tp/tp6-ph.pdf" download>TP6 — pH d'une solution aqueuse</a>
+    <details class="rappel"><summary>Rappel de cours — pH</summary>
+      <p>Le pH d'une solution aqueuse se calcule à partir de la concentration en ions oxonium :</p>
+      <p class="formule tex">\mathrm{pH} = -\log\left(\dfrac{[\mathrm{H_3O^+}]}{c^0}\right) \qquad\qquad [\mathrm{H_3O^+}] = c^0 \times 10^{-\mathrm{pH}}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\mathrm{pH}</span></td><td>pH de la solution</td><td>sans unité</td></tr><tr><td><span class="tex">[\mathrm{H_3O^+}]</span></td><td>concentration en ions oxonium</td><td>mol·L⁻¹</td></tr><tr><td><span class="tex">c^0</span></td><td>concentration standard : 1 mol·L⁻¹</td><td>mol·L⁻¹</td></tr></tbody></table>
+    </details>
+    <p class="contexte">Au TP6, cinq solutions d'acide chlorhydrique ont été préparées par dilution. La réaction du chlorure d'hydrogène avec l'eau est totale : la concentration en ions oxonium est égale à la concentration apportée <i>c</i>. Les pH mesurés sont ceux de l'exercice 5.1. C'est la partie 1 du programme du TP6.</p>
+    <ol class="questions">
+      <li>Compléter la ligne <code>pH_th = ……</code> qui calcule, en une seule ligne, les cinq pH théoriques.</li>
+      <li>Compléter la ligne <code>ecart = ……</code> qui calcule, pour chaque solution, l'écart entre le pH mesuré et le pH théorique.</li>
+      <li>Les mesures sont-elles en accord avec la définition du pH ?</li>
+    </ol>
+    <div class="aide"><ol>
+      <li>La concentration standard vaut 1 mol·L⁻¹ : diviser par <i>c</i><sup>0</sup> ne change pas la valeur.</li>
+      <li>Le log du cours est le logarithme décimal : <code>np.log10</code>, pas <code>np.log</code>.</li>
+      <li>Deux tableaux de même longueur se soustraient valeur par valeur.</li>
+    </ol></div>
+    <div class="py" data-mode="script" data-attendus="2">
+      <textarea class="py-code">import numpy as np
+
+c = np.array([0.100, 0.040, 0.020, 0.010, 0.005])   # concentrations, en mol/L
+pH = np.array([1.03, 1.41, 1.68, 2.08, 2.25])       # pH mesurés
+
+pH_th = ……             # pH théoriques des cinq solutions
+ecart = ……             # pH mesuré − pH théorique
+
+print('pH théoriques :', pH_th)
+print('écarts :', ecart)</textarea>
+      <script type="text/x-python" class="py-check">
+import numpy as _np
+_c = _np.array([0.100, 0.040, 0.020, 0.010, 0.005])
+_m = _np.array([1.03, 1.41, 1.68, 2.08, 2.25])
+_th = -_np.log10(_c)
+g = globals()
+if 'pH_th' in g and _np.shape(pH_th) == (5,) and _np.allclose(pH_th, _th):
+    ok("Question 1 — Cinq pH théoriques en une ligne : 1,00 ; 1,40 ; 1,70 ; 2,00 ; 2,30.")
+    if 'ecart' in g and _np.shape(ecart) == (5,) and _np.allclose(ecart, _m - _th):
+        ok("Question 2 — Cinq écarts, tous inférieurs à 0,1 en valeur absolue.")
+    elif 'ecart' in g and _np.shape(ecart) == (5,) and _np.allclose(ecart, _th - _m):
+        indice("Question 2 : l'écart demandé est pH mesuré − pH théorique, dans cet ordre.")
+elif 'pH_th' in g and _np.shape(pH_th) == (5,) and _np.allclose(pH_th, _np.log10(_c)):
+    indice("Des pH négatifs : il manque le signe moins devant np.log10.")
+elif 'pH_th' in g and _np.shape(pH_th) == (5,) and _np.allclose(pH_th, -_np.log(_c)):
+    indice("np.log est le logarithme népérien (ln) : le log du cours s'écrit np.log10.")
+      </script>
+    </div>
+    <details class="solution"><summary>Voir une solution</summary>
+      <pre class="code">pH_th = -np.log10(c)
+ecart = pH - pH_th</pre>
+      <p>Un calcul sur un tableau donne un tableau de même longueur : cinq pH théoriques, puis cinq écarts. Les écarts restent inférieurs à 0,1 en valeur absolue : les mesures sont en accord avec la définition du pH. C'est la ligne <code>pH_th</code> du programme du TP6.</p>
+    </details>
+  </article>
 </section>
 
 <!-- ============================================================ -->
@@ -835,22 +946,35 @@ print(h[3])</pre>
       <li><code>np.mean(x)</code> : la moyenne de la série <code>x</code>.</li>
       <li><code>np.std(x, ddof=1)</code> : l'<em class="cle">écart-type expérimental</em>, celui qui divise par <i>n</i> − 1, comme dans le cours. Sans <code>ddof=1</code>, numpy divise par <i>n</i> : ce n'est pas celui qu'on utilise.</li>
       <li><code>len(x)</code> donne <i>n</i>, et l'incertitude-type de la moyenne s'écrit <code>np.std(x, ddof=1) / np.sqrt(len(x))</code>.</li>
+      <li><b>À quoi ça sert</b> : exploiter une série de mesures répétées (les passages de la voiture au TP5, les pH de l'eau du robinet relevés par toute la classe au TP6) et écrire le résultat avec son incertitude.</li>
+      <li>Documentation : <a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html" target="_blank" rel="noopener">np.mean ↗</a> · <a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.std.html" target="_blank" rel="noopener">np.std ↗</a>.</li>
     </ul>
   </div>
 
   <article class="exo" id="ex-6-1">
     <h3><span class="num">6.1</span> Le cylindre d'aluminium</h3>
-    <details class="rappel"><summary>Rappel de cours — Moyenne et écart-type</summary>
-      <p class="formule">x̄ = <span class="frac"><span class="haut">1</span><span class="bas">n</span></span> ∑ x<sub>i</sub>      u(x̄) = <span class="frac"><span class="haut">s(x)</span><span class="bas">√n</span></span></p>
-      <p class="formule">s(x) = √<span class="par">(</span><span class="frac"><span class="haut">1</span><span class="bas">n − 1</span></span> ∑ (x<sub>i</sub> − x̄)²<span class="par">)</span></p>
-      <p>La moyenne est la meilleure estimation de la grandeur ; l'écart-type caractérise la dispersion des mesures ; l'incertitude-type de la moyenne, sa fiabilité.</p>
+    <details class="rappel"><summary>Rappel de cours — Moyenne, écart-type, incertitude-type</summary>
+      <p>Une grandeur <i>x</i> est mesurée <i>n</i> fois : on obtient les valeurs <i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>, …, <i>x<sub>n</sub></i>.</p>
+      <p class="rappel-titre">1. La moyenne</p>
+      <p class="formule tex">\bar{x} = \dfrac{1}{n}\sum_{i=1}^{n} x_i = \dfrac{x_1 + x_2 + \dots + x_n}{n}</p>
+      <p>C'est la meilleure estimation de la valeur de la grandeur.</p>
+      <p class="rappel-titre">2. L'écart-type expérimental</p>
+      <p class="formule tex">s(x) = \sqrt{\dfrac{1}{n-1}\sum_{i=1}^{n}\left(x_i - \bar{x}\right)^2}</p>
+      <p>Il mesure la <b>dispersion</b> des mesures autour de la moyenne. On divise par <i>n</i> − 1 : touche σ<sub>n−1</sub> ou Sx de la calculatrice, ECARTYPE du tableur, <code>np.std(x, ddof=1)</code> en Python.</p>
+      <p class="rappel-titre">3. L'incertitude-type de la moyenne</p>
+      <p class="formule tex">u(\bar{x}) = \dfrac{s(x)}{\sqrt{n}}</p>
+      <p>Elle évalue la <b>fiabilité</b> de la moyenne : plus on fait de mesures, plus elle est petite.</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">n</span></td><td>nombre de mesures</td><td>sans unité</td></tr><tr><td><span class="tex">x_i</span></td><td>la mesure numéro <i>i</i>, de <i>x</i><sub>1</sub> à <i>x<sub>n</sub></i></td><td>celle de x</td></tr><tr><td><span class="tex">\sum_{i=1}^{n}</span></td><td>somme des <i>n</i> termes, pour <i>i</i> allant de 1 à <i>n</i></td><td>—</td></tr><tr><td><span class="tex">\bar{x}</span></td><td>moyenne</td><td>celle de x</td></tr><tr><td><span class="tex">s(x)</span></td><td>écart-type expérimental</td><td>celle de x</td></tr><tr><td><span class="tex">u(\bar{x})</span></td><td>incertitude-type de la moyenne</td><td>celle de x</td></tr></tbody></table>
+      <p class="rappel-titre">Écrire le résultat</p>
+      <p><span class="tex">x = \bar{x} \pm u(\bar{x})</span>, suivi de l'unité. L'incertitude-type garde <b>un seul chiffre significatif</b>, arrondi à l'excès ; la moyenne s'arrondit <b>au même rang</b>. Pour un niveau de confiance de 95 %, on élargit l'incertitude : <span class="tex">U(\bar{x}) = 2 \times u(\bar{x})</span> (TP6).</p>
     </details>
     <p class="contexte">Voici les 15 masses du cylindre d'aluminium de l'exercice 4.3, cette fois mesure par mesure (valeurs construites d'après la fiche de cours).</p>
     <ol class="questions">
       <li>Compléter les lignes qui calculent la moyenne <code>m_moy</code> et l'incertitude-type <code>u</code>.</li>
       <li>Exécuter, puis retirer <code>ddof=1</code>. L'écart-type change-t-il ? Lequel faut-il utiliser ?</li>
+      <li>Ajouter une ligne <code>print</code> qui écrit le résultat de la mesure sous la forme m = (moyenne ± u) g, en respectant les chiffres significatifs (voir le rappel de cours).</li>
     </ol>
-    <div class="py" data-mode="script">
+    <div class="py" data-mode="script" data-attendus="2">
       <textarea class="py-code">import numpy as np
 
 m = np.array([55.47, 55.43, 55.45, 55.44, 55.48, 55.42, 55.46, 55.45,
@@ -872,7 +996,10 @@ if 'm' in g and 'u' in g and 'm_moy' in g:
     ok_m = abs(m_moy - _np.mean(m)) < 1e-9
     ok_u = abs(u - _np.std(m, ddof=1) / _np.sqrt(len(m))) < 1e-9
     if ok_m and ok_u:
-        ok("Moyenne 55,449 g, s ≈ 0,018 g, u ≈ 0,005 g : on écrit m = (55,449 ± 0,005) g.")
+        ok("Question 1 — Moyenne et incertitude-type calculées.")
+        import re as _re
+        if _re.search(r'55[.,]449\b', _sortie) and _re.search(r'0[.,]005\b', _sortie):
+            ok("Question 3 — m = (55,449 ± 0,005) g : u a un seul chiffre significatif (0,0048 arrondi à l'excès), et la moyenne s'arrête au même rang, le millième.")
     elif ok_m and abs(u - _np.std(m, ddof=1)) < 1e-9:
         indice("u est l'incertitude-type de la MOYENNE : il faut diviser s par la racine de n.")
     elif ok_m:
@@ -883,8 +1010,11 @@ if 'm' in g and 'u' in g and 'm_moy' in g:
     </div>
     <details class="solution"><summary>Voir une solution</summary>
       <pre class="code">m_moy = np.mean(m)
-u = s / np.sqrt(n)</pre>
+u = s / np.sqrt(n)
+
+print('m = (55.449 ± 0.005) g')</pre>
       <p>Moyenne 55,449 g, <i>s</i> ≈ 0,018 g, <i>u</i> ≈ 0,0048 g, arrondie à l'excès : 0,005 g. Sans <code>ddof=1</code>, l'écart-type vaut 0,0178 g : un peu plus petit, car numpy divise par <i>n</i>. En physique, on utilise l'écart-type expérimental, avec <code>ddof=1</code>.</p>
+      <p>Écriture du résultat : <i>u</i> = 0,0048 g garde un seul chiffre significatif, arrondi à l'excès : 0,005 g. Ce chiffre est celui des millièmes : la moyenne s'arrondit donc au millième, 55,449 g. On écrit m = (55,449 ± 0,005) g.</p>
     </details>
   </article>
 </section>
@@ -897,26 +1027,29 @@ u = s / np.sqrt(n)</pre>
   <div class="retenir">
     <h4>À retenir</h4>
     <ul>
-      <li><code>import matplotlib.pyplot as plt</code> charge pyplot sous le nom court <code>plt</code>.</li>
-      <li><code>plt.plot(x, y, 'b+')</code> place des points (croix bleues) ; <code>plt.plot(x, y, 'r-')</code> trace une ligne rouge. Les deux tableaux <code>x</code> et <code>y</code> doivent avoir <b>la même longueur</b>.</li>
-      <li><code>label='mesures'</code> donne un nom à la série ; <code>plt.legend()</code> affiche ces noms.</li>
-      <li><code>plt.xlabel('…')</code>, <code>plt.ylabel('…')</code> et <code>plt.title('…')</code> légendent le graphique ; <code>plt.grid()</code> ajoute un quadrillage.</li>
-      <li><code>np.linspace(0, 11, 100)</code> crée 100 valeurs régulièrement espacées de 0 à 11 : idéal pour tracer une courbe de modèle bien lisse.</li>
-      <li><code>plt.hist(x, bins=5, edgecolor='black')</code> trace l'histogramme d'une série, en 5 classes.</li>
-      <li><code>plt.show()</code> affiche le graphique.</li>
+      <li><code>import matplotlib.pyplot as plt</code> charge pyplot sous le nom court <code>plt</code>. Toutes ses fonctions sont dans la documentation officielle (en anglais) : <a class="lien-doc" href="https://matplotlib.org/stable/api/pyplot_summary.html" target="_blank" rel="noopener">pyplot ↗</a>. Un réglage à faire (couleur, taille des points, échelle) ? On va le chercher dans la page de la fonction : c'est un réflexe à prendre.</li>
+      <li><code>plt.plot(x, y, 'b+')</code> place des points (croix bleues) ; <code>plt.plot(x, y, 'r-')</code> trace une ligne rouge. Les deux tableaux <code>x</code> et <code>y</code> doivent avoir <b>la même longueur</b>. <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html" target="_blank" rel="noopener">doc ↗</a></li>
+      <li><code>label='mesures'</code> donne un nom à la série ; <code>plt.legend()</code> affiche ces noms. <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.legend.html" target="_blank" rel="noopener">doc ↗</a></li>
+      <li><code>plt.xlabel('…')</code>, <code>plt.ylabel('…')</code> et <code>plt.title('…')</code> légendent le graphique ; <code>plt.grid()</code> ajoute un quadrillage. <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlabel.html" target="_blank" rel="noopener">xlabel ↗</a> · <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html" target="_blank" rel="noopener">ylabel ↗</a> · <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.title.html" target="_blank" rel="noopener">title ↗</a> · <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.grid.html" target="_blank" rel="noopener">grid ↗</a></li>
+      <li><code>np.linspace(0, 11, 100)</code> crée 100 valeurs régulièrement espacées de 0 à 11 : idéal pour tracer une courbe de modèle bien lisse. <a class="lien-doc" href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html" target="_blank" rel="noopener">doc ↗</a></li>
+      <li><code>plt.hist(x, bins=5, edgecolor='black')</code> trace l'histogramme d'une série, en 5 classes. <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html" target="_blank" rel="noopener">doc ↗</a></li>
+      <li><code>plt.show()</code> affiche le graphique. <a class="lien-doc" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html" target="_blank" rel="noopener">doc ↗</a></li>
+      <li><b>À quoi ça sert</b> : tracer une courbe d'étalonnage (TP3, TP4), vérifier une loi en comparant mesures et modèle (TP1, TP6), représenter la dispersion d'une série par un histogramme (TP6).</li>
     </ul>
   </div>
 
   <article class="exo" id="ex-7-1">
     <h3><span class="num">7.1</span> La courbe d'étalonnage du TP4</h3>
+    <a class="doc" href="fiches/tp/tp4-conductimetrie.pdf" download>TP4 — Dosage par conductimétrie</a>
     <details class="rappel"><summary>Rappel de cours — Loi de Kohlrausch</summary>
-      <p>Pour une solution diluée ne contenant qu'un seul soluté ionique, la conductivité σ est proportionnelle à la concentration <i>c</i> :</p>
-      <p class="formule">σ = k × c</p>
-      <p>Une concentration inconnue se lit sur la droite d'étalonnage, ou se calcule : c = <span class="frac"><span class="haut">σ</span><span class="bas">k</span></span>.</p>
+      <p>Pour une solution diluée (concentration inférieure à 1,0 × 10⁻² mol·L⁻¹) ne contenant qu'un seul soluté ionique, la conductivité est proportionnelle à la concentration :</p>
+      <p class="formule tex">\sigma = k \times c \qquad\qquad \text{soit} \qquad c = \dfrac{\sigma}{k}</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">\sigma</span></td><td>conductivité de la solution</td><td>S·m⁻¹ (au TP4 : mS·cm⁻¹)</td></tr><tr><td><span class="tex">c</span></td><td>concentration du soluté</td><td>mol·L⁻¹ (au TP4 : mmol·L⁻¹)</td></tr><tr><td><span class="tex">k</span></td><td>coefficient de proportionnalité, pente de la droite d'étalonnage</td><td>celle de σ divisée par celle de c</td></tr></tbody></table>
+      <p>Une concentration inconnue se lit sur la droite d'étalonnage, ou se calcule avec la seconde relation.</p>
     </details>
     <p class="contexte">Au TP4, la gamme étalon de chlorure de sodium a donné les mesures ci-dessous. Le modèle de Kohlrausch s'écrit σ = <i>k</i> × <i>c</i>, avec <i>k</i> = 0,1172 mS·cm⁻¹ par mmol·L⁻¹.</p>
     <ol class="questions">
-      <li>Exécuter : les mesures s'affichent. Ajouter les légendes des axes et un titre.</li>
+      <li>Exécuter : les mesures s'affichent. Ajouter les légendes des axes et un titre. La touche <b>αβ</b> de la barre sous l'éditeur donne la lettre σ.</li>
       <li>Compléter <code>sigma_mod = ……</code>, puis ajouter la ligne qui trace le modèle en ligne rouge, avec <code>label='modèle'</code>.</li>
       <li>Le modèle est-il en accord avec les mesures ?</li>
     </ol>
@@ -1092,11 +1225,13 @@ plt.ylabel('effectif')</pre>
   </div>
 
   <details class="rappel"><summary>Rappel de cours — Loi de Beer-Lambert</summary>
-    <p>L'absorbance <i>A</i> d'une solution (sans unité) est proportionnelle à la concentration <i>c</i> de l'espèce absorbante :</p>
-    <p class="formule">A = ε × l × c   soit   A = k × c</p>
-    <p>On en déduit la concentration d'une solution inconnue : c = <span class="frac"><span class="haut">A</span><span class="bas">k</span></span>, avec <i>k</i> lu sur la droite d'étalonnage.</p>
-  </details>
+      <p>L'absorbance d'une solution est proportionnelle à la concentration de l'espèce colorée qu'elle contient :</p>
+      <p class="formule tex">A = \varepsilon \times \ell \times c \qquad\qquad \text{soit} \qquad A = k \times c</p>
+      <table class="notations"><thead><tr><th>Grandeur</th><th>Nom</th><th>Unité</th></tr></thead><tbody><tr><td><span class="tex">A</span></td><td>absorbance de la solution</td><td>sans unité</td></tr><tr><td><span class="tex">\varepsilon</span></td><td>coefficient d'absorption molaire de l'espèce colorée</td><td>L·mol⁻¹·cm⁻¹</td></tr><tr><td><span class="tex">\ell</span></td><td>épaisseur de solution traversée (largeur de la cuve)</td><td>cm</td></tr><tr><td><span class="tex">c</span></td><td>concentration de l'espèce colorée</td><td>mol·L⁻¹ (ici, en masse : mg·L⁻¹)</td></tr><tr><td><span class="tex">k</span></td><td>coefficient lu sur la droite d'étalonnage</td><td>ici L·mg⁻¹</td></tr></tbody></table>
+      <p>On en déduit la concentration d'une solution inconnue : <span class="tex">c = \dfrac{A}{k}</span>.</p>
+    </details>
   <p class="contexte">Les programmes de cette étape cherchent la concentration en colorant bleu d'un sirop de menthe dilué, comme au TP3. L'absorbance vaut <i>A</i> = 0,47 ; la droite d'étalonnage donne <i>k</i> = 0,124 L·mg⁻¹ (valeurs construites pour l'exercice). Chaque programme contient <b>une</b> erreur : exécuter, lire le message, corriger.</p>
+  <p><a class="doc" href="fiches/tp/tp3-sirop-menthe.pdf" download>TP3 — Dosage spectrophotométrique</a></p>
 
   <article class="exo" id="ex-8-1">
     <h3><span class="num">8.1</span> Première erreur</h3>

@@ -24,7 +24,13 @@
   exécute, lit le message d'erreur, consulte une solution après un premier essai.
 - **Interpréteur dans chaque cadre** (Pyodide auto-hébergé, numpy et matplotlib),
   messages d'erreur courts en français, explication détaillée dépliable.
-- **Rappels de cours** sous un bouton ⓘ, tirés des fiches et des cours Quizéo.
+- **Rappels de cours** sous un bouton ⓘ, tirés des fiches et des cours Quizéo. Formules en
+  LaTeX (`<p class="formule tex">`, `<span class="tex">`, rendu par KaTeX auto-hébergé) ;
+  chaque grandeur nommée avec son unité (tableau `.notations`) — règle du 18/10/2026.
+- **« À quoi ça sert »** dans les encadrés À retenir : chaque outil est relié aux TP où il
+  sert ; chaque fonction de numpy et de pyplot renvoie à sa documentation officielle.
+- **Le code se tape** : rien du cours ne se copie, et un éditeur n'accepte que ce que l'élève
+  y a lui-même copié (18/10/2026).
 - **Fiche PDF de fin de niveau** à télécharger, pour le travail sur papier.
 - **Étiquettes d'origine** aux niveaux 4 et 5 : chaque notion indique la
   formation qui l'attend (« attendu de PCSI », « BUT Mesures physiques »…).

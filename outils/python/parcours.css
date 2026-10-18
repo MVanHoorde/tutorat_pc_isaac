@@ -139,6 +139,9 @@ body.pp{display:grid;grid-template-columns:minmax(0,1fr);
   .pp-som-pastille{display:none}
   .pp-som-exos a.reussi .pp-som-pastille{display:inline}
   .pp-som-exos a.reussi .pp-som-pastille::before{content:"✓"}
+  .pp-som-exos a.commence{border-color:#E6CF94;background:var(--ambre-wash);color:var(--ambre-texte)!important}
+  .pp-som-exos a.commence .pp-som-pastille{display:inline}
+  .pp-som-exos a.commence .pp-som-pastille::before{content:"◐"}
 }
 
 /* ---------------------------------------------------------------- séances */
@@ -203,6 +206,17 @@ p:not(.formule) .frac,li .frac,td .frac{font-size:.86em}
    ni mono (les exposants ⁻² y sont chassés à pleine largeur et se détachent de leur unité). */
 .unite{font-family:var(--sans);font-style:normal;font-size:.86em;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
 .formule .unite{font-size:.72em}
+/* formules LaTeX (KaTeX) : la police et la taille sont celles de KaTeX */
+.formule.tex{font-style:normal;font-size:1rem;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.formule.tex .katex-display{margin:.2em 0}
+.tex:not(.rendue){font-family:var(--mono);font-size:.85em;color:var(--muted)}
+/* lien vers la documentation officielle (pyplot, numpy) : discret, ouvert dans un autre onglet */
+.lien-doc{font-family:var(--mono);font-size:12.5px;white-space:nowrap;padding:0 2px}
+/* rappel de cours : tableau des notations (grandeur, nom, unité) */
+.notations{width:100%;border-collapse:collapse;margin:8px 0 4px;font-size:15px}
+.notations th,.notations td{padding:5px 8px;border-bottom:1px solid var(--rule);vertical-align:top;text-align:left}
+.notations th{font-weight:500;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.notations td:first-child{white-space:nowrap;width:1%}
 
 /* ---------------------------------------------------------------- tableaux */
 .pp-table-defil{overflow-x:auto;margin:12px 0;max-width:100%}
@@ -283,6 +297,16 @@ details.rappel > :last-child{margin-bottom:0}
 .exo ol.questions li{margin:5px 0}
 .exo ol.questions li::marker{color:var(--accent);font-family:var(--mono);font-weight:500}
 .exo.reussi{border-color:#BFE1CF;box-shadow:inset 0 3px 0 var(--ok),var(--ombre)}
+/* « en cours » : touché, pas encore réussi (18/10/2026) */
+.pp-encours{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ambre-texte);background:var(--ambre-wash);
+  border:1px solid #E6CF94;border-radius:999px;padding:1px 10px;letter-spacing:0}
+.pp-encours::before{content:"◐ ";color:var(--ambre)}
+.exo.commence{box-shadow:inset 0 3px 0 #E0B84A,var(--ombre)}
+/* « J'ai compris » : consoles d'exploration, sans correction automatique */
+.pp-compris{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:12px 0 4px}
+.pp-btn.compris{background:var(--ok);border-color:var(--ok)}
+.pp-btn.compris:hover:not(:disabled){background:#0D6A4B}
+.pp-compris-aide{font-size:14px;color:var(--muted)}
 
 /* ---------------------------------------------------------------- boutons */
 .pp-btn{appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;font-family:var(--sans);
@@ -319,6 +343,13 @@ details.rappel > :last-child{margin-bottom:0}
   border:1px solid var(--rule);border-bottom-width:2px;border-radius:7px;background:#fff;color:var(--ink);cursor:pointer;
   touch-action:manipulation}
 .py-touche:active{background:#E8EBF1}
+.py-touches.grec{border-top:0;padding-top:0}
+.py-touche.bascule{font-family:var(--serif)}
+.py-touche.bascule[aria-expanded="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.py-collage{margin:0;padding:7px 12px;font-size:14px;color:var(--ambre-texte);background:var(--ambre-wash);border-top:1px solid #E6CF94}
+/* copier-coller : rien du cours ne se sélectionne ; l'éditeur et la console, si (parcours.js bloque aussi l'événement) */
+body.pp{-webkit-user-select:none;user-select:none}
+body.pp .cm-content,body.pp input,body.pp textarea,body.pp [contenteditable]{-webkit-user-select:text;user-select:text}
 
 /* sortie façon terminal clair */
 .py-sortie,.py-log{font-family:var(--mono);font-size:14px;line-height:1.5;background:#F7F8FB;border-top:1px solid var(--rule);
@@ -431,6 +462,29 @@ details.rappel > :last-child{margin-bottom:0}
 .quiz-corps{padding:4px 16px 8px}
 .quiz .qcm{background:none;border:0;border-bottom:1px dashed var(--rule);border-radius:0;padding:14px 0;margin:0}
 .quiz .qcm:last-child{border-bottom:0}
+/* quiz pas à pas : une question à la fois, puis le récapitulatif (18/10/2026) */
+.quiz.pas-a-pas .qcm{border-bottom:0}
+.quiz-nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 0 8px;border-top:1px dashed var(--rule)}
+.quiz-etape{font-family:var(--mono);font-size:13px;color:var(--orange-texte)}
+.quiz-points{display:flex;gap:4px;flex:1;min-width:0;flex-wrap:wrap}
+.quiz-point{appearance:none;width:22px;height:22px;padding:0;border-radius:50%;border:1.5px solid #E2C29C;background:#fff;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.quiz-point::before{content:"";width:8px;height:8px;border-radius:50%;background:transparent}
+.quiz-point.ok{border-color:var(--ok);background:var(--ok-wash)}
+.quiz-point.ok::before{background:var(--ok)}
+.quiz-point.cur{border-color:var(--orange);box-shadow:0 0 0 2px var(--orange-wash)}
+.quiz-point:disabled{opacity:.45;cursor:default}
+.quiz-nav .pp-btn{min-height:38px}
+.quiz-suiv{margin-left:auto}
+.quiz-recap-titre{display:none;margin:12px 0 2px;font-family:var(--mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ok-texte)}
+.quiz.recap .quiz-recap-titre{display:block}
+.quiz.recap .qcm{border-bottom:1px dashed var(--rule);padding:10px 0}
+.quiz.recap .qcm:last-of-type{border-bottom:0}
+.quiz.recap .qcm .opt:not(.bonne),.quiz.recap .qcm-retour{display:none}
+.quiz.recap .qcm-opts{grid-template-columns:minmax(0,1fr)!important}
+.quiz.recap .qcm .opt.bonne{display:inline-block;width:auto;max-width:100%}
+.quiz-recap-pied{padding:8px 0 6px;border-top:1px dashed var(--rule)}
 
 /* ---------------------------------------------------------------- document à télécharger */
 .doc{display:flex;align-items:center;gap:14px;max-width:520px;margin:16px 0;padding:12px 16px 12px 12px;text-decoration:none!important;

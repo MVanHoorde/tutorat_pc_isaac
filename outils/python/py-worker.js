@@ -140,7 +140,7 @@ async function traiter(m) {
     if (!res.erreur && m.check) {
       muet = true;
       try {
-        const v = fn.verifier(m.check, sortie);
+        const v = fn.verifier(m.check, sortie, m.mode === 'console' ? (m.cle || '') : '');
         if (v) { verdict = v.toJs({ dict_converter: Object.fromEntries }); v.destroy(); }
       } catch (e) { verdict = null; }
       muet = false;

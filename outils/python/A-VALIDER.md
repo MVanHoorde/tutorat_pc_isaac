@@ -18,6 +18,8 @@ part dans `PARCOURS.md`.*
 - **Vouvoiement** partout (comme l'Atelier 1/2).
 
 ## Niveau 1
+- **Audit du 18/10/2026, propositions à relire** : les rappels de cours réécrits (noms, unités ; « I = P/S » en 1.3, « sources de même fréquence » en 2.3, domaine de validité de Kohlrausch, U = 2u à 95 % en 6.1) ; l'exercice 5.4 (pH théoriques et écarts du TP6, « en accord » si les écarts restent sous 0,1) ; la question 3 du 6.1 ; les lignes « À quoi ça sert » des étapes 4 à 7.
+- **Critères de réussite des consoles** (posés le 18/10/2026, à valider) : 1.2, les trois valeurs (340 m/s, 0,002 s, 0,77 m) apparues dans la console, sans contrôler que la question 3 tient en une ligne ; 1.3, la valeur 10⁷ (la question 2, de réflexion, n'est pas vérifiée) ; 5.1, `pH` contient les cinq mesures, puis `pH` est un tableau numpy (les essais `len`, `pH[0]`, `pH[5]`… ne sont pas exigés) ; 3.1, « J'ai compris ».
 - Harmonique « de rang 3 » (3f) en 2.1 : conforme à la numérotation du cours ?
 - Doppler exact en 2.2 : fR = fE × c / (c − v) (émetteur qui s'approche d'un récepteur fixe).
 - Données construites : 15 masses du cylindre (somme 831,73 g, s ≈ 0,02 g), sirop de menthe

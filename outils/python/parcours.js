@@ -155,16 +155,29 @@ function colorer(pre) {
 }
 
 // ---------------------------------------------------------------- progression (pas de persistance en V1)
-const etatExos = new Map();   // id d'exo -> { reussi, essai, cibles:Map(cle -> ok) , qcm:Map }
+const etatExos = new Map();   // exo -> { reussi, essai, runOk, compris, checks:Map(bloc -> ok), qcms:Map(qcm -> ok) }
 const reussis = new Set();
+const commences = new Set();  // « en cours » : touché mais pas réussi. Mémoire de la page seulement, jamais en base
 
 function etatExo(exo) {
   if (!exo) return null;
-  if (!etatExos.has(exo)) etatExos.set(exo, { reussi: false, essai: false, runOk: false, checks: new Map(), qcms: new Map() });
+  if (!etatExos.has(exo)) etatExos.set(exo, { reussi: false, essai: false, runOk: false, compris: false, checks: new Map(), qcms: new Map() });
   return etatExos.get(exo);
 }
 
+// Premier geste sur l'exercice (ligne de code, exécution, réponse à une question) : marque « en cours ».
+function marquerCommence(exo) {
+  const e = etatExo(exo);
+  if (!e || e.reussi || commences.has(exo.id)) return;
+  commences.add(exo.id);
+  exo.classList.add('commence');
+  const h = exo.querySelector('h3');
+  if (h && !h.querySelector('.pp-encours')) h.append(el('span', { class: 'pp-encours', text: 'en cours' }));
+  majSommaire();
+}
+
 function marquerEssai(exo) {
+  marquerCommence(exo);
   const e = etatExo(exo);
   if (!e || e.essai) return;
   e.essai = true;
@@ -176,9 +189,14 @@ function marquerReussi(exo, opts = {}) {
   if (!e || e.reussi) return;
   e.reussi = true;
   reussis.add(exo.id);
+  commences.delete(exo.id);
+  exo.classList.remove('commence');
+  exo.querySelector('.pp-encours')?.remove();
   exo.classList.add('reussi');
   const h = exo.querySelector('h3');
   if (h && !h.querySelector('.pp-reussi')) h.append(el('span', { class: 'pp-reussi', text: '✓ réussi' }));
+  const compris = exo.querySelector('.pp-compris');
+  if (compris) compris.ppMaj();
   majSommaire();
   if (!opts.silencieux) {
     document.dispatchEvent(new CustomEvent('pp:reussi', {
@@ -187,21 +205,49 @@ function marquerReussi(exo, opts = {}) {
   }
 }
 
-// Règle de réussite d'un exercice :
-// - partie code : si l'exo a des éditeurs avec check, chacun doit avoir atteint son nombre de « ok »
-//   distincts (data-attendus, 1 par défaut) ; sinon, une exécution sans erreur (script ou console) suffit ;
+// Règle de réussite d'un exercice (une exécution sans erreur ne suffit plus, 18/10/2026) :
+// - partie code : chaque éditeur ou console qui porte un check doit avoir atteint son nombre de « ok »
+//   distincts (data-attendus, 1 par défaut) ;
 // - partie questions : avec du code, toutes les questions de ses .quiz doivent être trouvées ;
-//   sans code, toutes ses .qcm (dans un quiz ou non).
+//   sans code, toutes ses .qcm (dans un quiz ou non). Du code sans check, accompagné d'un quiz :
+//   le quiz suffit, l'éditeur ou la console ne sert qu'à vérifier ;
+// - ni check ni quiz (consoles d'exploration) : l'élève déclare « J'ai compris », après un premier essai.
 function evaluerExo(exo) {
   const e = etatExo(exo);
   if (!e || e.reussi) return;
   const avecCode = !!exo.querySelector('.py');
-  const avecCheck = [...exo.querySelectorAll('.py')].filter((p) => p.dataset.mode !== 'console' && p.querySelector('.py-check'));
+  const avecCheck = [...exo.querySelectorAll('.py')].filter((p) => p.querySelector('script.py-check'));
   const qcms = [...exo.querySelectorAll(avecCode ? '.quiz .qcm' : '.qcm')];
   if (!avecCode && !qcms.length) return;
-  const codeOk = !avecCode || (avecCheck.length ? avecCheck.every((p) => e.checks.get(p) === true) : e.runOk);
+  const codeOk = !avecCode || (avecCheck.length ? avecCheck.every((p) => e.checks.get(p) === true)
+    : qcms.length ? true : e.compris);
   const qcmOk = qcms.every((q) => e.qcms.get(q) === true);
   if (codeOk && qcmOk) marquerReussi(exo);
+}
+
+// Bouton « J'ai compris » des exercices sans correction automatique (ni check ni quiz).
+// Grisé tant que l'élève n'a rien essayé : on ne déclare pas avoir compris une console vide.
+function preparerCompris(exo) {
+  if (!exo.querySelector('.py') || exo.querySelector('script.py-check') || exo.querySelector('.quiz .qcm')) return;
+  const bouton = el('button', { type: 'button', class: 'pp-btn compris', disabled: true },
+    el('span', { 'aria-hidden': 'true', text: '✓' }), ' J\'ai compris');
+  const aide = el('span', { class: 'pp-compris-aide' });
+  const zone = el('div', { class: 'pp-compris' }, bouton, aide);
+  zone.ppMaj = () => {
+    const e = etatExo(exo);
+    bouton.disabled = e.reussi || !e.runOk;
+    aide.textContent = e.reussi ? 'Exercice validé.'
+      : e.runOk ? 'Quand vous avez fait tous les essais demandés.' : 'Après un premier essai.';
+  };
+  bouton.addEventListener('click', () => {
+    const e = etatExo(exo);
+    if (!e.runOk) return;
+    e.compris = true;
+    evaluerExo(exo);
+  });
+  const solution = exo.querySelector(':scope > details.solution');
+  if (solution) solution.before(zone); else exo.append(zone);
+  zone.ppMaj();
 }
 
 window.ppProgression = {
@@ -336,7 +382,44 @@ const TOUCHES = [
   { label: '⇥', aria: 'Indenter (décaler à droite)', cmd: 'plus' },
   { label: '⇤', aria: 'Désindenter (décaler à gauche)', cmd: 'moins' },
   '(', ')', '[', ']', "'", '"', '#', '=', ':', '.', ',', '*', '**', '_',
+  { label: 'αβ', aria: 'Afficher ou masquer les lettres grecques', cmd: 'grec' },
 ];
+// Lettres grecques des grandeurs du programme, pour les légendes d'axes ('σ (mS/cm)') et les noms de variables
+// (demande de Loïc, 18/10/2026). Repliées par défaut : la barre reste courte sur iPad.
+const GRECQUES = ['λ', 'σ', 'θ', 'Δ', 'δ', 'μ', 'ρ', 'τ', 'ω', 'π', 'ε', 'α', 'Ω', '°'];
+
+// ---------------------------------------------------------------- copier-coller
+// Le code se tape, il ne se recopie pas (demande de Loïc, 18/10/2026) : on ne copie rien du cours
+// (exemples, solutions, données), et un éditeur ou une console n'accepte que ce que l'élève a lui-même
+// copié dans un éditeur ou une console de la page. Dissuasion, pas verrou : une autre application
+// de la tablette reste hors d'atteinte.
+let copieEleve = '';
+const ZONE_ELEVE = '.cm-editor, .py-ligne';
+const normaliserCopie = (t) => String(t || '').replace(/\r\n?/g, '\n').trim();
+document.addEventListener('copy', surCopie, true);
+document.addEventListener('cut', surCopie, true);
+function surCopie(ev) {
+  const cible = ev.target instanceof Element ? ev.target : ev.target?.parentElement;
+  const vue = cible?.closest('.cm-editor')?.closest('.py')?.ppVue;
+  if (vue) { noterCopie(vue); return; }      // noté ici, en capture : CodeMirror traite ensuite la copie lui-même
+  if (cible?.closest(ZONE_ELEVE)) return;   // la console note elle-même ce qui est copié
+  ev.preventDefault();
+}
+// sélection vide : CodeMirror copie la ligne entière
+function noterCopie(v) {
+  const s = v.state.selection.main;
+  copieEleve = s.empty ? v.state.doc.lineAt(s.head).text : v.state.sliceDoc(s.from, s.to);
+}
+function collageAutorise(ev) {
+  const texte = normaliserCopie(ev.clipboardData?.getData('text/plain'));
+  return !texte || texte === normaliserCopie(copieEleve);
+}
+function signalerCollage(zone) {
+  if (!zone || zone.querySelector('.py-collage')) return;
+  const p = el('p', { class: 'py-collage', role: 'status', text: 'Coller est désactivé dans le parcours : tapez le code, c\'est ainsi qu\'il s\'apprend.' });
+  zone.append(p);
+  setTimeout(() => p.remove(), 6000);
+}
 
 let numEditeur = 0;
 
@@ -360,14 +443,50 @@ function stylerFichiers() {   // feuille propre à la fonctionnalité, posée un
     '.py-fichier-contenu:focus-visible{outline:none;box-shadow:var(--focus)}' }));
 }
 
+// Liste « Vérifications réussies : 1 / 2 », commune à l'éditeur et à la console.
+// Les « ok » se cumulent au fil des exécutions : une question trouvée le reste.
+function creerVerifs(bloc, attendus) {
+  const obtenus = new Set();
+  const liste = el('ul');
+  const titre = el('p', { class: 'py-reussites-titre' });
+  const zone = el('div', { class: 'py-reussites', role: 'status', 'aria-live': 'polite', hidden: true }, titre, liste);
+  // « Question 2 — … » : le préfixe en gras
+  function ligne(msg) {
+    const li = el('li');
+    const m = msg.match(/^((?:Questions?|Étape|Partie)\s[^—–:]{1,30}?\s*[—–:])\s*(.*)$/s);
+    if (m) li.append(el('strong', { text: m[1] }), ' ' + m[2]);
+    else li.textContent = msg;
+    return li;
+  }
+  return {
+    zone,
+    atteint: () => obtenus.size >= attendus,
+    ajouter(oks) {
+      const nouveaux = new Set();
+      for (const msg of oks || []) if (!obtenus.has(msg)) { obtenus.add(msg); nouveaux.add(msg); }
+      if (!obtenus.size) return;
+      zone.hidden = false;
+      titre.textContent = attendus > 1
+        ? 'Vérifications réussies : ' + Math.min(obtenus.size, attendus) + ' / ' + attendus
+        : 'Vérification réussie';
+      bloc.classList.toggle('atteint', obtenus.size >= attendus);
+      liste.textContent = '';
+      for (const msg of obtenus) {
+        const li = ligne(msg);
+        if (nouveaux.has(msg)) li.classList.add('nouveau');
+        liste.append(li);
+      }
+    },
+  };
+}
+
 function creerEditeur(bloc) {
   const exo = bloc.closest('.exo');
   const ta = bloc.querySelector('textarea.py-code');
   const sc = bloc.querySelector('script.py-check');
   const depart = ta ? dedent(ta.value) : '';
   const check = sc ? dedent(sc.textContent) : '';
-  const attendus = Math.max(1, parseInt(bloc.dataset.attendus, 10) || 1);
-  const obtenus = new Set();          // messages ok distincts, cumulés au fil des exécutions
+  const verifs = creerVerifs(bloc, Math.max(1, parseInt(bloc.dataset.attendus, 10) || 1));
   const num = ++numEditeur;
   let enCours = false;
 
@@ -382,10 +501,6 @@ function creerEditeur(bloc) {
   const zoneSortie = el('div', { class: 'py-sortie', role: 'log', 'aria-live': 'polite', 'aria-label': 'Sortie du programme', hidden: true });
   const sortie = new Sortie(zoneSortie);
 
-  const listeReussites = el('ul');
-  const titreReussites = el('p', { class: 'py-reussites-titre' });
-  const zoneReussites = el('div', { class: 'py-reussites', role: 'status', 'aria-live': 'polite', hidden: true }, titreReussites, listeReussites);
-
   // fichiers de données fournis avec l'exercice : écrits par le worker avant chaque exécution
   const fichiers = [...bloc.querySelectorAll('script.py-fichier')]
     .map((s) => ({ nom: (s.dataset.nom || '').trim(), contenu: dedent(s.textContent) + '\n' }))
@@ -398,31 +513,8 @@ function creerEditeur(bloc) {
   if (fichiers.length) stylerFichiers();
 
   if (ta) ta.hidden = true;
-  bloc.append(barre, zoneEditeur, touches, zoneSortie, zoneReussites);
+  bloc.append(barre, zoneEditeur, touches, zoneSortie, verifs.zone);
   if (zoneFichiers) touches.after(zoneFichiers);
-
-  // « Question 2 — … » : le préfixe en gras
-  function ligneReussite(msg) {
-    const li = el('li');
-    const m = msg.match(/^((?:Questions?|Étape|Partie)\s[^—–:]{1,30}?\s*[—–:])\s*(.*)$/s);
-    if (m) li.append(el('strong', { text: m[1] }), ' ' + m[2]);
-    else li.textContent = msg;
-    return li;
-  }
-  function majReussites(nouveaux) {
-    zoneReussites.hidden = obtenus.size === 0;
-    const atteint = obtenus.size >= attendus;
-    titreReussites.textContent = attendus > 1
-      ? 'Vérifications réussies : ' + Math.min(obtenus.size, attendus) + ' / ' + attendus
-      : 'Vérification réussie';
-    bloc.classList.toggle('atteint', atteint);
-    listeReussites.textContent = '';
-    for (const msg of obtenus) {
-      const li = ligneReussite(msg);
-      if (nouveaux.has(msg)) li.classList.add('nouveau');
-      listeReussites.append(li);
-    }
-  }
 
   const vue = new CM.EditorView({
     parent: zoneEditeur,
@@ -440,6 +532,14 @@ function creerEditeur(bloc) {
           ...CM.defaultKeymap, ...CM.historyKeymap,
         ]),
         champErreur, themeClair,
+        CM.EditorView.domEventHandlers({
+          paste: (ev) => {
+            if (collageAutorise(ev)) return false;
+            ev.preventDefault();
+            signalerCollage(bloc);
+            return true;
+          },
+        }),
         CM.EditorView.contentAttributes.of({
           autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', autocomplete: 'off',
           'aria-label': 'Éditeur de code Python, exercice ' + (exo?.querySelector('.num')?.textContent || num),
@@ -448,22 +548,30 @@ function creerEditeur(bloc) {
     }),
   });
 
-  for (const t of TOUCHES) {
+  const rangeeGrecque = el('div', { class: 'py-touches grec', role: 'toolbar', 'aria-label': 'Lettres grecques', hidden: true });
+  function touche(t, rangee) {
     const label = typeof t === 'string' ? t : t.label;
-    const b = el('button', { type: 'button', class: 'py-touche', 'aria-label': typeof t === 'string' ? 'Insérer ' + t : t.aria, text: label });
+    const b = el('button', { type: 'button', class: 'py-touche' + (t.cmd === 'grec' ? ' bascule' : ''), 'aria-label': typeof t === 'string' ? 'Insérer ' + t : t.aria, text: label });
+    if (t.cmd === 'grec') b.setAttribute('aria-expanded', 'false');
     // ne pas voler le focus à l'éditeur : le clavier de l'iPad reste ouvert
     b.addEventListener('pointerdown', (ev) => ev.preventDefault());
     b.addEventListener('mousedown', (ev) => ev.preventDefault());
     b.addEventListener('click', () => {
-      if (typeof t !== 'string') {
+      if (t.cmd === 'grec') {
+        rangeeGrecque.hidden = !rangeeGrecque.hidden;
+        b.setAttribute('aria-expanded', String(!rangeeGrecque.hidden));
+      } else if (typeof t !== 'string') {
         (t.cmd === 'plus' ? CM.indentMore : CM.indentLess)(vue);
       } else {
         vue.dispatch(vue.state.replaceSelection(t), { scrollIntoView: true, userEvent: 'input.type' });
       }
       vue.focus();
     });
-    touches.append(b);
+    rangee.append(b);
   }
+  for (const t of TOUCHES) touche(t, touches);
+  for (const t of GRECQUES) touche(t, rangeeGrecque);
+  touches.after(rangeeGrecque);
 
   function enMarche(oui) {
     enCours = oui;
@@ -506,18 +614,15 @@ function creerEditeur(bloc) {
     const e = etatExo(exo);
     if (e) e.runOk = true;
     if (check && fin.verdict) {
-      const nouveaux = new Set();
-      for (const msg of fin.verdict.oks || []) {
-        if (!obtenus.has(msg)) { obtenus.add(msg); nouveaux.add(msg); }
-      }
-      if (obtenus.size) majReussites(nouveaux);
+      verifs.ajouter(fin.verdict.oks);
       if (fin.verdict.indice) {
         zoneSortie.append(el('p', { class: 'py-verdict indice', role: 'status' },
           el('strong', { text: 'Indice : ' }), fin.verdict.indice));
       }
-      if (e && obtenus.size >= attendus) e.checks.set(bloc, true);
+      if (e && verifs.atteint()) e.checks.set(bloc, true);
       sortie.defiler();
     }
+    exo?.querySelector('.pp-compris')?.ppMaj();
     if (exo) evaluerExo(exo);
   }
 
@@ -544,6 +649,11 @@ function creerConsole(bloc) {
   const cle = 'console-' + (++numConsole);
   const historique = [];
   let pos = 0, enCours = false;
+  // Check facultatif : relu après chaque ligne sans erreur, sur une copie des variables de la console.
+  // Il ne doit pas importer numpy (sinon chaque ligne attendrait son chargement) : type(x).__name__.
+  const sc = bloc.querySelector('script.py-check');
+  const check = sc ? dedent(sc.textContent) : '';
+  const verifs = check ? creerVerifs(bloc, Math.max(1, parseInt(bloc.dataset.attendus, 10) || 1)) : null;
 
   const journal = el('div', { class: 'py-log', role: 'log', 'aria-live': 'polite', 'aria-label': 'Échanges avec la console Python' });
   const sortie = new Sortie(journal);
@@ -568,6 +678,7 @@ function creerConsole(bloc) {
     bloc.append(chips);
   }
   bloc.append(formulaire);
+  if (verifs) bloc.append(verifs.zone);
 
   async function executerLigne(code) {
     if (enCours || !code.trim()) return;
@@ -577,7 +688,7 @@ function creerConsole(bloc) {
     champ.value = '';
     enCours = true; bloc.classList.add('en-cours');
     if (Moteur.etat !== 'pret') sortie.info('Python se prépare… (téléchargement la 1re fois)', true);
-    const fin = await Moteur.executer({ code, mode: 'console', cle }, {
+    const fin = await Moteur.executer({ code, mode: 'console', cle, check }, {
       surDebut: () => sortie.retirerTemporaires(),
       surAttente: (oui) => { if (oui) sortie.info('Chargement de numpy et matplotlib…', true); else sortie.retirerTemporaires(); },
       surSortie: (flux, t) => sortie.texte(flux === 'err' ? 'err' : flux === 'info' ? 'note' : 'out', t),
@@ -591,11 +702,32 @@ function creerConsole(bloc) {
     else {
       sortie.remarques(fin.remarques);
       const e = etatExo(exo);
-      if (e) { e.runOk = true; evaluerExo(exo); }
+      if (verifs && fin.verdict) {
+        verifs.ajouter(fin.verdict.oks);
+        if (fin.verdict.indice) {
+          journal.append(el('p', { class: 'py-verdict indice', role: 'status' },
+            el('strong', { text: 'Indice : ' }), fin.verdict.indice));
+          sortie.flux = null;
+        }
+        if (e && verifs.atteint()) e.checks.set(bloc, true);
+      }
+      if (e) {
+        e.runOk = true;
+        exo.querySelector('.pp-compris')?.ppMaj();
+        evaluerExo(exo);
+      }
     }
     sortie.defiler();
   }
 
+  const noterChamp = () => { copieEleve = champ.value.slice(champ.selectionStart, champ.selectionEnd) || champ.value; };
+  champ.addEventListener('copy', noterChamp);
+  champ.addEventListener('cut', noterChamp);
+  champ.addEventListener('paste', (ev) => {
+    if (collageAutorise(ev)) return;
+    ev.preventDefault();
+    signalerCollage(bloc);
+  });
   formulaire.addEventListener('submit', (ev) => { ev.preventDefault(); executerLigne(champ.value); });
   champ.addEventListener('keydown', (ev) => {
     if (ev.key === 'ArrowUp' && historique.length) {
@@ -633,7 +765,9 @@ function creerQcm(q) {
       if (q.classList.contains('resolu') || b.disabled) return;
       const juste = b.dataset.v === bonne;
       b.setAttribute('aria-pressed', 'true');
+      // la solution d'un exercice à coder ne s'ouvre qu'après un essai de code, pas sur une réponse au quiz
       if (exo && !exo.querySelector('.py')) marquerEssai(exo);
+      else if (exo) marquerCommence(exo);
       if (juste) {
         b.classList.add('bonne');
         q.classList.add('resolu');
@@ -675,13 +809,84 @@ function creerQuiz(quiz) {
       enonce.append(el('span', { class: 'qcm-n', 'aria-hidden': 'true', text: String(i + 1) }), contenu);
     }
   });
+  // Une question à la fois, dans le cours (pas de fenêtre par-dessus : l'énoncé, le code et la console
+  // restent visibles pour vérifier). Une fois toutes trouvées, récapitulatif : chaque question,
+  // sa bonne réponse et son explication (demande de Loïc, 18/10/2026, sur le modèle des QCM du SNT).
+  let rang = 0, vu = 0, recap = false;
+  const etape = el('span', { class: 'quiz-etape' });
+  const points = el('span', { class: 'quiz-points' });
+  const boutonsPoints = qcms.map((q, i) => {
+    const b = el('button', { type: 'button', class: 'quiz-point', 'aria-label': 'Question ' + (i + 1) });
+    b.addEventListener('click', () => { if (i <= vu) montrer(i, true); });
+    points.append(b);
+    return b;
+  });
+  const precedente = el('button', { type: 'button', class: 'pp-btn discret quiz-prec', text: '← Précédente' });
+  const suivante = el('button', { type: 'button', class: 'pp-btn quiz-suiv' });
+  const nav = el('div', { class: 'quiz-nav' }, etape, points, precedente, suivante);
+  const revoir = el('button', { type: 'button', class: 'pp-btn discret quiz-revoir', text: 'Revoir question par question' });
+  const titreRecap = el('p', { class: 'quiz-recap-titre', text: 'Récapitulatif — les bonnes réponses' });
+  const pied = el('div', { class: 'quiz-recap-pied', hidden: true }, revoir);
+  if (n > 1) {
+    corps.append(nav);
+    corps.prepend(titreRecap);
+    corps.append(pied);
+    quiz.classList.add('pas-a-pas');
+  }
+
+  function montrer(i, focus) {
+    recap = false;
+    quiz.classList.remove('recap');
+    pied.hidden = true;
+    nav.hidden = false;
+    rang = i;
+    vu = Math.max(vu, i);
+    qcms.forEach((q, k) => { q.hidden = k !== i; });
+    if (focus) {
+      const enonce = qcms[i].querySelector('.qcm-q');
+      if (enonce) { enonce.tabIndex = -1; enonce.focus({ preventScroll: true }); }
+      if (quiz.getBoundingClientRect().top < 0) quiz.scrollIntoView({ block: 'start', behavior: reduitMouvement() ? 'auto' : 'smooth' });
+    }
+    majNav();
+  }
+  function montrerRecap(focus) {
+    recap = true;
+    quiz.classList.add('recap');
+    nav.hidden = true;
+    pied.hidden = false;
+    for (const q of qcms) q.hidden = false;
+    if (focus) { titreRecap.tabIndex = -1; titreRecap.focus({ preventScroll: true }); }
+  }
+  function majNav() {
+    const resolu = qcms[rang].classList.contains('resolu');
+    etape.textContent = 'Question ' + (rang + 1) + ' / ' + n;
+    precedente.hidden = rang === 0;
+    // On n'avance qu'une fois la question trouvée : arrivé à la dernière, toutes les précédentes le sont.
+    suivante.textContent = rang === n - 1 ? 'Voir toutes les réponses' : 'Question suivante →';
+    suivante.disabled = !resolu;
+    boutonsPoints.forEach((b, k) => {
+      b.classList.toggle('ok', qcms[k].classList.contains('resolu'));
+      b.classList.toggle('cur', k === rang);
+      b.disabled = k > vu;
+      if (k === rang) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+  }
+  precedente.addEventListener('click', () => { if (rang > 0) montrer(rang - 1, true); });
+  suivante.addEventListener('click', () => {
+    if (rang < n - 1) montrer(rang + 1, true);
+    else montrerRecap(true);
+  });
+  revoir.addEventListener('click', () => montrer(0, true));
+
   quiz.ppMaj = () => {
     const trouves = qcms.filter((q) => q.classList.contains('resolu')).length;
     score.textContent = trouves + ' / ' + n;
     score.setAttribute('aria-label', trouves + ' question' + (trouves > 1 ? 's' : '') + ' trouvée' + (trouves > 1 ? 's' : '') + ' sur ' + n);
     quiz.classList.toggle('complet', n > 0 && trouves === n);
+    if (n > 1 && !recap) majNav();
   };
   quiz.ppMaj();
+  if (n > 1) montrer(0, false);
 }
 
 // ---------------------------------------------------------------- aide progressive : un indice à la fois
@@ -861,15 +1066,40 @@ function majSommaire() {
     l.lien.classList.toggle('complet', total > 0 && faits === total);
     for (const a of l.sous.querySelectorAll('a[data-exo]')) {
       const ok = reussis.has(a.dataset.exo);
+      const commence = !ok && commences.has(a.dataset.exo);
       a.classList.toggle('reussi', ok);
-      a.title = ok ? 'Exercice réussi' : '';
+      a.classList.toggle('commence', commence);
+      a.title = ok ? 'Exercice réussi' : commence ? 'Exercice en cours' : '';
     }
   }
 }
 
 // ---------------------------------------------------------------- démarrage
+// ---------------------------------------------------------------- formules (LaTeX, rendu par KaTeX auto-hébergé)
+// <p class="formule tex">…</p> : centrée ; <span class="tex">…</span> : dans le texte. Le LaTeX est la source
+// (demande de Loïc, 18/10/2026) ; KaTeX n'est téléchargé que si la page en contient.
+const KATEX = new URL('../../vendor/katex/', ICI).href;
+function preparerFormules() {
+  const formules = [...document.querySelectorAll('.tex')];
+  if (!formules.length) return;
+  document.head.append(el('link', { rel: 'stylesheet', href: KATEX + 'katex.min.css' }));
+  const s = el('script', { src: KATEX + 'katex.min.js' });
+  s.addEventListener('load', () => {
+    for (const f of formules) {
+      const source = f.textContent.trim();
+      f.dataset.tex = source;
+      try {
+        window.katex.render(source, f, { displayMode: f.tagName !== 'SPAN', throwOnError: false, output: 'htmlAndMathml' });
+        f.classList.add('rendue');
+      } catch (e) { /* la source LaTeX reste lisible */ }
+    }
+  });
+  document.head.append(s);
+}
+
 function initialiser() {
   Moteur.demarrer(false);   // Pyodide se charge en tâche de fond dès l'ouverture
+  preparerFormules();
   preparerSeances();
   preparerEncadres();
   for (const p of document.querySelectorAll('pre.code')) colorer(p);
@@ -880,6 +1110,7 @@ function initialiser() {
   }
   for (const q of document.querySelectorAll('.qcm')) creerQcm(q);
   for (const z of document.querySelectorAll('.quiz')) creerQuiz(z);
+  for (const x of document.querySelectorAll('.exo')) preparerCompris(x);
   for (const a of document.querySelectorAll('.aide')) creerAide(a);
   for (const a of document.querySelectorAll('a.doc')) preparerDoc(a);
   construireSommaire();
