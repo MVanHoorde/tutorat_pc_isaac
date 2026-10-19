@@ -2,7 +2,7 @@
 
 Tutorat entre pairs en physique-chimie (première et terminale spécialité), lycée Isaac de l'Étoile, Poitiers.
 
-*Dernière mise à jour : 17 octobre 2026*
+*Dernière mise à jour : 19 octobre 2026*
 
 ## En ligne
 
@@ -114,6 +114,12 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Seuls les élèves de la classe de l'enseignant comptent : rien ne s'affiche chez les premières. La période 1 de `B1_T_3_PH-CH_VANHOORDE` commence le 01/09/2026.
   - Vérifié sans toucher la base en ligne : migration rejouée dans des transactions annulées (calcul, droits, clôture, plafonds) ; application seule (16 contrôles) ; Résonance dans Chromium avec une base simulée (27 contrôles, enseignant et élève).
 
+- **Boîte à cartes par Résonance** (19/10/2026), écrite et éprouvée, **pas encore en ligne** (fonction à déployer). Section I de `docs/plan-test-refonte.md`.
+  - Outils → « Boîte à cartes » : un élève de terminale entre dans Leitner (`mvanhoorde.github.io/Leitner/`) avec sa session Résonance, sans second compte, comme on « se connecte avec Google ». Leitner vit sur le projet Supabase du site du cours (`ztyv…`), pas sur celui de Résonance.
+  - `ouvrirLeitner()` (`index.html`) envoie le jeton de session à la fonction `pont-resonance` **du site du cours** (`Site-Web-Portfolio/supabase/functions/pont-resonance/`), qui le fait vérifier par Résonance, applique la règle des terminales, crée ou retrouve un compte sans nom et rend un ticket à usage unique ; Leitner l'échange contre sa propre session.
+  - Leitner ouvert directement propose « Me connecter avec Résonance » → `index.html#vers-leitner` : connexion demandée s'il le faut, puis le pont. Première : message « réservée aux élèves de terminale ». Enseignant : lien direct, il se connecte avec son compte du site du cours.
+  - Données : la Boîte à cartes enregistre les révisions sous l'identifiant `PC-…` seul, sur le serveur du site du cours (ajouté dans « Tes données » du pied de page). Le tableau de bord de Résonance ne les voit pas.
+
 ## Horaires et lieu (CDI, septembre 2026)
 
 - Récré du matin, 9 h 55 : tous les jours.
@@ -177,9 +183,11 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Polices en double (`polices/` et `outils/python/polices/`) : faire importer `../../polices/polices.css` par `parcours.css`, puis supprimer la copie du parcours.
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.
+- [ ] Boîte à cartes : `supabase functions deploy pont-resonance --no-verify-jwt` depuis `Site-Web-Portfolio/` (pas d'ici : autre projet), publier Leitner puis Résonance, puis la section I de `docs/plan-test-refonte.md`.
 
 ## Journal
 
+- **19/10/2026** — Boîte à cartes (Leitner) reliée par un pont de connexion : carte dans Outils, `#vers-leitner`, fonction `pont-resonance` dans le dépôt du site du cours.
 - **18/10/2026** — Audit du niveau 1 : rappels de cours en LaTeX avec noms et unités, exercice 5.4 (pH théoriques du TP6), question 3 du 6.1 (écriture du résultat), « à quoi ça sert » et liens de documentation, sujets des TP 3, 4 et 6, clavier grec, copier-coller bloqué.
 - **18/10/2026** — Parcours Python : marque « en cours », fin de la réussite sur simple exécution (vérifications dans les consoles du niveau 1, bouton « J'ai compris »), quiz une question à la fois avec récapitulatif. Les réussites enregistrées avant restent en base.
 - **17/10/2026** — Périodes de participation et note de période sur 20 (migration `007`, Bilan de période), en ligne le jour même (Résonance et `participation_terminale`).

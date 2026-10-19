@@ -2,6 +2,7 @@
 
 Sections A à G : accueil, parcours Python et signalements (en ligne depuis le 17/10/2026). Section H : périodes et
 bilan de période (en ligne depuis le 17/10/2026), à dérouler avec de vrais comptes, de préférence sur la classe TEST avant la clôture réelle de P1.
+Section I : Boîte à cartes par Résonance (pont vers Leitner), après le déploiement de la fonction.
 Durée : une vingtaine de minutes. Matériel : un ordinateur, et si possible un iPad avec Résonance sur l'écran d'accueil.
 Comptes : `PR-TEST1` (enseignant) et `PC-TEST1` (élève, classe « TEST »), déjà dans la base.
 
@@ -146,6 +147,26 @@ Préalable : migration `007` collée (fait le 17/10/2026). **Exporter une sauveg
 
 Pour un essai sur la classe TEST sans toucher à la vraie classe : ouvrir la participation à TEST, puis, après les essais :
 `delete from public.participation_suivi where eleve in (select id from public.profils where classe = 'TEST'); delete from public.periodes where classe = 'TEST';`
+
+## I. Boîte à cartes par Résonance (pont vers Leitner)
+
+Déjà vérifié automatiquement : fonction `pont-resonance` (14 cas, faux réseau) et banc de bout en bout sur un vrai serveur
+d'authentification Supabase (GoTrue v2.193) ; Chromium sur Résonance et Leitner servis comme sur GitHub Pages (13 contrôles :
+Outils → Boîte à cartes connecté, ticket retiré de l'adresse, session gardée au rechargement, « ‹ Résonance » ramène à Outils ;
+Leitner ouvert directement → « Me connecter avec Résonance » → connexion Résonance → retour connecté ; première refusée avec un
+message ; ticket faux ou rejoué refusé, sans session).
+
+Préalable, dans l'ordre : `supabase functions deploy pont-resonance --no-verify-jwt` **depuis `Site-Web-Portfolio/`** (projet
+du site du cours, pas celui de Résonance) ; publier `Leitner`, puis Résonance.
+
+| # | Geste | Attendu |
+|---|---|---|
+| I1 | `PC-TEST1` : Outils → Boîte à cartes | Leitner s'ouvre connecté, « Bonjour PC-TEST1 », « Terminale (Résonance) », bouton « ‹ Résonance » en haut |
+| I2 | Réviser quelques cartes, puis recharger | Toujours connecté ; progression gardée |
+| I3 | « ‹ Résonance » | Retour à Outils, toujours connecté à Résonance |
+| I4 | Sur un autre appareil : ouvrir directement `mvanhoorde.github.io/Leitner/` → « Me connecter avec Résonance » | Connexion Résonance demandée, puis retour dans Leitner, connecté ; la progression de I2 est là |
+| I5 | Compte de première (ou `PR-TEST1`) : `…/tutorat_pc_isaac/index.html#vers-leitner` | Message « réservée aux élèves de terminale » (enseignant : « avec leur compte du site du cours ») ; on reste sur Résonance |
+| I6 | iPad, Résonance ouvert depuis l'écran d'accueil : Outils → Boîte à cartes | Leitner s'ouvre (dans l'app ou dans Safari selon iPadOS) ; noter lequel |
 
 ## Si quelque chose ne va pas
 

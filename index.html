@@ -424,6 +424,12 @@ a.outil h3{margin:0 0 6px}
       jusqu'à ce qui t'attend dans le supérieur. Python tourne dans la tablette : la première ouverture télécharge
       une vingtaine de mégaoctets, gardés ensuite sur l'appareil.</p>
     </a>
+    <a class="outil card" href="/Leitner/reconnaitre-mes-eleves.html" id="lienLeitner">
+      <h3>Boîte à cartes <span class="badge p0">Terminale spé</span></h3>
+      <p class="note" style="margin:0">Des cartes de révision qui reviennent juste avant que tu les oublies (boîte de Leitner) :
+      conversions, grandeurs et unités, et tes propres paquets. Tu y entres avec ton compte Résonance, sans rien créer ;
+      ta progression est gardée sur ton compte.</p>
+    </a>
 
     <h3 style="margin-top:34px">Banque d'outils</h3>
     <p class="note">Des sites choisis par ton professeur. Ils s'ouvrent dans un nouvel onglet : ce sont des sites extérieurs,
@@ -753,7 +759,8 @@ a.outil h3{margin:0 0 6px}
         <h5>Tes données</h5>
         <p><b style="color:#fff;font-weight:500">Ce qui est enregistré :</b> ton identifiant, ta classe, tes demandes ou
         propositions d'aide, tes séances, les exercices réussis du parcours Python (jamais ton code) ; en terminale, tes points et
-        tes notes de participation par période. Jamais ton nom.</p>
+        tes notes de participation par période. Jamais ton nom. Si tu ouvres la Boîte à cartes, tes révisions y sont
+        enregistrées sous ton seul identifiant, sur le serveur du site du cours de M. Van Hoorde.</p>
         <p><b style="color:#fff;font-weight:500">Qui le voit :</b> tes professeurs de physique-chimie.</p>
         <p><b style="color:#fff;font-weight:500">Combien de temps :</b> textes effacés quinze jours après la séance,
         tout le reste fin août. Effacement sur simple demande.</p>
@@ -1045,13 +1052,62 @@ function niveauDeClasse(c){
   c=String(c||'').trim();
   return /_P_/i.test(c)||/^(1|p)/i.test(c)?1:/_T_/i.test(c)||/^t/i.test(c)?0:null;
 }
+/* ---------- Boîte à cartes (Leitner) : le pont ----------
+   Leitner vit sur un autre projet Supabase, celui du site du cours. Pour qu'un élève de terminale y
+   entre sans second compte, on envoie le jeton de cette session à la fonction pont-resonance de ce
+   projet-là : elle le fait vérifier par Résonance, puis rend un ticket à usage unique que Leitner
+   échange contre sa propre session. Ouvert directement, Leitner renvoie ici avec #vers-leitner.
+   Un enseignant y va avec son compte du site du cours : lien direct, sans pont. */
+const PONT_LEITNER='https://ztyvuiaohxekuyjeoaxz.supabase.co/functions/v1/pont-resonance';
+// Clé « anon » du projet de Leitner : publique par conception, comme celle de Résonance.
+const CLE_LEITNER='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0eXZ1aWFvaHhla3V5amVvYXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NDQzNTIsImV4cCI6MjEwMDEyMDM1Mn0.iBBZiAIec0hSxzAU8FKNe6AO-HeysuxBKXduURBP7Hc';
+const ADRESSE_LEITNER='/Leitner/reconnaitre-mes-eleves.html';
+const MSG_PONT={
+  RESERVE_TERMINALE:"La Boîte à cartes, par Résonance, est réservée aux élèves de terminale.",
+  SESSION_RESONANCE:"Ta session Résonance a expiré : reconnecte-toi, puis réessaie."
+};
+let pontEnCours=false;
+async function ouvrirLeitner(){
+  if(role==='prof'){ location.assign(ADRESSE_LEITNER); return; }
+  if(pontEnCours) return;
+  pontEnCours=true;
+  try{
+    const {data}=await sb.auth.getSession(); // jeton à jour : supabase-js le renouvelle au besoin
+    if(!data.session) throw new Error(MSG_PONT.SESSION_RESONANCE);
+    let r;
+    try{
+      r=await fetch(PONT_LEITNER,{method:'POST',headers:{'Content-Type':'application/json',apikey:CLE_LEITNER},
+        body:JSON.stringify({jeton:data.session.access_token})});
+    }catch(e){ throw new Error("Pas de connexion internet pour le moment."); }
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok || !d.ticket) throw new Error(MSG_PONT[d.erreur]||"La Boîte à cartes ne répond pas. Réessaie dans un instant.");
+    location.assign(ADRESSE_LEITNER+'#pont='+encodeURIComponent(d.ticket));
+  }catch(e){
+    pontEnCours=false;
+    alert(e.message);
+  }
+}
+document.getElementById('lienLeitner').addEventListener('click',e=>{ e.preventDefault(); ouvrirLeitner(); });
+
 async function entrer(){
-  const demandee=vueDeAdresse(); // ex. retour d'un outil vers #outils, ou rechargement de la page
+  let demandee=vueDeAdresse(); // ex. retour d'un outil vers #outils, ou rechargement de la page
+  // Arrivée depuis Leitner (« Me connecter avec Résonance ») : on passe le pont dès la connexion.
+  const versLeitner=demandee==='vers-leitner';
+  if(versLeitner){
+    demandee=window.RESONANCE.espaceComplet(session)?'outils':'';
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+  }
   appliquerRole(roleDeSession(session));
   document.body.classList.toggle('espace-complet', window.RESONANCE.espaceComplet(session));
   const n=niveauDeClasse(session.user.app_metadata && session.user.app_metadata.classe);
   if(role==='eleve' && n!==null) remplirNiveau(n);
   aller(demandee||'accueil',true);
+  if(versLeitner){
+    // L'enseignant venu de Leitner n'y retourne pas : il en viendrait, sans compte du pont.
+    if(role==='prof') alert("Les enseignants se connectent à la Boîte à cartes avec leur compte du site du cours.");
+    else if(window.RESONANCE.espaceComplet(session)) ouvrirLeitner();
+    else alert(MSG_PONT.RESERVE_TERMINALE);
+  }
   majBlocNotif();
   // « J'ai vu un bug » : élèves de terminale seulement (décision du 17/10/2026).
   if(role==='eleve' && window.RESONANCE.espaceComplet(session)) installerSignalement();
