@@ -1090,6 +1090,8 @@ async function ouvrirLeitner(){
 document.getElementById('lienLeitner').addEventListener('click',e=>{ e.preventDefault(); ouvrirLeitner(); });
 
 async function entrer(){
+  // Enseignant : ses classes décident de l'espace complet (Participation, Outils), avant tout affichage.
+  await window.RESONANCE.chargerClassesProf(sb,session);
   let demandee=vueDeAdresse(); // ex. retour d'un outil vers #outils, ou rechargement de la page
   // Arrivée depuis Leitner (« Me connecter avec Résonance ») : on passe le pont dès la connexion.
   const versLeitner=demandee==='vers-leitner';

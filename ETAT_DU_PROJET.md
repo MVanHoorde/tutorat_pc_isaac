@@ -17,8 +17,9 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle, règle des espaces (terminale complète, première Tutorat seulement ; `classeTerminale`). Même origine, donc même session |
 | `signalement.js` | Bouton « J'ai vu un bug » et son formulaire (élève connecté), fenêtre 🎁 du +0,5 ; partagé par `index.html` et les pages du parcours Python (chargé par `progression-resonance.js`) |
 | `polices/` | Polices auto-hébergées (Bricolage Grotesque, IBM Plex Sans et Mono, Spectral, STIX Two Text ; licence OFL) : copie à l'identique de `outils/python/polices/`. Plus aucun appel à Google Fonts |
+| `trombi_png_vers_liste.py` | Trombinoscope en captures PNG → liste CSV à vérifier dans Excel, par l'OCR de Windows (hors ligne) ; signale les élèves déjà au registre. Lecture imparfaite : la relecture est obligatoire |
 | `analyser_trombi.py` | Relève la mise en page d'un trombinoscope PDF, avec le texte masqué par défaut |
-| `generer_identifiants.py` | Trombinoscopes PDF → identifiants, coupons, registre de correspondance et fichier serveur |
+| `generer_identifiants.py` | Trombinoscopes PDF, ou listes vérifiées (CSV ou classeur Excel, colonnes Nom et Prénom) → identifiants, coupons, registre de correspondance et fichier serveur |
 | `preparer_supabase.py` | Fichiers serveur → `import_supabase_….sql` à coller dans Supabase ; crée les comptes enseignants (`PR-…`) |
 | `supabase/schema.sql` | Tables et règles d'accès de la base (élève / enseignant) |
 | `supabase/functions/premiere-connexion/` | Fonction Supabase : première connexion avec le mot de passe du coupon |
@@ -93,7 +94,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Sujets de TP téléchargeables dans `outils/python/fiches/tp/` : TP1, TP3, TP4, TP5, TP6.
   - Libre accès. Sans connexion à Résonance, rien n'est enregistré ni envoyé.
 - **Accueil à trois entrées** (17/10/2026), **en ligne** ; migration `005` collée le 17/10/2026. Tests réels avec les élèves (plan : `docs/plan-test-refonte.md`).
-  - Après connexion : trois cartes, Tutorat (demander / proposer de l'aide), Participation (classes ouvertes seulement), Outils ; une quatrième, Tableau de bord, pour les enseignants. **Les premières n'ont que le Tutorat** : Participation et Outils forment l'espace de terminale (règle `espaceComplet` de `commun.js`, lue d'après la classe du compte : `_T_` terminale, `_P_` première ; classe inconnue : Tutorat seulement). Dans une rubrique, la barre ne montre que ses onglets et « Accueil » ; l'onglet Tableau de bord reste visible partout pour l'enseignant.
+  - Après connexion : trois cartes, Tutorat (demander / proposer de l'aide), Participation (classes ouvertes seulement), Outils ; une quatrième, Tableau de bord, pour les enseignants. **Les premières, et les enseignants qui n'ont que des premières, n'ont que le Tutorat** (et le Tableau de bord pour les enseignants) : Participation et Outils forment l'espace de terminale (règle `espaceComplet` de `commun.js`). Élève : lue d'après la classe du compte (`_T_` ou initiale « T » : terminale ; sinon Tutorat seulement — un intitulé de première ne doit donc jamais commencer par « T »). Enseignant : espace complet s'il a au moins une classe de terminale dans `profils.classes`, lue à l'entrée ; si la lecture échoue (hors ligne), espace complet, les droits réels restant fixés par la base. Dans une rubrique, la barre ne montre que ses onglets et « Accueil » ; l'onglet Tableau de bord reste visible partout pour l'enseignant.
   - Choix : des vues dans `index.html`, et non des pages séparées. `participation.js` vit des variables de la page et garde en mémoire la séance ouverte et le cadre de participation : changer de page couperait une séance en cours. Seuls les Outils sont des pages à part (charte propre, moteur Python lourd), reliées par `commun.js`.
   - Chaque vue a son adresse : rechargement, bouton retour de Safari et retour depuis les Outils (`index.html#outils`) ramènent au bon endroit.
   - Polices auto-hébergées (`polices/`) : plus aucune requête vers Google.
@@ -187,6 +188,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
+- **31/10/2026** — Les enseignants sans classe de terminale (M. Perche, par exemple) n'ont plus que Tutorat et Tableau de bord. Banc Chromium sur base simulée : 7 profils (enseignants terminale / premières / sans classe / profil illisible, élèves première / terminale), aucune erreur JS.
+- **31/10/2026** — Les deux groupes de première spé repris par M. Perche (`1re spé COUVRAT1`, `1re spé COUVRAT2`) : trombis reçus en captures PNG, d'où `trombi_png_vers_liste.py` et la lecture de listes CSV / Excel par `generer_identifiants.py` (encodage Windows-1252, plage de cellules périmée).
 - **19/10/2026** — Boîte à cartes (Leitner) reliée par un pont de connexion : carte dans Outils, `#vers-leitner`, fonction `pont-resonance` dans le dépôt du site du cours.
 - **18/10/2026** — Audit du niveau 1 : rappels de cours en LaTeX avec noms et unités, exercice 5.4 (pH théoriques du TP6), question 3 du 6.1 (écriture du résultat), « à quoi ça sert » et liens de documentation, sujets des TP 3, 4 et 6, clavier grec, copier-coller bloqué.
 - **18/10/2026** — Parcours Python : marque « en cours », fin de la réussite sur simple exécution (vérifications dans les consoles du niveau 1, bouton « J'ai compris »), quiz une question à la fois avec récapitulatif. Les réussites enregistrées avant restent en base.

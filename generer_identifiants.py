@@ -19,6 +19,8 @@ déjà attribués : seuls les nouveaux élèves reçoivent un compte et un coupo
     python generer_identifiants.py trombi_1re2.pdf trombi_tle1.pdf --sortie "C:/Users/.../OneDrive/Résonance"
     python generer_identifiants.py trombi.pdf --simulation          # lit, n'écrit rien
     python generer_identifiants.py trombi.pdf --classe "1re spé 2"  # impose le nom de classe
+    python generer_identifiants.py "liste_1re spé 2.csv"           # liste vérifiée, issue de captures PNG
+                                                                   # (voir trombi_png_vers_liste.py)
 
 Par défaut, les noms ne s'affichent pas dans le terminal (masqués comme dans
 analyser_trombi.py) ; --afficher-noms pour les voir.
@@ -131,8 +133,69 @@ def separer_nom_prenom(texte):
     return " ".join(mots[:i]), " ".join(mots[i:])
 
 
+def lire_liste(chemin, classe_imposee=None):
+    """Liste vérifiée, CSV ou classeur Excel (sortie de trombi_png_vers_liste.py) : colonnes Classe ; Nom ; Prénom."""
+    if Path(chemin).suffix.lower() == ".xlsx":
+        # Liste réenregistrée en classeur Excel (« liste_….csv.xlsx »).
+        # Pas de read_only : il se fie à la plage déclarée par le fichier, parfois périmée (0 ligne lue).
+        lecteur = iter([["" if v is None else str(v) for v in l]
+                        for l in load_workbook(chemin).active.iter_rows(values_only=True)])
+    else:
+        # Excel enregistre en UTF-8 (« CSV UTF-8 ») ou en Windows-1252 (« CSV (séparateur : point-virgule) »).
+        brut = Path(chemin).read_bytes()
+        try:
+            texte = brut.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            texte = brut.decode("cp1252")
+        premiere = texte.splitlines()[0] if texte else ""
+        sep = ";" if premiere.count(";") >= premiere.count(",") else ","
+        lecteur = csv.reader(texte.splitlines(), delimiter=sep)
+    # L'en-tête est la première ligne qui contient une case « Nom » (lignes vides au-dessus tolérées).
+    norme = lambda c: unicodedata.normalize("NFC", (c or "").strip()).casefold().replace("é", "e")
+    entete, vues = [], []
+    for l in lecteur:
+        if any(str(c).strip() for c in l):
+            vues.append(l)
+        if "nom" in [norme(c) for c in l]:
+            entete = [norme(c) for c in l]
+            break
+        if len(vues) >= 10:
+            break
+    if not entete:
+        premiere = [norme(c) for c in vues[0]] if vues else []
+        sys.exit(f"{Path(chemin).name} : aucune ligne d'en-tête avec une case « Nom ».\n"
+                 f"    Première ligne lue : {[masquer(c) for c in premiere][:8]}\n"
+                 f"    (si tout est dans une seule case, la liste a été collée sans être découpée en colonnes)")
+    col = {k: entete.index(k) for k in ("classe", "nom", "prenom") if k in entete}
+    val = lambda l, k: l[col[k]].strip() if k in col and col[k] < len(l) else ""
+    lignes = [{"Classe": val(l, "classe"), "Nom": val(l, "nom"), "Prénom": val(l, "prenom")}
+              for l in lecteur if val(l, "nom")]
+    classes = {(l.get("Classe") or "").strip() for l in lignes} - {""}
+    alertes = []
+    if not lignes:
+        alertes.append(f"aucune ligne avec un nom sous l'en-tête (colonnes lues : {', '.join(entete)})")
+    if classe_imposee:
+        classe = classe_imposee
+    elif len(classes) == 1:
+        classe = classes.pop()
+    else:
+        alertes.append("une seule classe par liste : colonne Classe vide ou mélangée, utilisez --classe")
+        classe = Path(chemin).stem
+    eleves = []
+    for num, l in enumerate(lignes, start=2):
+        nom, prenom = l["Nom"].strip(), (l.get("Prénom") or "").strip()
+        if not prenom:
+            alertes.append(f"ligne {num} : prénom vide pour « {nom} »")
+        eleves.append({"nom": nom, "prenom": prenom, "page": num})
+    return classe, eleves, alertes
+
+
 def lire_trombi(chemin, classe_imposee=None):
     """Retourne (classe, élèves, alertes). Un élève = {nom, prenom, page}."""
+    if Path(chemin).suffix.lower() in (".csv", ".xlsx"):
+        if Path(chemin).name == REGISTRE:
+            sys.exit(f"{REGISTRE} est le registre, pas une liste d'élèves : ne le passez pas en argument.")
+        return lire_liste(chemin, classe_imposee)
     doc = fitz.open(chemin)
     classe, eleves, alertes = classe_imposee, [], []
     for num, page in enumerate(doc, start=1):
@@ -288,7 +351,7 @@ def main():
         except AttributeError:
             pass
     ap = argparse.ArgumentParser(description="Crée les identifiants Résonance à partir des trombinoscopes PDF.")
-    ap.add_argument("pdf", nargs="+", help="trombinoscope(s) PDF, un par classe")
+    ap.add_argument("pdf", nargs="+", help="trombinoscope(s) PDF ou liste(s) CSV vérifiée(s), un fichier par classe")
     ap.add_argument("--sortie", default="sortie_resonance", help="dossier de sortie (idéalement dans OneDrive)")
     ap.add_argument("--classe", help="impose le nom de classe (si un seul PDF)")
     ap.add_argument("--simulation", action="store_true", help="lit les PDF et affiche le bilan, n'écrit rien")

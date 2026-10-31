@@ -39,13 +39,26 @@ window.RESONANCE = {
   },
   role: s => (s && s.user && s.user.app_metadata && s.user.app_metadata.role) || 'visiteur',
   identifiant: s => (s && s.user && s.user.app_metadata && s.user.app_metadata.identifiant) || '',
-  /* Espace complet (Tutorat + Participation + Outils) : enseignants et élèves de terminale.
-     Les premières n'ont que le Tutorat (décision de M. Van Hoorde, 17/10/2026). La classe vient du
-     compte (« B1_T_3_… » terminale, « B1_P_3_… » première ; « TEST » compte comme terminale).
-     Classe inconnue : Tutorat seulement, par prudence. */
+  /* Classes de l'enseignant connecté (profils.classes) : elles ne sont pas dans le jeton, on les lit
+     une fois par page, après la connexion. null = pas encore lues ou lecture impossible. */
+  classesProf: null,
+  async chargerClassesProf(sb, s){
+    this.classesProf = null;
+    if (this.role(s) !== 'prof' || !sb) return;
+    try{
+      const { data, error } = await sb.from('profils').select('classes').eq('id', s.user.id).maybeSingle();
+      if (!error && data) this.classesProf = data.classes || [];
+    }catch(e){ /* hors ligne : on garde null */ }
+  },
+  /* Espace complet (Tutorat + Participation + Outils) : élèves de terminale, et enseignants qui ont au
+     moins une classe de terminale. Les premières, et leurs enseignants, n'ont que le Tutorat (décisions
+     de M. Van Hoorde, 17/10 et 31/10/2026). La classe vient du compte (« B1_T_3_… » terminale,
+     « B1_P_3_… » première ; « TEST » compte comme terminale). Classe d'élève inconnue : Tutorat
+     seulement, par prudence. Classes d'enseignant illisibles (hors ligne) : espace complet, comme avant,
+     les droits réels restant fixés par la base. */
   espaceComplet(s){
     const r = this.role(s);
-    if (r === 'prof') return true;
+    if (r === 'prof') return this.classesProf === null || this.classesProf.some(c => this.classeTerminale(c));
     if (r !== 'eleve') return false;
     return this.classeTerminale(s.user.app_metadata && s.user.app_metadata.classe);
   },
