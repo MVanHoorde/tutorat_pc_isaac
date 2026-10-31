@@ -303,6 +303,8 @@ body:not(.role-prof) .carte.prof{display:none}
 /* Premières (et classe inconnue) : Tutorat seulement. */
 body:not(.espace-complet) .carte.participation,body:not(.espace-complet) .carte.outils,
 body:not(.espace-complet) .tab[data-section="participation"],body:not(.espace-complet) .tab[data-section="outils"]{display:none}
+/* Textes qui changent selon l'espace (enseignant de première : Tutorat seulement). */
+body:not(.espace-complet) .complet-seul,body.espace-complet .tutorat-seul{display:none}
 a.outil{display:block;text-decoration:none;color:inherit;margin:0 0 14px}
 a.outil:hover h3{text-decoration:underline}
 a.outil:focus-visible{outline:2px solid var(--match);outline-offset:3px;border-radius:14px}
@@ -406,7 +408,7 @@ a.outil h3{margin:0 0 6px}
     </div>
     <div class="carte prof">
       <h3>Tableau de bord</h3>
-      <p>Demandes à apparier, séances validées, disponibilités des tuteurs, correspondance des noms, parcours Python de vos élèves.</p>
+      <p>Demandes à apparier, séances validées, disponibilités des tuteurs, correspondance des noms<span class="complet-seul">, parcours Python de vos élèves</span>.</p>
       <div class="acts"><button class="mini" data-aller="prof">Ouvrir le tableau de bord</button></div>
     </div>
   </div>
@@ -732,7 +734,7 @@ a.outil h3{margin:0 0 6px}
   </table>
   </div>
 
-  <div class="en-ligne-seul">
+  <div class="en-ligne-seul complet-seul">
     <h3>Parcours Python</h3>
     <p class="lede" style="margin-bottom:8px">Exercices réussis par élève et par niveau, pour les élèves de vos classes. Le serveur
     ne connaît que l'identifiant ; les noms viennent de la correspondance chargée sur cet appareil. Le code des élèves n'est jamais enregistré.</p>
@@ -1025,7 +1027,7 @@ function appliquerRole(r){
   const ident=esc(identifiantDeSession(session));
   if(r==='prof'){
     rolebar.className='rolebar';
-    rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> Les rubriques Tutorat et Participation montrent exactement ce que voient les élèves, '+
+    rolebar.innerHTML='<span aria-hidden="true">👁</span><span><b>Vue enseignant.</b> <span class="complet-seul">Les rubriques Tutorat et Participation montrent</span><span class="tutorat-seul">La rubrique Tutorat montre</span> exactement ce que voient les élèves, '+
       'mais vous ne pouvez ni déposer une demande, ni vous positionner.</span>';
     whoBtn.innerHTML='Enseignant · <span class="id">'+ident+'</span> · se déconnecter';
   } else if(r==='eleve'){

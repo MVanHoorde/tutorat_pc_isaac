@@ -188,7 +188,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
-- **31/10/2026** — Les enseignants sans classe de terminale (M. Perche, par exemple) n'ont plus que Tutorat et Tableau de bord. Banc Chromium sur base simulée : 7 profils (enseignants terminale / premières / sans classe / profil illisible, élèves première / terminale), aucune erreur JS.
+- **31/10/2026** — Les enseignants sans classe de terminale (M. Perche, par exemple) n'ont plus que Tutorat et Tableau de bord. Banc Chromium sur base simulée : 7 profils (enseignants terminale / premières / sans classe / profil illisible, élèves première / terminale), aucune erreur JS. Bandeau « Vue enseignant », carte et bloc « Parcours Python » du Tableau de bord ajustés à l’espace.
 - **31/10/2026** — Les deux groupes de première spé repris par M. Perche (`1re spé COUVRAT1`, `1re spé COUVRAT2`) : trombis reçus en captures PNG, d'où `trombi_png_vers_liste.py` et la lecture de listes CSV / Excel par `generer_identifiants.py` (encodage Windows-1252, plage de cellules périmée).
 - **19/10/2026** — Boîte à cartes (Leitner) reliée par un pont de connexion : carte dans Outils, `#vers-leitner`, fonction `pont-resonance` dans le dépôt du site du cours.
 - **18/10/2026** — Audit du niveau 1 : rappels de cours en LaTeX avec noms et unités, exercice 5.4 (pH théoriques du TP6), question 3 du 6.1 (écriture du résultat), « à quoi ça sert » et liens de documentation, sujets des TP 3, 4 et 6, clavier grec, copier-coller bloqué.
