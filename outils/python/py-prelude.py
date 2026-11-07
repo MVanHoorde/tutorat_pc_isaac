@@ -415,11 +415,22 @@ def message_court(exc, src, ligne, ns):
         return ("Le fichier %s est introuvable : son nom doit être écrit exactement comme sur l'onglet 📄 "
                 "sous l'éditeur, entre guillemets, avec son extension." % (nom or 'demandé'))
     if isinstance(exc, ModuleNotFoundError):
-        mod = (getattr(exc, 'name', '') or '').split('.')[0]
+        nom = getattr(exc, 'name', '') or ''
+        mod = nom.split('.')[0]
         if mod == 'scipy':
             return "scipy n'a pas pu être téléchargé : vérifiez la connexion, puis relancez."
         if mod.lower() in ('numpy', 'matplotlib', 'math', 'random') and mod != mod.lower():
             return "Le nom du module s'écrit tout en minuscules : import %s." % mod.lower()
+        if mod in ('numpy', 'matplotlib'):
+            import importlib.util
+            if importlib.util.find_spec(mod) is None:
+                # chargement de numpy et matplotlib échoué (réseau) : le module existe pourtant
+                return ("numpy et matplotlib n'ont pas pu être téléchargés : vérifiez la connexion, "
+                        "puis rechargez la page.")
+            if '.' in nom:
+                # import matplotlib.pyplt : c'est la partie après le point qui est fausse (signalement du 29/10/2026)
+                return ("%s existe, mais pas « %s » : vérifiez l'orthographe après le point, "
+                        "par exemple import matplotlib.pyplot as plt." % (mod, nom.split('.', 1)[1]))
         return ("Le module %s n'est pas disponible ici : ce parcours propose math, random, numpy et "
                 "matplotlib." % mod)
     if isinstance(exc, ImportError):

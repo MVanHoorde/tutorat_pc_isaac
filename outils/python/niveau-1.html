@@ -466,7 +466,9 @@ for i, l in enumerate(attendues):
     if l in lignes:
         ok("Ligne " + str(i + 1) + " — " + l)
 if any(l not in lignes for l in attendues):
-    if any(('=' in l and ' = ' not in l) for l in lignes):
+    if any(' '.join(l.split()) in attendues and l not in attendues for l in lignes):
+        indice("Il y a une espace en trop : print met déjà une espace entre ses morceaux, donc 'f =' et non 'f = '.")
+    elif any(('=' in l and ' = ' not in l) for l in lignes):
         indice("Le texte doit être exactement 'f =' : une espace avant et après le signe égal, comme dans l'affichage attendu.")
     elif 'f = 500 Hz' in lignes:
         indice("Les lignes manquantes ont la même forme que la première : un texte, une variable, une unité.")

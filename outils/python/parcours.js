@@ -1050,7 +1050,14 @@ function construireSommaire() {
         if (l && en.isIntersecting) {
           for (const x of liensSeance.values()) x.lien.removeAttribute('aria-current');
           l.lien.setAttribute('aria-current', 'true');
-          if (window.innerWidth < 1100) l.lien.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduitMouvement() ? 'auto' : 'smooth' });
+          // Barre horizontale : on fait défiler la barre seule. scrollIntoView déplaçait aussi la page (sommaire
+          // collé en haut, scroll-padding-top) et, sur iPad, la ramenait en arrière au passage d'une étape
+          // (signalements des 19 et 23/10/2026).
+          if (window.innerWidth < 1100) {
+            const r = l.lien.getBoundingClientRect(), b = liste.getBoundingClientRect();
+            const dx = r.left < b.left ? r.left - b.left - 8 : r.right > b.right ? r.right - b.right + 8 : 0;
+            if (dx) liste.scrollBy({ left: dx, behavior: reduitMouvement() ? 'auto' : 'smooth' });
+          }
         }
       }
     }, { rootMargin: '-30% 0px -60% 0px' });
