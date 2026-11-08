@@ -717,8 +717,9 @@ a.outil h3{margin:0 0 6px}
     <span class="f">Correspondance identifiants ↔ noms</span>
     <p class="note" id="correspEtat" style="margin:0 0 12px">Aucune correspondance chargée sur cet appareil : les élèves apparaissent par leur identifiant.</p>
     <div class="barre" style="margin-top:0">
-      <label class="mini" style="display:inline-block">Charger mon fichier .xlsx
-        <input type="file" id="correspFichier" accept=".xlsx" hidden></label>
+      <label class="mini" style="display:inline-block">Charger mon fichier (.xlsx ou .csv)
+        <input type="file" id="correspFichier" hidden
+          accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"></label>
       <button class="mini ghost" id="correspOublier" hidden>Oublier sur cet appareil</button>
     </div>
     <p class="note">Le fichier est lu sur cet appareil et n'est jamais envoyé sur Internet.
@@ -1313,7 +1314,16 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
   if(!f) return;
   if(!window.XLSX){ alert("Le lecteur de fichiers Excel n'est pas chargé : vérifiez la connexion Internet."); return; }
   try{
-    const wb=XLSX.read(await f.arrayBuffer());
+    // L'iPad ne propose pas un .xlsx si le champ n'annonce que l'extension : types MIME ajoutés, CSV accepté.
+    // Un CSV d'Excel est en UTF-8 ou en Windows-1252 : décodé à part pour garder les accents.
+    const brut=await f.arrayBuffer();
+    let wb;
+    if(/\.csv$/i.test(f.name) || f.type==='text/csv'){
+      let texte;
+      try{ texte=new TextDecoder('utf-8',{fatal:true}).decode(brut); }
+      catch(e){ texte=new TextDecoder('windows-1252').decode(brut); }
+      wb=XLSX.read(texte.replace(/^﻿/,''),{type:'string'});
+    } else wb=XLSX.read(brut);
     const eleves={}, ws=wb.Sheets[wb.SheetNames[0]];
     // Plage recalculée d'après les cellules réelles : celle déclarée dans le fichier peut être périmée
     // (fichier complété par un script), et la lecture s'arrêterait alors avant les dernières lignes.
