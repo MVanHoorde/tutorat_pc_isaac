@@ -2,7 +2,7 @@
 
 Tutorat entre pairs en physique-chimie (première et terminale spécialité), lycée Isaac de l'Étoile, Poitiers.
 
-*Dernière mise à jour : 19 octobre 2026*
+*Dernière mise à jour : 11 novembre 2026*
 
 ## En ligne
 
@@ -16,6 +16,9 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `index.html` | Le site : page unique branchée sur Supabase, connexion obligatoire. Après connexion, un accueil à trois entrées (Tutorat, Participation, Outils) et, pour les enseignants, le Tableau de bord ; chaque rubrique a son adresse (`#demande`, `#offre`, `#participation`, `#depots`, `#outils`, `#prof`) |
 | `commun.js` | Ce que partagent `index.html` et les pages Outils : adresse et clé publique de Supabase, client unique, lecture du rôle, règle des espaces (terminale complète, première Tutorat seulement ; `classeTerminale`). Même origine, donc même session |
 | `signalement.js` | Bouton « J'ai vu un bug » et son formulaire (élève connecté), fenêtre 🎁 du +0,5 ; partagé par `index.html` et les pages du parcours Python (chargé par `progression-resonance.js`) |
+| `gestion.js` | Gestion entre collègues (enseignants) : « Mes élèves » (Masquer / À supprimer), « ⚙︎ Personnaliser l'affichage » du Tableau de bord, bouton ✉️ « Écrire à M. Van Hoorde » et ses réponses, fenêtre « ✨ Nouveautés » ; pour le gestionnaire, section « Gestion du site » (comptes à supprimer, effacement, messages) |
+| `nouveautes.js` | Les nouveautés annoncées aux enseignants à leur connexion, une fois chacune : **une édition à ajouter à chaque évolution qui les concerne** (mode d'emploi en tête du fichier) |
+| `supabase/migrations/008_gestion.sql` | Gestionnaire du site, réglages par enseignant, demandes de suppression, effacement d'un compte élève, messages ; étape 11 de `MISE_EN_PLACE.md` |
 | `polices/` | Polices auto-hébergées (Bricolage Grotesque, IBM Plex Sans et Mono, Spectral, STIX Two Text ; licence OFL) : copie à l'identique de `outils/python/polices/`. Plus aucun appel à Google Fonts |
 | `trombi_png_vers_liste.py` | Trombinoscope en captures PNG → liste CSV à vérifier dans Excel, par l'OCR de Windows (hors ligne) ; signale les élèves déjà au registre. Lecture imparfaite : la relecture est obligatoire |
 | `analyser_trombi.py` | Relève la mise en page d'un trombinoscope PDF, avec le texte masqué par défaut |
@@ -121,6 +124,15 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Leitner ouvert directement propose « Me connecter avec Résonance » → `index.html#vers-leitner` : connexion demandée s'il le faut, puis le pont. Première : message « réservée aux élèves de terminale ». Enseignant : lien direct, il se connecte avec son compte du site du cours.
   - Données : la Boîte à cartes enregistre les révisions sous l'identifiant `PC-…` seul, sur le serveur du site du cours (ajouté dans « Tes données » du pied de page). Le tableau de bord de Résonance ne les voit pas.
 
+- **Gestion entre collègues** (11/11/2026), écrite et éprouvée ; migration `008` collée le 11/11/2026, constatée en base (étape 11 de `supabase/MISE_EN_PLACE.md`). Demande de M. Van Hoorde : des comptes en double chez une collègue, et plus de mots papier dans les casiers.
+  - Tableau de bord → **Mes élèves** : les comptes des classes de l'enseignant (activés ou coupon pas encore utilisé), avec la dernière connexion. Deux coches : **Masquer** (l'élève disparaît des listes de cet enseignant : dépôts, disponibilités, parcours Python ; une demande ou une séance reste visible) et **À supprimer** (avec un motif court, sans nom ; l'élève est masqué en attendant). Correspondance chargée : deux identifiants au même nom sont marqués « même nom que… ».
+  - **⚙︎ Personnaliser l'affichage** : chaque enseignant décoche les rubriques du Tableau de bord qui ne lui servent pas. Réglages en base, donc sur tous ses appareils.
+  - Bouton ✉️ **« Écrire à M. Van Hoorde »**, en bas à droite de toutes les vues de Résonance (enseignants) : message, vue d'où il part, historique et réponses ; pastille à une réponse nouvelle.
+  - **Gestion du site** (M. Van Hoorde seul, table `gestionnaires`) : comptes à supprimer, avec qui demande et pourquoi ; « Effacer définitivement » (compte élève seulement, toutes ses données et son coupon) ou « Écarter la demande » ; messages des collègues, « Lu », « Répondre ».
+  - **✨ Nouveautés** : à la connexion, un enseignant voit une fois les nouveautés pas encore vues, avec de petits aperçus ; il les revoit par le bouton du Tableau de bord. Règle de M. Van Hoorde : **chaque évolution qui touche les collègues s'accompagne d'une édition dans `nouveautes.js`, proposée par Claude.**
+  - Le même dispositif existe sur le site du cours et dans Leitner (autre base, `ztyv…` : `Site-Web-Portfolio/bdd/schema/038-gestion-collegues.sql`). Les deux boîtes à messages restent séparées : celle de Résonance se relève dans son Tableau de bord, celle du cours et de Leitner dans l'onglet *Gestion* du tableau de bord du cours.
+  - Vérifié sans toucher la base en ligne : migration rejouée deux fois sur un PostgreSQL local (droits collègue / élève / gestionnaire, refus d'effacer un compte enseignant, coupon effacé) ; Résonance dans Chromium avec une base simulée (26 contrôles : collègue, gestionnaire, migration absente).
+
 ## Horaires et lieu (CDI, septembre 2026)
 
 - Récré du matin, 9 h 55 : tous les jours.
@@ -184,10 +196,12 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Polices en double (`polices/` et `outils/python/polices/`) : faire importer `../../polices/polices.css` par `parcours.css`, puis supprimer la copie du parcours.
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.
+- [ ] Gestion entre collègues : coller la migration `008` (étape 11 de `supabase/MISE_EN_PLACE.md`), vérifier que votre compte est inscrit gestionnaire, publier Résonance, puis demander à la collègue de cocher ses comptes en double.
 - [ ] Boîte à cartes : `supabase functions deploy pont-resonance --no-verify-jwt` depuis `Site-Web-Portfolio/` (pas d'ici : autre projet), publier Leitner puis Résonance, puis la section I de `docs/plan-test-refonte.md`.
 
 ## Journal
 
+- **11/11/2026** — Gestion entre collègues : Mes élèves (masquer, demander une suppression), affichage personnalisable, « Écrire à M. Van Hoorde », section Gestion du site, fenêtre des nouveautés (migration `008`, `gestion.js`, `nouveautes.js`).
 - **31/10/2026** — Les enseignants sans classe de terminale (M. Perche, par exemple) n'ont plus que Tutorat et Tableau de bord. Banc Chromium sur base simulée : 7 profils (enseignants terminale / premières / sans classe / profil illisible, élèves première / terminale), aucune erreur JS. Bandeau « Vue enseignant », carte et bloc « Parcours Python » du Tableau de bord ajustés à l’espace.
 - **31/10/2026** — Les deux groupes de première spé repris par M. Perche (`1re spé COUVRAT1`, `1re spé COUVRAT2`) : trombis reçus en captures PNG, d'où `trombi_png_vers_liste.py` et la lecture de listes CSV / Excel par `generer_identifiants.py` (encodage Windows-1252, plage de cellules périmée).
 - **31/10/2026** — Signalements du parcours Python (niveau 1) : sur iPad, la barre du sommaire défile seule, sans plus ramener la page en arrière au passage d'une étape ; message clair pour `import matplotlib.pyplt` (faute après le point) et pour un échec de téléchargement de numpy/matplotlib ; indice « espace en trop » au 3.3.

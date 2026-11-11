@@ -323,6 +323,20 @@ a.outil h3{margin:0 0 6px}
 .sig-bonus b{color:var(--vert);font-weight:600}
 .sig .acts{display:flex;gap:8px;flex-wrap:wrap}
 .sig .acts .mini{padding:6px 12px;font-size:13.5px}
+/* gestion.js : barre de réglages, Mes élèves, Gestion du site */
+.gst-barre{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;margin:0 0 18px}
+.gst-perso{flex:1 1 320px;background:#fff;border:1px solid var(--rule);border-radius:12px;padding:8px 14px}
+.gst-perso summary{cursor:pointer;font-size:14.5px;font-weight:600;min-height:28px;display:flex;align-items:center}
+.gst-perso .coche{display:inline-flex;margin:0 18px 8px 0}
+.gst-classe{background:#fff;border:1px solid var(--rule);border-radius:12px;margin-bottom:10px}
+.gst-classe>summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:14.5px}
+.gst-classe>summary .hint{font-weight:400}
+.gst-classe .tscroll{margin:0 10px 10px}
+.gst-classe td.c{text-align:center;width:1%;white-space:nowrap}
+.gst-classe td.c input{width:20px;height:20px;accent-color:var(--ink);cursor:pointer}
+.gst-classe tr.masque td{opacity:.55}
+.gst-classe tr.suppr td:first-child{text-decoration:line-through;text-decoration-color:#C0392B}
+.badge.rouge{background:#FBE3E1;color:#9B231A}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -408,7 +422,7 @@ a.outil h3{margin:0 0 6px}
     </div>
     <div class="carte prof">
       <h3>Tableau de bord</h3>
-      <p>Demandes à apparier, séances validées, disponibilités des tuteurs, correspondance des noms<span class="complet-seul">, parcours Python de vos élèves</span>.</p>
+      <p>Demandes à apparier, séances validées, disponibilités des tuteurs, vos élèves, correspondance des noms<span class="complet-seul">, parcours Python de vos élèves</span>.</p>
       <div class="acts"><button class="mini" data-aller="prof">Ouvrir le tableau de bord</button></div>
     </div>
   </div>
@@ -680,7 +694,34 @@ a.outil h3{margin:0 0 6px}
 
 <!-- ================= PROF ================= -->
 <section class="view" id="v-prof">
+  <!-- Réglages de l'affichage, nouveautés, gestion du site (gestion.js, migration 008). -->
+  <div class="gst-barre en-ligne-seul">
+    <details class="gst-perso" id="gstPerso">
+      <summary>⚙︎ Personnaliser l'affichage</summary>
+      <p class="note" style="margin:6px 0 8px">Décochez ce qui ne vous sert pas : la rubrique disparaît de <b>votre</b> écran
+      (et de vos autres appareils), rien n'est effacé. Les élèves masqués se règlent dans « Mes élèves ».</p>
+      <div id="gstRubriques"></div>
+    </details>
+    <button class="mini ghost" id="gstVoirNouveautes" type="button">✨ Nouveautés</button>
+    <span class="note" id="gstEtat" role="status" style="margin:0"></span>
+  </div>
+
+  <div class="en-ligne-seul gestion-seul" id="gestion" hidden>
+    <h2 class="sem" style="margin:0 0 6px">Gestion du site <span class="badge">vous seul</span></h2>
+    <h3 style="margin-top:10px">Comptes à supprimer <span class="sig-n" id="gstNSuppr" hidden></span></h3>
+    <p class="lede" style="margin-bottom:8px">Cochés par les enseignants dans « Mes élèves ». L'effacement est définitif : le compte,
+    toutes ses données (demandes, séances, participation, parcours Python…) et son coupon s'il n'a pas servi.</p>
+    <div id="gstSuppressions"><p class="note">Chargement…</p></div>
+    <h3>Messages des collègues <span class="sig-n" id="gstNMsg" hidden></span></h3>
+    <div class="barre" style="margin:0 0 12px">
+      <label class="coche" style="margin:0"><input type="checkbox" id="gstMsgTout"> montrer aussi les messages déjà lus</label>
+    </div>
+    <div id="gstMessages"><p class="note">Chargement…</p></div>
+    <div style="height:28px"></div>
+  </div>
+
   <div class="en-ligne-seul">
+   <div data-rubrique="apparier">
     <div class="calhead" style="margin-bottom:6px">
       <h2 class="sem" style="margin:0">Demandes à apparier</h2>
       <button class="mini ghost" id="actualiser">Actualiser</button>
@@ -688,17 +729,23 @@ a.outil h3{margin:0 0 6px}
     <p class="lede">Pour chaque demande ouverte : les tuteurs qui se sont positionnés, et ceux qui sont disponibles sur les
     mêmes créneaux. Les créneaux en vert sont communs à l'élève et au tuteur.</p>
     <div id="appariements"><p class="note">Chargement…</p></div>
+   </div>
     <datalist id="listeEleves"></datalist>
 
+   <div data-rubrique="seances">
     <h3>Séances validées à venir</h3>
     <p class="lede" style="margin-bottom:8px">Les deux élèves les voient en haut de leur page à leur prochaine connexion
     (date, horaire, chapitre, rôle), sans le nom de l'autre : c'est à vous de leur dire avec qui.</p>
     <div id="seancesProf"><p class="note">Chargement…</p></div>
+   </div>
 
+   <div data-rubrique="dispos">
     <h3>Disponibilités déclarées par les tuteurs</h3>
     <div id="dispoTuteurs"><p class="note">Chargement…</p></div>
+   </div>
 
-    <!-- « J'ai vu un bug » (migration 006) : la base ne rend que les signalements des élèves de vos classes. -->
+   <!-- « J'ai vu un bug » (migration 006) : la base ne rend que les signalements des élèves de vos classes. -->
+   <div data-rubrique="signalements">
     <h3 id="signalements">Signalements <span class="sig-n" id="sigN" hidden></span></h3>
     <p class="lede" style="margin-bottom:8px">Envoyés par les élèves avec le bouton 🐞 « J'ai vu un bug », sur Résonance et dans le
     parcours Python. Chacun dit où l'élève était et sur quel appareil ; l'élève est reconnu par son compte (bouton réservé aux terminales).
@@ -710,6 +757,20 @@ a.outil h3{margin:0 0 6px}
       <span class="note" id="sigEtat" role="status" style="margin:0"></span>
     </div>
     <div id="sigListe"><p class="note">Chargement…</p></div>
+   </div>
+
+   <!-- Comptes des classes de l'enseignant : masquer, demander une suppression (migration 008). -->
+   <div data-rubrique="eleves">
+    <h3 id="mesEleves">Mes élèves <span class="hint" style="font-weight:400">— les comptes de vos classes</span></h3>
+    <p class="lede" style="margin-bottom:8px"><b>Masquer</b> retire un élève de vos listes (compte de test, élève parti…), sur votre
+    écran seulement. <b>À supprimer</b> prévient M. Van Hoorde, qui efface le compte (un doublon, par exemple) ; l'élève est masqué
+    chez vous en attendant. Les noms viennent de la correspondance chargée sur cet appareil.</p>
+    <div class="barre" style="margin:0 0 12px">
+      <label class="coche" style="margin:0"><input type="checkbox" id="gstMontrerMasques"> montrer les élèves masqués</label>
+      <span class="note" id="gstElevesEtat" role="status" style="margin:0"></span>
+    </div>
+    <div id="gstEleves"><p class="note">Chargement…</p></div>
+   </div>
     <div style="height:44px"></div>
   </div>
 
@@ -726,6 +787,7 @@ a.outil h3{margin:0 0 6px}
     Sur iPad, chargez-le depuis l'icône Résonance de l'écran d'accueil (et non depuis Safari).</p>
   </div>
 
+  <div data-rubrique="deposes">
   <h3>Tout ce qui a été déposé</h3>
   <div class="tscroll">
   <table class="t">
@@ -734,8 +796,10 @@ a.outil h3{margin:0 0 6px}
     </tbody>
   </table>
   </div>
+  <p class="note" id="depotsMasques" hidden></p>
+  </div>
 
-  <div class="en-ligne-seul complet-seul">
+  <div class="en-ligne-seul complet-seul" data-rubrique="python">
     <h3>Parcours Python</h3>
     <p class="lede" style="margin-bottom:8px">Exercices réussis par élève et par niveau, pour les élèves de vos classes. Le serveur
     ne connaît que l'identifiant ; les noms viennent de la correspondance chargée sur cet appareil. Le code des élèves n'est jamais enregistré.</p>
@@ -818,6 +882,8 @@ a.outil h3{margin:0 0 6px}
 <script src="commun.js"></script>
 <script src="signalement.js"></script>
 <script src="participation.js"></script>
+<script src="nouveautes.js"></script>
+<script src="gestion.js"></script>
 <script>
 /* ---------- Supabase ---------- */
 // URL, clé « anon » et client : commun.js, partagé avec les pages Outils (même session).
@@ -1116,12 +1182,15 @@ async function entrer(){
   majBlocNotif();
   // « J'ai vu un bug » : élèves de terminale seulement (décision du 17/10/2026).
   if(role==='eleve' && window.RESONANCE.espaceComplet(session)) installerSignalement();
+  // Enseignant : ses réglages (rubriques et élèves masqués), « Écrire à M. Van Hoorde », puis les nouveautés.
+  if(role==='prof' && window.gestionEntrer) await gestionEntrer().catch(e=>console.error('gestion',e));
   // Participation et dépôts : à part, une panne ne doit pas bloquer le tutorat.
   // Le droit de voir la rubrique arrive avec la réponse du serveur : on rouvre alors la vue demandée.
   if(window.participationEntrer) participationEntrer().then(()=>{
     if(SECTION[demandee]==='participation' && vueAutorisee(demandee) && document.body.dataset.section==='accueil') aller(demandee,true);
   }).catch(e=>console.error('participation',e));
   await chargerDonneesReelles();
+  if(role==='prof' && window.gestionAnnoncer) gestionAnnoncer();
 }
 
 /* ---------- grilles de créneaux ---------- */
@@ -1302,6 +1371,9 @@ function nomAffiche(id){
   return n ? esc(n)+' <span class="anon" style="margin:0">'+esc(id)+'</span>'
            : '<span style="font-family:var(--mono)">'+esc(id||'?')+'</span>';
 }
+/* Élèves masqués par l'enseignant, ou dont il a demandé la suppression (gestion.js, migration 008). */
+const masque=id=>!!(window.gestionMasque && window.gestionMasque(id));
+const noteMasques=n=>n?n+' élève'+(n>1?'s':'')+' masqué'+(n>1?'s':'')+' (voir « Mes élèves »).':'';
 function majCorrespEtat(){
   const etat=document.getElementById('correspEtat');
   document.getElementById('correspOublier').hidden=!corresp;
@@ -1338,13 +1410,13 @@ document.getElementById('correspFichier').addEventListener('change',async e=>{
     try{ localStorage.setItem(CLE_CORRESP,JSON.stringify(corresp)); }
     catch(err){ alert("Chargée pour cette visite seulement : ce navigateur refuse de la conserver (navigation privée ?)."); }
     majCorrespEtat();
-    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); }
+    if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); if(window.gestionRendre) gestionRendre(); }
   }catch(err){ alert("Fichier illisible : "+err.message); }
 });
 document.getElementById('correspOublier').addEventListener('click',()=>{
   try{ localStorage.removeItem(CLE_CORRESP); }catch(e){}
   corresp=null; majCorrespEtat();
-  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); }
+  if(enLigne() && role==='prof'){ chargerDepots(); chargerAppariements(); chargerPython(); rendreSignalements(); if(window.gestionRendre) gestionRendre(); }
 });
 
 /* ---------- données réelles (Supabase) ---------- */
@@ -1369,7 +1441,8 @@ async function chargerDonneesReelles(){
   slotsTuteur.querySelectorAll('input').forEach(i=>i.checked=!!(dispo && dispo.creneaux.includes(i.value)));
   afficherDemandes();
   spectreReel(DEMANDES);
-  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements(), chargerPython(), chargerSignalements()]);
+  if(role==='prof') await Promise.all([chargerDepots(), chargerAppariements(), chargerPython(), chargerSignalements(),
+    window.gestionCharger?gestionCharger().catch(e=>console.error('gestion',e)):null]);
   if(role==='eleve') await Promise.all([chargerMesDemandes(), chargerMesSeances()]);
 }
 
@@ -1404,6 +1477,8 @@ async function chargerAppariements(){
   if(err){ zone.innerHTML='<p class="note">Erreur : '+esc(err.message)+'</p>'; zoneDispo.innerHTML=''; return; }
   APPAR={demandes:rd.data, positionnements:rp.data, eleves:rel.data};
   const dispos=rdis.data.filter(x=>x.creneaux && x.creneaux.length);
+  // Masqués : retirés de la liste des disponibilités seulement ; une demande ou un tuteur positionné reste visible.
+  const disposVues=dispos.filter(x=>!masque(x.profils&&x.profils.identifiant));
   const parId=Object.fromEntries(rel.data.map(p=>[p.id,p]));
   document.getElementById('listeEleves').innerHTML=rel.data.map(p=>{
     const n=corresp && corresp.eleves[p.identifiant];
@@ -1442,11 +1517,12 @@ async function chargerAppariements(){
       '</tbody></table></div>'
     : '<p class="note">Aucune séance validée à venir.</p>';
 
-  zoneDispo.innerHTML=dispos.length
+  zoneDispo.innerHTML=disposVues.length
     ? '<div class="tscroll"><table class="t"><thead><tr><th>Tuteur</th><th>Classe</th><th>Créneaux</th><th>Mis à jour</th></tr></thead><tbody>'+
-      dispos.map(x=>'<tr><td>'+nomAffiche(x.profils&&x.profils.identifiant)+'</td><td>'+esc(x.profils&&x.profils.classe||'')+'</td><td>'+
-        chipsCren(x.creneaux)+'</td><td>'+dateCourte(x.maj_le)+'</td></tr>').join('')+'</tbody></table></div>'
-    : '<p class="note">Aucun élève n\'a encore déclaré de disponibilités de tuteur.</p>';
+      disposVues.map(x=>'<tr><td>'+nomAffiche(x.profils&&x.profils.identifiant)+'</td><td>'+esc(x.profils&&x.profils.classe||'')+'</td><td>'+
+        chipsCren(x.creneaux)+'</td><td>'+dateCourte(x.maj_le)+'</td></tr>').join('')+'</tbody></table></div>'+
+      (dispos.length>disposVues.length?'<p class="note">'+noteMasques(dispos.length-disposVues.length)+'</p>':'')
+    : '<p class="note">'+(dispos.length?noteMasques(dispos.length):'Aucun élève n\'a encore déclaré de disponibilités de tuteur.')+'</p>';
 }
 /* Validation d'un binôme : le tuteur est soit choisi dans la liste (data-t), soit saisi (« Associer un autre élève »). */
 function ouvrirValidation(carte, d, tuteurUuid){
@@ -1568,9 +1644,12 @@ async function chargerDepots(){
     // « !demandes_auteur_fkey » : l'auteur, et non les tuteurs positionnés (deux liens possibles vers profils).
     .select('id,niveau,chapitre,besoin,duree,urgent,date_eval,statut,cree_le,profils!demandes_auteur_fkey(identifiant,classe)')
     .order('cree_le',{ascending:false});
+  const noteM=document.getElementById('depotsMasques'); noteM.hidden=true;
   if(error){ tabDepots.innerHTML='<tr><td colspan="6">Erreur : '+esc(error.message)+'</td></tr>'; return; }
-  if(!data.length){ tabDepots.innerHTML='<tr><td colspan="6" class="note">Aucune demande pour l\'instant.</td></tr>'; return; }
-  tabDepots.innerHTML=data.map(d=>{
+  const vues=data.filter(d=>!masque(d.profils&&d.profils.identifiant));
+  if(vues.length<data.length){ noteM.textContent=noteMasques(data.length-vues.length); noteM.hidden=false; }
+  if(!vues.length){ tabDepots.innerHTML='<tr><td colspan="6" class="note">Aucune demande pour l\'instant.</td></tr>'; return; }
+  tabDepots.innerHTML=vues.map(d=>{
     const p=d.profils||{}, st=LIB_STATUT[d.statut]||['',d.statut];
     const besoin=esc(((LIB_BESOIN[d.besoin]||'')+' · '+(LIB_DUREE[d.duree]||'')).toLowerCase())+
       (d.urgent?' · <b style="color:#8A5D08;font-weight:600">pressant'+(d.date_eval?' ('+dateCourte(d.date_eval)+')':'')+'</b>':'');
@@ -1610,7 +1689,8 @@ async function chargerPython(){
       if(l.reussi_le>e.dernier) e.dernier=l.reussi_le;
     });
     const nom=e=>(corresp && corresp.eleves[e.id])||'';
-    const eleves=Object.values(parEleve).sort((a,b)=>a.classe.localeCompare(b.classe,'fr')||(nom(a)||a.id).localeCompare(nom(b)||b.id,'fr'));
+    const tousEleves=Object.values(parEleve), nbMasques=tousEleves.filter(e=>masque(e.id)).length;
+    const eleves=tousEleves.filter(e=>!masque(e.id)).sort((a,b)=>a.classe.localeCompare(b.classe,'fr')||(nom(a)||a.id).localeCompare(nom(b)||b.id,'fr'));
     const niveaux=[1,2,3,4,5].filter(n=>eleves.some(e=>e.n[n].length));
     const cellule=ex=>ex.length?'<td><details><summary style="cursor:pointer"><b>'+ex.length+'</b></summary><span class="hint">'+esc(ex.join(', '))+'</span></details></td>':'<td class="hint">—</td>';
     zone.innerHTML='<div class="tscroll"><table class="t"><thead><tr><th>Élève</th><th>Classe</th>'+
@@ -1618,7 +1698,8 @@ async function chargerPython(){
       eleves.map(e=>'<tr><td>'+nomAffiche(e.id)+'</td><td>'+esc(e.classe)+'</td>'+niveaux.map(n=>cellule(e.n[n])).join('')+
         '<td>'+dateCourte(e.dernier)+'</td></tr>').join('')+
       '</tbody></table></div><p class="note">Nombre d\'exercices réussis (touchez un nombre pour voir lesquels) — '+
-      eleves.length+' élève'+(eleves.length>1?'s':'')+'. La réussite est constatée sur la tablette de l\'élève : c\'est un repère de travail, pas une note.</p>';
+      eleves.length+' élève'+(eleves.length>1?'s':'')+'. La réussite est constatée sur la tablette de l\'élève : c\'est un repère de travail, pas une note.'+
+      (nbMasques?' '+noteMasques(nbMasques):'')+'</p>';
   }catch(e){ zone.innerHTML='<p class="note">Erreur : '+esc(e.message)+'</p>'; }
 }
 

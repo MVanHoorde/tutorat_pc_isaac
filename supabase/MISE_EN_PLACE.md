@@ -131,6 +131,23 @@ Règles posées par la base :
 
 Fin d'année : `delete from public.participation_suivi; delete from public.periodes;`.
 
+## 11. Gestion entre collègues : élèves masqués, suppressions, messages, nouveautés (novembre 2026)
+
+Uniquement des ajouts. Suppose l'étape 8 faite (`mes_classes_prof()`).
+
+1. **SQL Editor → New query** : collez `supabase/migrations/008_gestion.sql`, puis **Run**. La migration peut être relancée sans dommage.
+   - Elle inscrit comme **gestionnaire** le seul compte enseignant qui a la classe `B1_T_3_PH-CH_VANHOORDE`. S'il n'y en a pas exactement un, un message (« Gestionnaire non inscrit… ») le dit : inscrivez alors votre compte à la main, avec la ligne indiquée dans le fichier.
+2. Vérification : les requêtes du bloc « Vérification » en fin de fichier. Attendu : quatre tables à `true`, votre identifiant `PR-…` seul comme gestionnaire, sept fonctions.
+3. Publiez ensuite Résonance (`index.html`, `gestion.js`, `nouveautes.js`). Publié avant la migration, le site fonctionne quand même : réglages gardés sur l'appareil, « pas encore activé » ailleurs.
+
+Règles posées par la base :
+- un enseignant ne voit et ne coche que les comptes de **ses** classes (comptes activés et coupons pas encore utilisés) ;
+- seul le gestionnaire lit toutes les demandes de suppression et efface un compte, **jamais un compte enseignant** ; l'effacement emporte toutes les données de l'élève et son coupon, sans retour possible ;
+- les messages ne sont lus que par leur auteur et le gestionnaire ; seul le gestionnaire répond (date du serveur) ; trente messages par jour et par enseignant au plus ;
+- les élèves n'ont accès à rien de tout cela.
+
+Fin d'année : `delete from public.messages_gestion; delete from public.demandes_suppression;`.
+
 ## Où sont les données
 
 | Donnée | Emplacement |
@@ -146,4 +163,5 @@ Fin d'année : `delete from public.participation_suivi; delete from public.perio
 | Clés privées de chiffrement | Chaque appareil (IndexedDB) ; celle de l'enseignant aussi dans sa sauvegarde protégée par phrase de passe |
 | Exercices réussis du parcours Python (identifiant, niveau, exercice, date ; jamais le code) | Supabase (Paris) |
 | Signalements « J'ai vu un bug » (identifiant, rubrique, page, étape, appareil résumé, message, +0,5 et « vu » ; aucun nom) | Supabase (Paris) |
+| Réglages des enseignants (identifiants masqués, rubriques masquées, dernière nouveauté vue), demandes de suppression (identifiant, motif court), messages entre enseignants | Supabase (Paris) |
 | Python lui-même (Pyodide, ~20 Mo) | Le cache de l'appareil, après la première ouverture d'un niveau |
