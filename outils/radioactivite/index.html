@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radioactivité · Résonance</title>
+<meta name="description" content="Animation interactive : décroissance radioactive, demi-vie, radioprotection. Terminale spécialité physique-chimie.">
+<link rel="icon" href="../../icone-192.png">
+<!-- Polices auto-hébergées de Résonance : aucune requête vers Google (RGPD). -->
+<link rel="stylesheet" href="../../polices/polices.css">
+<style>
+/* VOICE everyday, classroom: calm, exact, readable at the back of the room
+   IDEA a lab bench beside a lab notebook: the experiment on the left, the controls and working on the right
+   PICTURE the grid of nuclei and its curve; the source-to-body bench with its graphs and dose scale
+   COLOUR white ground, navy band (brand), cyan for living nuclei, orange for decay and measured values
+   TYPE Bricolage Grotesque for titles and figures, IBM Plex Sans for text (Résonance's self-hosted fonts)
+   LAYOUT PC/tablet landscape: split screen, scene left, controls right, no page scroll; phone: stacked
+   COLOURS explicit tokens + prefers-color-scheme (no light-dark(): Safari < 17.5 on school iPads would lose every colour) */
+:root{color-scheme:light;--bg:#ffffff;--ink:#14213a;--muted:#56637a;--line:#d8dfe9;--panel:#f3f6fa;--navy:#1B2A4A;--band:#1B2A4A;--or:#E8772E;--cy:#1FA3C4;--orsoft:#fdeee3;--cysoft:#e3f4f9;--fs:13px;
+  --c1:#1FA3C4;--c2:#6b4fd8;--c3:#2e9e5b;--c4:#c2417a;--c5:#8a6d1f;--c6:#4a6fa5;
+  --ff:"IBM Plex Sans",system-ui,sans-serif;--fh:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0d1525;--ink:#e7edf6;--muted:#a3b2c8;--line:#28354d;--panel:#142038;--band:#0a1120;--or:#E0702A;--cy:#1C9DBF;--orsoft:#3a2414;--cysoft:#10303d;--c2:#a08cff;--c3:#5cc98a;--c4:#f07aae;--c5:#d9b45a;--c6:#8fb0e0}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0d1525;--ink:#e7edf6;--muted:#a3b2c8;--line:#28354d;--panel:#142038;--band:#0a1120;--or:#E0702A;--cy:#1C9DBF;--orsoft:#3a2414;--cysoft:#10303d;--c2:#a08cff;--c3:#5cc98a;--c4:#f07aae;--c5:#d9b45a;--c6:#8fb0e0}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--ff);display:flex;flex-direction:column;overflow-x:clip}
+h1,h2,h3,.big,.ro b{font-family:var(--fh);letter-spacing:-.02em}
+h2{font-size:18px;margin:4px 0 8px}
+a{color:var(--cy)}
+:focus-visible{outline:3px solid var(--cy);outline-offset:2px}
+.top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:2px 16px;padding:4px max(2vw,12px);background:var(--band);color:#fff}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{margin:0;font-size:20px;line-height:1.1}
+.brand p{margin:0;font-size:13px;color:#c9d4e6}
+.balmer{display:flex;gap:4px;height:28px}
+.balmer i{width:3px;border-radius:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;flex:1}
+.tabs button{font:600 15px var(--ff);color:#c9d4e6;background:none;border:0;border-bottom:3px solid transparent;padding:8px 10px;min-height:44px;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--or)}
+.proj{font:600 15px var(--ff);color:#fff;background:none;border:1px solid rgba(255,255,255,.4);border-radius:8px;min-height:40px;padding:4px 12px;cursor:pointer}
+.proj[aria-pressed=true]{background:var(--or);border-color:var(--or)}
+main{flex:1;min-height:0}
+.view{display:none}
+.view.on{display:block}
+.scene{display:grid;gap:12px;padding:12px;align-content:start}
+.pupitre{padding:12px 16px 24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px 10px;display:flex;flex-direction:column;min-height:0;position:relative}
+.cardhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;font-size:14px;color:var(--muted);margin-bottom:4px;min-height:28px}
+.cardhead b{color:var(--ink)}
+.fig{position:relative;flex:1;min-height:0}
+.fig>svg,.fig>canvas{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+svg text{fill:var(--muted);font:var(--fs) var(--ff);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+svg text.ink{fill:var(--ink)}
+svg text.or{fill:var(--or);font-weight:700}
+svg text.cy{fill:var(--cy);font-weight:700}
+svg text.bd{font-weight:700;fill:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:2px 14px}
+.legend span::before{content:"";display:inline-block;width:18px;height:0;border-top:3px solid var(--c);margin-right:6px;vertical-align:middle}
+.legend .dash::before{border-top-style:dashed}
+.tip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13px;line-height:1.35;display:none;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.12);z-index:2}
+.gridlab{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 10px;font-size:14px;color:var(--muted);margin-top:4px}
+.gridlab span{white-space:nowrap}
+.lead{margin:0 0 10px;color:var(--muted);font-size:15px}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:0 0 12px}
+.ro{border-left:3px solid var(--line);padding:1px 10px}
+.ro small{display:block;color:var(--muted);font-size:13px}
+.ro b{display:block;font-size:clamp(17px,1.6vw,23px);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ro.hot{border-left-color:var(--or)}
+.ro.cool{border-left-color:var(--cy)}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin:0 0 12px;align-items:end}
+.sub{margin:4px 0 2px;font-weight:700;font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin:0 0 12px}
+.ctl{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+.ctl output{color:var(--ink);font-weight:700}
+select,input[type=number],input[type=text],textarea{font:16px var(--ff);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;min-height:44px;padding:6px 8px}
+input[type=number]{width:7.5em}
+textarea{width:100%;min-height:90px;resize:vertical}
+input[type=range]{width:min(260px,100%);accent-color:var(--or);min-height:32px}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+button.b{font:600 15px var(--ff);min-height:44px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button.b:hover{border-color:var(--cy)}
+button.b.main{background:var(--or);border-color:var(--or);color:#fff}
+button.b[aria-pressed=true]{background:var(--cysoft);border-color:var(--cy)}
+button.b:disabled{opacity:.45;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.seg button{font:600 14px var(--ff);min-height:40px;padding:4px 12px;border:0;background:var(--bg);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--navy);color:#fff}
+.seg button:disabled{opacity:.4;cursor:default}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;color:var(--ink);font-size:15px}
+.chk input{width:20px;height:20px;accent-color:var(--or)}
+details{border-top:1px solid var(--line)}
+details>summary{cursor:pointer;padding:10px 2px;font-weight:700;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
+details>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+summary .tag{font-weight:600;font-size:12.5px;border:1px solid var(--line);border-radius:10px;padding:0 8px;color:var(--muted)}
+details>div{padding:0 2px 12px}
+details.menu{border:1px solid var(--line);border-radius:10px;margin:0 0 12px;background:var(--panel)}
+details.menu>summary{padding:6px 12px}
+details.menu>div{padding:2px 12px 12px;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end}
+.eq{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:17px}
+.note{font-size:14px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:600 15px var(--ff);min-height:44px;min-width:52px;padding:6px 12px;border-radius:22px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--or);border-color:var(--or);color:#fff}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+.obs{background:var(--orsoft);border-radius:8px;padding:8px 12px}
+.obs p{margin:4px 0}
+.zone{position:absolute;right:10px;top:8px;font-weight:700;font-size:14px;padding:3px 10px;border-radius:14px;background:var(--bg);border:2px solid var(--line);max-width:calc(100% - 20px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 4px}
+.big{font-size:clamp(22px,2.4vw,34px);font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg{font-size:15px;margin:4px 0 12px}
+.ladder{list-style:none;margin:0;padding:0}
+.ladder li{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:10px;padding:5px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.ladder li b{text-align:right;white-space:nowrap}
+.src{list-style:none;padding:0;margin:0}
+.src li{margin-bottom:6px;font-size:14px}
+.src a{overflow-wrap:anywhere}
+.ver{font-size:14px;color:var(--muted)}
+/* retour vers Résonance */
+.back{color:#fff;text-decoration:none;font:600 14px var(--ff);border:1px solid rgba(255,255,255,.4);border-radius:8px;min-height:40px;padding:4px 10px;display:inline-flex;align-items:center}
+.back:hover{background:rgba(255,255,255,.12)}
+/* équations de transformation nucléaire : A au-dessus de Z, à gauche du symbole */
+.trans{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cy);border-radius:8px;padding:6px 12px 8px;margin:0 0 12px}
+.trans .ty{font-weight:700;font-size:15px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.trans .ty .pill{font:700 13px var(--ff);border-radius:10px;padding:0 8px;background:var(--cysoft);color:var(--ink)}
+.trans .ty .pill.a{background:var(--orsoft)}
+.trans .l{font-family:"STIX Two Math","Cambria Math",Georgia,serif;font-size:19px;margin:4px 0 0;line-height:1.9;overflow-x:auto;white-space:nowrap}
+.trans .cons{font-size:14px;color:var(--muted);margin:2px 0 0}
+.trans .nt{font-size:14px;color:var(--muted);margin:4px 0 0}
+.trans details{border:0;margin-top:2px}
+.trans details>summary{min-height:32px;padding:2px 0;font-weight:600;font-size:14px;color:var(--muted)}
+.trans details>div{padding:0}
+.nz{display:inline-flex;align-items:center;white-space:nowrap;vertical-align:middle}
+.nz .az{display:inline-flex;flex-direction:column;align-items:flex-end;font-size:.6em;line-height:1.05;margin-right:1px}
+.nz .ex{font-size:.7em;align-self:flex-start;margin-left:1px}
+/* boutons posés sur le graphe */
+.onchart{display:flex;gap:6px;flex-wrap:wrap}
+.onchart button{font:600 14px var(--ff);min-height:36px;padding:2px 12px;border-radius:18px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.onchart button[aria-pressed=true]{background:var(--cy);border-color:var(--cy);color:#fff}
+.onchart button:disabled{opacity:.45;cursor:default}
+/* courbes gardées */
+.saved{margin:0 0 12px}
+.saved table td:first-child{width:26px}
+.saved i.sw{display:inline-block;width:18px;height:0;border-top:3px solid var(--c);vertical-align:middle}
+.saved button.x{font:600 14px var(--ff);background:none;border:0;color:var(--muted);min-height:32px;min-width:32px;cursor:pointer}
+.zok{color:var(--cy);font-weight:700}
+.zko{color:var(--or);font-weight:700}
+/* missions */
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:12px;align-content:start}
+.mcard{gap:6px}
+.mcard h2{font-size:18px;margin:2px 0 0;line-height:1.2}
+.mcard p{margin:0;font-size:14px;color:var(--muted)}
+.prog{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex}
+.prog i{display:block;height:100%}
+.corr{font-size:14px;border-top:1px dashed var(--line)}
+.corr ol{padding-left:20px;margin:4px 0}
+#mdock{background:var(--bg)}
+#mdock>header{display:flex;align-items:center;gap:10px;padding:2px 6px 2px 14px;background:var(--navy);color:#fff;position:sticky;top:0;z-index:1}
+#mdock>header b{flex:1;font-size:15px;line-height:1.2}
+#mdock>header span{font-size:13px;color:#c9d4e6;white-space:nowrap}
+#mdock>header button{background:none;border:0;color:#fff;font:600 14px var(--ff);min-height:40px;padding:0 8px;cursor:pointer}
+#mdock.min #mbody{display:none}
+#mbody{padding:8px 14px 12px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 8px;align-items:center}
+.dots i{width:16px;height:16px;border-radius:4px;background:var(--line);border:2px solid transparent}
+.dots i.ok{background:var(--cy)}
+.dots i.su{background:var(--bg);border-color:var(--or)}
+.dots i.pa,.dots i.no{background:var(--navy)}
+.dots i.cur{background:var(--bg);border-color:var(--ink)}
+.dots small{font-size:13px;color:var(--muted);margin-left:6px}
+.mtag{display:inline-block;font-size:13px;font-weight:700;border-radius:10px;padding:0 8px;background:var(--cysoft);margin-bottom:4px}
+.mtag.pari{background:var(--orsoft)}
+.mq{font-size:16px;margin:0 0 10px}
+.mans{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mans input{width:10em}
+.mopts{display:flex;flex-direction:column;gap:6px}
+.mopts button{text-align:left}
+.mfb{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:15px}
+.mfb.ok{background:var(--cysoft);border-left:4px solid var(--cy)}
+.mfb.ko{background:var(--orsoft);border-left:4px solid var(--or)}
+.mfb.hint{background:var(--panel);border-left:4px solid var(--muted)}
+.mnav{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted);margin:0 0 8px}
+.pend button{min-height:36px;padding:4px 10px;font-size:14px}
+/* empilé (téléphone, tablette en portrait) */
+.sc-dec>.card:nth-child(1){height:300px}
+.sc-dec>.card:nth-child(2){height:340px}
+.sc-exp>.card{height:400px}
+.sc-rad .bench{height:240px}
+.sc-rad .bottom{display:grid;gap:12px}
+.sc-rad .bottom>.card:nth-child(1){height:320px}
+.sc-rad .bottom>.card:nth-child(2){height:440px}
+#mdock{position:fixed;left:8px;right:8px;bottom:8px;max-height:52vh;overflow:auto;border:2px solid var(--navy);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:20}
+body.has-m main{padding-bottom:54vh}
+body.has-m.mmin main{padding-bottom:64px}
+/* écran partagé (PC, tablette en paysage) */
+@media (min-width:900px) and (orientation:landscape){
+  main{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(330px,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .view.on{display:contents}
+  .scene{grid-column:1;grid-row:1/3;min-height:0;overflow:hidden;align-content:stretch}
+  .pupitre{grid-column:2;grid-row:1;min-height:0;overflow:auto;border-left:1px solid var(--line)}
+  #mdock{position:static;grid-column:2;grid-row:2;max-height:min(56vh,560px);border:0;border-left:1px solid var(--line);border-radius:0;box-shadow:none}
+  body.has-m main,body.has-m.mmin main{padding-bottom:0}
+  .scene .card,.sc-rad .bench,.sc-rad .bottom>.card{height:auto!important}
+  .sc-dec{grid-template-rows:minmax(0,.9fr) minmax(0,1.1fr)}
+  .sc-exp{grid-template-rows:minmax(0,1fr)}
+  .sc-rad{grid-template-rows:minmax(0,.72fr) minmax(0,1.28fr)}
+  .sc-rad .bottom{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);min-height:0}
+  .sc-list{overflow:auto;align-content:start}
+}
+:root.projection{--fs:16px}
+:root.projection body{font-size:18px}
+:root.projection .lead{display:none}
+@media (min-width:900px) and (orientation:landscape){:root.projection main{grid-template-columns:minmax(0,1.75fr) minmax(330px,1fr)}}
+@media (max-width:600px){.tabs{flex-basis:100%}.tabs button{padding:8px 6px;font-size:14px}.back{min-height:36px;font-size:13px;padding:2px 8px;margin-left:auto}.brand p{display:none}.proj{display:none}#mdock>header span{display:none}table{font-size:13px}th,td{padding:5px 4px}}
+.ray{animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-48}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="balmer" aria-hidden="true"><i style="background:#ff3b30"></i><i style="background:#30c8e0"></i><i style="background:#4d5bff"></i><i style="background:#8b3dff"></i></div>
+    <div><h1>Radioactivité</h1><p>Terminale spécialité · M. Van Hoorde</p></div>
+  </div>
+  <a class="back" href="../../index.html#outils" title="Revenir aux Outils de Résonance">← Résonance</a>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-v="decroissance" id="t-decroissance">Décroissance</button>
+    <button role="tab" data-v="experience" id="t-experience">Expérience t½ et N₀</button>
+    <button role="tab" data-v="radioprotection" id="t-radioprotection">Radioprotection</button>
+    <button role="tab" data-v="missions" id="t-missions">Missions</button>
+    <button role="tab" data-v="apropos" id="t-apropos">Sources</button>
+  </nav>
+  <button class="proj" id="projBtn" aria-pressed="false">Projection</button>
+</header>
+
+<main>
+<!-- ============ DÉCROISSANCE ============ -->
+<section class="view" id="v-decroissance">
+  <div class="scene sc-dec">
+    <div class="card"><div class="fig"><canvas id="grid" aria-label="Grille des noyaux"></canvas></div><div class="gridlab"><span><b id="gN"></b> noyaux restants</span><span id="gT"></span></div></div>
+    <div class="card">
+      <div class="cardhead"><span class="legend"><span style="--c:var(--or)">Simulation</span><span class="dash" style="--c:var(--ink)" id="lgModel">Modèle N₀ e<sup>−λt</sup></span></span>
+        <span class="onchart"><button id="halfB" aria-pressed="false" title="Afficher la demi-vie sur le graphe">Afficher t½</button><button id="keepB" title="Garder cette courbe pour la comparer à un autre tirage">Garder la courbe</button></span></div>
+      <div class="fig" id="chartBox"><svg id="chart" role="img" aria-label="Courbe de décroissance" style="touch-action:pan-y"></svg><div class="tip" id="tip"></div></div>
+    </div>
+  </div>
+  <div class="pupitre">
+    <p class="lead">Chaque carré est un noyau. À chaque pas de temps, chaque noyau présent tire au sort sa désintégration.</p>
+    <div class="readouts">
+      <div class="ro"><small>Temps écoulé</small><b id="rT">0</b></div>
+      <div class="ro cool"><small>Demi-vie du nucléide</small><b id="rTh">–</b></div>
+      <div class="ro hot"><small>Demi-vie mesurée</small><b id="rTm">–</b></div>
+      <div class="ro"><small>Constante radioactive λ</small><b id="rL">–</b></div>
+    </div>
+    <div class="row">
+      <label class="ctl">Nucléide<select id="nuc"></select></label>
+      <span class="ctl" id="libreBox" hidden>Demi-vie libre<span style="display:flex;gap:6px"><input type="number" id="libT" min="0.001" step="any" value="10"><select id="libU"><option value="s">s</option><option value="min" selected>min</option><option value="h">h</option><option value="j">j</option><option value="a">ans</option></select></span></span>
+    </div>
+    <div class="trans" id="trans1"></div>
+    <div class="row">
+      <div class="ctl">Nombre initial de noyaux N₀<span style="display:flex;gap:8px;align-items:center"><input type="number" id="n0n" min="1" max="100000" step="1" value="200" aria-label="N₀"><input type="range" id="n0" min="0" max="5" step="0.01" value="2.3" aria-label="N₀, échelle logarithmique"></span></div>
+    </div>
+    <div class="row"><div class="btns"><button class="b main" id="play">Lancer</button><button class="b" id="stepB">Pas à pas</button><button class="b" id="reset">Nouveau tirage</button></div></div>
+    <div class="saved" id="savedBox" hidden>
+      <p class="sub">Courbes gardées <span class="note" id="savedNote"></span></p>
+      <div class="scroll"><table><thead><tr><th></th><th>Nucléide</th><th>N₀</th><th>t½ mesurée</th><th></th></tr></thead><tbody id="savedTab"></tbody></table></div>
+      <button class="b" id="savedClr" style="margin-top:6px">Effacer les courbes gardées</button>
+    </div>
+    <details class="menu"><summary>Options</summary><div>
+      <label class="ctl">Vitesse : <output id="oSpeedO"></output><input type="range" id="oSpeed" min="-1.3" max="0.7" step="0.01" value="-0.155"></label>
+      <label class="ctl">Pas de temps Δt<select id="oStep"></select></label>
+      <label class="ctl">Probabilité par pas<select id="oProb"><option value="exact">exacte : p = 1 − exp(−λΔt)</option><option value="approx">approchée : p = λΔt</option></select></label>
+      <div class="ctl">Courbe<div class="seg" id="mode"><button data-m="N" aria-pressed="true">N(t)</button><button data-m="R">N/N₀</button><button data-m="A">A(t)</button><button data-m="L">ln N</button></div></div>
+      <label class="chk"><input type="checkbox" id="tan">Tangente à l'origine</label>
+    </div></details>
+    <details><summary>Calcul<span class="tag">niveau 1</span></summary><div id="calc1"></div></details>
+    <details><summary>Modèle et hypothèses<span class="tag">niveau 2</span></summary><div>
+      <p><b>Tirage pas à pas.</b> Le temps avance par pas Δt (t½/50 par défaut, réglable dans Options). Pendant un pas, chaque noyau présent se désintègre avec la probabilité <span class="eq">p = 1 − e<sup>−λΔt</sup></span>. C'est le principe de la fiche éduscol de simulation en Python [3]. Quand λΔt est petit devant 1, p ≈ λΔt ; avec un grand pas, cette approximation surestime p et la simulation décroît trop vite.</p>
+      <p><b>Ce que le modèle ne dit pas.</b> La loi N₀e<sup>−λt</sup> décrit une grande population. Un noyau isolé a seulement une chance sur deux de se désintégrer pendant chaque demi-vie.</p>
+      <p><b>Valeurs mesurées.</b> Demi-vie mesurée : instant où la courbe simulée franchit N₀/2, c'est-à-dire la médiane des durées de vie des N₀ noyaux. Les désintégrations d'un même pas sont réparties régulièrement dans ce pas : sans cette interpolation, la mesure serait trop longue d'un demi-pas en moyenne (+1 % avec le pas par défaut).</p>
+      <p><b>Courbes gardées.</b> Avec des N₀ différents, on compare les courbes en N/N₀ : toutes passent par 1/2 au bout d'une demi-vie, quel que soit N₀.</p>
+      <p>En mode ln N, la pente mesurée est obtenue par régression linéaire sur les points simulés. Activité simulée : désintégrations pendant un pas divisées par Δt. Unités : 1 an = 365,25 j.</p>
+    </div></details>
+    <details><summary>Sources<span class="tag">niveau 3</span></summary><div id="src1"></div></details>
+  </div>
+</section>
+
+<!-- ============ EXPÉRIENCE ============ -->
+<section class="view" id="v-experience">
+  <div class="scene sc-exp">
+    <div class="card">
+      <div class="cardhead legend"><span style="--c:var(--or)">Une demi-vie mesurée (un essai)</span><span style="--c:var(--ink)">Médiane</span><span style="--c:var(--c2)">Moyenne ± 2u</span><span class="dash" style="--c:var(--cy)">Demi-vie du nucléide</span></div>
+      <div class="fig" id="xBox"><svg id="xChart" role="img" aria-label="Demi-vies mesurées selon N0"></svg><div class="tip" id="xTip"></div></div>
+      <p class="note" id="xStat" style="margin:4px 0 0"></p>
+    </div>
+  </div>
+  <div class="pupitre">
+    <p class="lead">On relance la même simulation de nombreuses fois, pour plusieurs N₀, et on relève à chaque fois la demi-vie mesurée. Nucléide : <b id="xNuc"></b> (à changer dans l'onglet Décroissance).</p>
+    <div class="trans" id="trans2"></div>
+    <div class="row"><div class="ctl">Valeurs de N₀<div class="chips" id="chips"></div></div></div>
+    <div class="row">
+      <label class="ctl">Essais par N₀<select id="nTr"><option>10</option><option selected>20</option><option>50</option></select></label>
+      <div class="btns"><button class="b main" id="xRun">Lancer</button><button class="b" id="xMore">Ajouter des essais</button><button class="b" id="xClr">Effacer</button></div>
+    </div>
+    <details class="menu"><summary>Options</summary><div>
+      <label class="ctl">Ajouter un N₀<span style="display:flex;gap:6px"><input type="number" id="addN" min="1" max="100000" step="1" value="50"><button class="b" id="addNB">Ajouter</button></span></label>
+    </div></details>
+    <details open><summary>Tableau des mesures</summary><div><div class="scroll"><table id="xTab"><thead><tr><th>N₀</th><th>Essais</th><th>Médiane</th><th>Moyenne</th><th>Écart-type</th><th>Écart relatif</th><th>u(moyenne)</th><th>z-score</th></tr></thead><tbody></tbody></table></div>
+      <p class="note">z-score : <span class="eq">z = |moyenne − t½| / u</span>, avec <span class="eq">u = s / √n</span>. Si z ≤ 2, la moyenne mesurée est compatible avec la demi-vie du nucléide.</p></div></details>
+    <details><summary>Ce qu'il faut constater<span class="tag">après l'expérience</span></summary><div class="obs">
+      <p>La demi-vie ne dépend pas de N₀ : quel que soit N₀, les mesures se regroupent autour de la même valeur, et le z-score reste inférieur à 2 : chaque série est compatible avec la demi-vie du nucléide.</p>
+      <p>Plus N₀ est petit, plus les mesures sont dispersées : la loi exponentielle décrit une grande population, pas un noyau isolé.</p>
+    </div></details>
+    <details><summary>Calcul<span class="tag">niveau 1</span></summary><div>
+      <p>Pour chaque essai : N₀ noyaux, pas Δt = t½/100, probabilité <span class="eq">p = 1 − 2<sup>−1/100</sup> ≈ 0,0069</span> par pas. Demi-vie mesurée : instant où N franchit N₀/2.</p>
+      <p>Le tirage ne dépend que du rapport Δt/t½ : les mêmes essais valent pour tous les nucléides, seule l'unité change.</p>
+      <p>Écart relatif = écart-type ÷ moyenne. Médiane : la moitié des essais est en dessous, l'autre moitié au-dessus.</p>
+      <p>Incertitude-type sur la moyenne de n essais : <span class="eq">u = s / √n</span> (s : écart-type expérimental). z-score : <span class="eq">z = |moyenne − t½<sub>ref</sub>| / u</span> ; la mesure est jugée compatible avec la référence si z ≤ 2. Sur le graphe, le trait violet va de moyenne − 2u à moyenne + 2u : z ≤ 2 quand il coupe la ligne en tirets.</p>
+    </div></details>
+    <details><summary>Modèle et hypothèses<span class="tag">niveau 2, hors programme</span></summary><div>
+      <p>La dispersion relative diminue à peu près comme 1/√N₀ : multiplier N₀ par 100 divise environ la dispersion par 10.</p>
+      <p>Avec N₀ = 1, la demi-vie mesurée est l'instant où l'unique noyau se désintègre : sa médiane vaut t½, mais sa moyenne vaut environ 1,44 t½ (la constante de temps τ). C'est pourquoi le graphe montre la médiane.</p>
+      <p>Le z-score repose sur la moyenne. Pour un très petit N₀ (1, 2 ou 3 noyaux, et un peu encore à 10), la moyenne des demi-vies mesurées dépasse t½ (environ 1,44 t½ pour N₀ = 1 et 1,08 t½ pour N₀ = 10) : avec beaucoup d'essais, z finit par dépasser 2. Ce n'est pas la demi-vie qui change, c'est la mesure « instant où N franchit N₀/2 » qui n'est plus un bon estimateur avec si peu de noyaux. Dès N₀ = 100, l'écart est inférieur à 1 %.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ============ RADIOPROTECTION ============ -->
+<section class="view" id="v-radioprotection">
+  <div class="scene sc-rad">
+    <div class="card bench"><div class="fig"><svg id="benchSvg" aria-label="Banc source, écrans, personne"></svg></div><div class="zone" id="zone"></div></div>
+    <div class="bottom">
+      <div class="card">
+        <div class="cardhead"><div class="seg" id="chartSeg"><button data-c="dist" aria-pressed="true">Distance</button><button data-c="ecran">Écran</button><button data-c="duree">Durée</button></div><div class="seg" id="matSeg"><button data-t="pb" aria-pressed="true">Plomb</button><button data-t="be">Béton</button></div></div>
+        <div class="fig"><svg id="rChart" role="img" aria-label="Graphe de radioprotection"></svg></div>
+      </div>
+      <div class="card">
+        <div class="cardhead"><b>Échelle des doses</b><span>log</span></div>
+        <div class="fig"><svg id="scale" role="img" aria-label="Échelle logarithmique des doses"></svg></div>
+      </div>
+    </div>
+  </div>
+  <div class="pupitre">
+    <div class="res">
+      <div><small class="note">Débit de dose reçu</small><div class="big" id="rate">–</div></div>
+      <div><small class="note">Dose pendant la durée choisie</small><div class="big" id="dose" style="color:var(--or)">–</div></div>
+    </div>
+    <p class="msg" id="rMsg"></p>
+    <div class="row">
+      <label class="ctl">Source<select id="rSrc"></select></label>
+      <label class="ctl" id="actBox">Activité : <output id="actO"></output><input type="range" id="act" min="5" max="14" step="0.001" value="10"></label>
+      <label class="chk" id="xBoxOn" hidden><input type="checkbox" id="xOn" checked>Tube sous tension</label>
+    </div>
+    <div class="trans" id="trans3"></div>
+    <div class="g2">
+      <label class="ctl">Distance : <output id="dO"></output><input type="range" id="dist" min="-1.3" max="1.3" step="0.01" value="0"></label>
+      <label class="ctl">Durée : <output id="tO"></output><input type="range" id="dur" min="0" max="7.5" step="0.0001" value="3.5563"></label>
+    </div>
+    <p class="sub">Écrans</p>
+    <div class="g2">
+      <label class="chk"><input type="checkbox" id="sPap">Feuille de papier</label>
+      <label class="ctl">Aluminium : <output id="sAlO"></output><input type="range" id="sAl" min="0" max="10" step="0.5" value="0"></label>
+      <label class="ctl">Plomb : <output id="sPbO"></output><input type="range" id="sPb" min="0" max="100" step="1" value="0"></label>
+      <label class="ctl">Béton : <output id="sBeO"></output><input type="range" id="sBe" min="0" max="100" step="1" value="0"></label>
+    </div>
+    <details class="menu"><summary>Options</summary><div>
+      <div class="ctl">Préréglages<div class="btns" id="presets"></div></div>
+      <div class="ctl">Épaisseurs moitié de référence<div class="seg" id="cdaRef"><button data-r="cnrs" aria-pressed="true">CNRS [11]</button><button data-r="osha">OSHA [12]</button></div></div>
+      <label class="chk"><input type="checkbox" id="oDecay" checked>Tenir compte de la décroissance de la source pendant l'exposition</label>
+    </div></details>
+    <details><summary>Calcul<span class="tag">niveau 1</span></summary><div id="calc3"></div></details>
+    <details><summary>Modèle et hypothèses<span class="tag">niveau 2</span></summary><div>
+      <p><b>Gamma.</b> Source ponctuelle ; débit à 1 m pour 1 Bq tiré des fiches de l'IRSN [13, 52, 53] : 2,75 × 10⁻¹⁷ Sv/s (Cs-137), 9,76 × 10⁻¹⁷ Sv/s (Co-60), 3,75 × 10⁻¹⁷ Sv/s (Ir-192). La CCSN donne 0,16 mSv/h par GBq à 1 m pour l'Ir-192 [7], environ 20 % de plus.</p>
+      <p><b>Écrans.</b> Chaque épaisseur moitié (CDA) divise le débit par 2. Valeurs du CNRS ou de l'OSHA, différentes ; pour l'Ir-192, seule celle du CNRS est disponible. Non pris en compte : atténuation par l'air, le papier et l'aluminium pour le gamma, rayonnement diffusé.</p>
+      <p><b>Décroissance pendant l'exposition.</b> Si l'option est cochée, <span class="eq">D = Ḋ₀ (1 − e<sup>−λΔt</sup>) / λ</span> au lieu de <span class="eq">D = Ḋ₀ Δt</span>. L'écart devient visible quand la durée n'est plus petite devant la demi-vie (Ir-192 : 74 j [7]).</p>
+      <p><b>Alpha et bêta : « tout ou rien ».</b> L'alpha est arrêté par une feuille de papier ; parcours dans l'air de 3,84 cm pour le Po-210 [9, 10]. Le bêta traverse le papier, il est arrêté par l'aluminium, 4 mm sur le schéma du CNRS [9, 10]. Leur dose n'est pas calculée.</p>
+      <p><b>Gy et Sv.</b> Pour un gamma reçu par tout le corps, on assimile Gy et Sv.</p>
+      <p><b>Zonage.</b> Code du travail [14] : rouge à partir de 100 mSv sur une heure, orange au-dessus de 2 mSv sur une heure. En dessous, les zones jaune, verte et bleue dépendent aussi de la dose sur un mois, non calculée ici.</p>
+    </div></details>
+    <details><summary>Repères de dose et sources</summary><div><ul class="ladder" id="ladder"></ul></div></details>
+  </div>
+</section>
+
+<!-- ============ MISSIONS ============ -->
+<section class="view" id="v-missions">
+  <div class="scene sc-list"><div class="mlist" id="mlist"></div></div>
+  <div class="pupitre">
+    <h2>Comment ça marche</h2>
+    <p>Les questions arrivent une par une. Les réponses se trouvent dans l'appli : un onglet, un menu Options, un panneau Calcul, Modèle ou Sources, ou une manipulation.</p>
+    <p><b>Paris.</b> Certaines missions commencent par un pari : on note son intuition, la réponse vient plus loin.</p>
+    <p><b>En suspens.</b> On peut laisser une question de côté et y revenir plus tard. Les questions ouvertes restent en suspens jusqu'à la discussion en classe.</p>
+    <label class="chk" id="teachBox" hidden><input type="checkbox" id="teach">Mode professeur : corrigés et pistes</label>
+    <details><summary>Réponses aux questions ouvertes</summary><div><div id="notesList" class="note"></div><button class="b" id="copyNotes">Copier les réponses</button> <span class="note" id="copyMsg"></span></div></details>
+    <p class="note">Progression enregistrée dans ce navigateur seulement. <button class="b" id="mReset">Tout effacer</button></p>
+  </div>
+</section>
+
+<!-- ============ SOURCES ============ -->
+<section class="view" id="v-apropos">
+  <div class="scene sc-list"><ol class="src" id="srcList"></ol></div>
+  <div class="pupitre">
+    <h2>Transparence</h2>
+    <p>Version de travail, construite d'après le cahier des charges v0.1 du 24 novembre 2026. Les numéros entre crochets sont ceux du cahier des charges ; [52] à [64] sont nouveaux. Les équations de transformation viennent des tables du LNHB [54] à [64], qui donnent aussi des demi-vies un peu différentes de celles utilisées ici : les deux sont affichées sous chaque équation.</p>
+    <p class="ver">© 2026 M. Van Hoorde – « du cahier au laboratoire ». Prototype réalisé avec l'aide de Claude (Claude Opus 5.5, Anthropic) : code, recherche documentaire et mise en forme. Choix pédagogiques, vérification des données et validation : M. Van Hoorde.</p>
+    <p class="ver">v0.4 (dans Résonance) : équations de transformation pour chaque nucléide et chaque source (fluor 18 ajouté, émetteur β⁺), bouton « Afficher t½ » et construction graphique, courbes gardées et mode N/N₀, z-score dans l'Expérience, demi-vie mesurée sans biais de demi-pas, polices de Résonance, info-bulle au doigt sur tablette.</p>
+    <p class="ver">v0.3 : écran partagé, valeurs mesurées sur les graphes, missions progressives, vitesse et pas de temps réglables. v0.2 : missions, N₀ jusqu'à 100 000. v0.1 : première version.</p>
+  </div>
+</section>
+
+<aside id="mdock" hidden aria-label="Mission en cours"><header><b id="mTitle"></b><span id="mCount"></span><button id="mMin">Réduire</button><button id="mClose">Fermer</button></header><div id="mbody"></div></aside>
+</main>
+<span id="probeOr" style="color:var(--or);display:none"></span><span id="probeCy" style="color:var(--cy);display:none"></span><span id="probeLine" style="color:var(--line);display:none"></span>
+
+<script>
+{
+const $ = (id) => document.getElementById(id);
+const LN2 = Math.LN2;
+const U = { s: 1, min: 60, h: 3600, j: 86400, a: 365.25 * 86400 };
+const UL = { s: "s", min: "min", h: "h", j: "j", a: "ans" };
+
+// ---------- données sourcées ----------
+const SRC = {
+  1: ["Fiche CCM « Décroissance radioactive », Pégase – ENS de Lyon (capacités du programme)", "https://pegase.ens-lyon.fr/sites/default/files/2025-07/Terminale_RADIOACTIVITE_CCM.pdf"],
+  3: ["Éduscol, Programmer en Python – Pour aller plus loin n° 2 : simulation d'une décroissance radioactive", "https://eduscol.education.fr/document/22822/download"],
+  4: ["LNHB (CEA-LNE), table de radionucléides, base Nucléide", "http://www.nucleide.org"],
+  5: ["ANCCLI, fiche technique 02 « Radioactivité » (périodes)", "https://www.anccli.org/wp-content/uploads/2023/01/FT_02_Radioactivite.pdf"],
+  6: ["CNRS, Guide Risques radioactifs et radioprotection, chap. 2 « Notions fondamentales »", "https://www.dgdr.cnrs.fr/sst/CNPS/guides/doc/radioprotection/Chapitre2_RI_Notions_fondamentales.pdf"],
+  7: ["CCSN, fiche signalétique Iridium-192", "https://bac-lac.wayback.archive-it.org/web/20061029062647/https://www.nuclearsafety.gc.ca/fr/safety/pdf/Ir-192.pdf"],
+  8: ["INRS, fiche ED 4319 « Césium-137 »", "https://inrs.fr/dam/inrs/CataloguePapier/ED/TI-ED-4319.pdf"],
+  9: ["CNRS, fiche 1 « Pénétration dans la matière »", "https://www.dgdr.cnrs.fr/sst/CNPS/guides/doc/radioprotection/Fiche1_Penetration_dans_la_matiere.pdf"],
+  10: ["ASNR, exposition pédagogique « Radioactivité »", "https://expo-radioactivite.asnr.fr/app/uploads/2026/02/expo-v2025-1-3.pdf"],
+  11: ["CNRS, fiche 2 « Écrans de protection » (épaisseurs moitié et dixième)", "https://www.dgdr.cnrs.fr/sst/CNPS/guides/doc/radioprotection/Fiche2_Ecrans_de_protection.pdf"],
+  12: ["OSHA, Shielding Layer Examples", "https://www.osha.gov/ionizing-radiation/introduction/shielding-layer-examples"],
+  13: ["IRSN, fiche radionucléide Iridium 192 – aspects sanitaires", "https://www.irsn.fr/FR/Larecherche/publications-documentation/fiches-radionucleides/Documents/sante/Ir192SAN.pdf"],
+  14: ["Code du travail, article R4451-23 (zonage)", "https://code.travail.gouv.fr/code-du-travail/r4451-23"],
+  18: ["IRSN, infographie « Exposition de la population aux rayonnements ionisants » (2021)", "https://www.irsn.fr/FR/Actualites_presse/Communiques_et_dossiers_de_presse/Documents/info_exposition_population-V2021.pdf"],
+  19: ["Connaissance des énergies, « Quelle dose annuelle de radioactivité un Français reçoit-il ? »", "https://www.connaissancedesenergies.org/questions-et-reponses-energies/quelle-dose-annuelle-de-radioactivite-un-francais-recoit-il"],
+  20: ["EDF, « La protection des travailleurs en zone nucléaire »", "https://www.edf.fr/groupe-edf/comprendre/production/nucleaire/radioprotection"],
+  22: ["SFRP / IRSN, « Tous exposés, mais tous différemment » (2017)", "https://sfrp.asso.fr/wp-content/uploads/2021/11/S13-a-VIAL-E-IELSCH-G-1.pdf"],
+  23: ["ASNR, Exposition de la population française aux rayonnements ionisants – bilan 2020-2024 (septembre 2026)", "https://www.vie-publique.fr/files/rapport/pdf/304796.pdf"],
+  25: ["INRS, Documents pour le médecin du travail AC 161 (valeurs limites)", "https://www.inrs.fr/dms/inrs/CataloguePapier/DMT/TI-AC-161/ac161.pdf"],
+  26: ["INRS, « Rayonnements ionisants – effets sur la santé »", "https://www.inrs.fr/risques/rayonnements-ionisants/effets-sur-la-sante.html"],
+  27: ["CNRS, fiche 4 « Effets non aléatoires ou déterministes » (DL50)", "https://www.dgdr.cnrs.fr/sst/CNPS/guides/doc/radioprotection/Fiche4_Effets_non_aleatoires_ou_deterministe.pdf"],
+  37: ["INRS, fiche ED 4287 « Curiethérapie à haut débit »", "https://inrs.fr/dam/jcr:7f7490b8-5e13-4c6b-8f90-3c90276e0081/ed4287.pdf"],
+  38: ["SFRP, B. Hajji, retour d'expérience en curiethérapie à haut débit (source de 370 GBq)", "https://sfrp.asso.fr/wp-content/uploads/2021/11/2016_11_09_HAJJI_B.pdf"],
+  39: ["IRSN, Tchernobyl, fiche 6 (contamination des produits agricoles)", "https://recherche-expertise.asnr.fr/FR/connaissances/Installations_nucleaires/Les-accidents-nucleaires/accident-tchernobyl-1986/librairie-Tchernobyl/Documents/irsn_tchernobyl_fiche6.pdf"],
+  43: ["Wikipédia (via Wikiwand), Goiânia accident – 74 TBq en 1971, à recouper avec l'AIEA", "https://www.wikiwand.com/en/articles/Goiania_accident"],
+  52: ["IRSN, fiche radionucléide Césium 137 – aspects sanitaires (d'après Delacroix et al., 1998)", "https://recherche-expertise.asnr.fr/sites/default/files/documents/larecherche/publications-documentation/fiches-radionucleides/CS137SAN.pdf"],
+  53: ["IRSN, fiche radionucléide Cobalt 60 – aspects sanitaires (d'après Delacroix et al., 1998)", "https://www.irsn.fr/FR/Larecherche/publications-documentation/fiches-radionucleides/Documents/sante/Co60SAN.pdf"],
+  54: ["LNHB, table de radionucléides : fluor 18", "https://www.lnhb.fr/nuclides/F-18_tables.pdf"],
+  55: ["LNHB, table de radionucléides : iode 125", "https://www.lnhb.fr/nuclides/I-125_tables.pdf"],
+  56: ["LNHB, table de radionucléides : iridium 192", "https://www.lnhb.fr/nuclides/Ir-192_tables.pdf"],
+  57: ["LNHB, table de radionucléides : technétium 99m", "https://www.lnhb.fr/nuclides/Tc-99m_tables.pdf"],
+  58: ["LNHB, table de radionucléides : iode 131", "https://www.lnhb.fr/nuclides/I-131_tables.pdf"],
+  59: ["LNHB, table de radionucléides : cobalt 60", "https://www.lnhb.fr/nuclides/Co-60_tables.pdf"],
+  60: ["LNHB, table de radionucléides : tritium (hydrogène 3)", "https://www.lnhb.fr/nuclides/H-3_tables.pdf"],
+  61: ["LNHB, table de radionucléides : césium 137", "https://www.lnhb.fr/nuclides/Cs-137_tables.pdf"],
+  62: ["LNHB, table de radionucléides : carbone 14", "https://www.lnhb.fr/nuclides/C-14_tables.pdf"],
+  63: ["LNHB, table de radionucléides : plutonium 239", "https://www.lnhb.fr/nuclides/Pu-239_tables.pdf"],
+  64: ["LNHB, table de radionucléides : polonium 210", "https://www.lnhb.fr/nuclides/Po-210_tables.pdf"],
+};
+const NUC = [
+  { id: "f18", nom: "Fluor 18", t: 109.73, u: "min", src: 54, ctx: "imagerie TEP" },
+  { id: "tc99m", nom: "Technétium 99m", t: 6.02, u: "h", src: 6, ctx: "scintigraphie" },
+  { id: "i131", nom: "Iode 131", t: 8.04, u: "j", src: 5, ctx: "Tchernobyl, thyroïde" },
+  { id: "i125", nom: "Iode 125", t: 59.4, u: "j", src: 6, ctx: "curiethérapie de prostate" },
+  { id: "ir192", nom: "Iridium 192", t: 74.02, u: "j", src: 7, ctx: "curiethérapie" },
+  { id: "co60", nom: "Cobalt 60", t: 5.27, u: "a", src: 5, ctx: "radiothérapie" },
+  { id: "h3", nom: "Tritium", t: 12.35, u: "a", src: 5, ctx: "" },
+  { id: "cs137", nom: "Césium 137", t: 30.1, u: "a", src: 8, ctx: "Tchernobyl, Goiânia" },
+  { id: "c14", nom: "Carbone 14", t: 5730, u: "a", src: 5, ctx: "datation" },
+  { id: "pu239", nom: "Plutonium 239", t: 24065, u: "a", src: 5, ctx: "" },
+  { id: "libre", nom: "Demi-vie libre", t: 10, u: "min", src: null, ctx: "" },
+];
+const RSRC = [
+  { id: "cs", nom: "Césium 137 (gamma)", court: "Césium 137", type: "g", gam: 2.75e-17, gsrc: 52, t: 30.1, u: "a", tsrc: 8, cda: { cnrs: [6, 66], osha: [7, 48] } },
+  { id: "co", nom: "Cobalt 60 (gamma)", court: "Cobalt 60", type: "g", gam: 9.76e-17, gsrc: 53, t: 5.27, u: "a", tsrc: 5, cda: { cnrs: [11.5, 84], osha: [12, 66] } },
+  { id: "ir", nom: "Iridium 192 (gamma)", court: "Iridium 192", type: "g", gam: 3.75e-17, gsrc: 13, t: 74.02, u: "j", tsrc: 7, cda: { cnrs: [3.5, 54], osha: null } },
+  { id: "po", nom: "Polonium 210 (alpha)", court: "Polonium 210", type: "a" },
+  { id: "be", nom: "Émetteur bêta (générique)", court: "Émetteur bêta", type: "b" },
+  { id: "rx", nom: "Tube à rayons X (pas de λ)", court: "Tube à rayons X", type: "x" },
+];
+// ---------- équations de transformation (tables du LNHB, [54] à [64]) ----------
+// Un noyau : [A, Z, symbole, excité ?]. "g" = photon γ. La première ligne sert au bilan de conservation.
+const E_ = [0, -1, "e"], EP_ = [0, 1, "e"], HE_ = [4, 2, "He"];
+const EQ = {
+  f18: { ty: "β⁺", lab: "Radioactivité β⁺ (96,86 %)", l: [[[[18, 9, "F"]], [[18, 8, "O"], EP_]]], src: 54, lnhb: "109,73 min (1,8289 h)",
+    nt: "Dans 3,14 % des cas : capture électronique, vers le même oxygène 18. Le positon émis s'annihile avec un électron en deux photons, que détecte la caméra TEP. Un neutrino est aussi émis (hors programme)." },
+  tc99m: { ty: "γ", lab: "Émission γ : désexcitation du noyau", l: [[[["99m", 43, "Tc"]], [[99, 43, "Tc"], "g"]]], src: 57, lnhb: "6,0067 h",
+    nt: "Le « m » désigne un noyau dans un état excité de longue durée (métastable). Il se désexcite en émettant un photon γ : A et Z ne changent pas. C'est ce γ que détecte la gamma-caméra en scintigraphie." },
+  i131: { ty: "β⁻", lab: "Radioactivité β⁻", l: [[[[131, 53, "I"]], [[131, 54, "Xe", 1], E_]], [[[131, 54, "Xe", 1]], [[131, 54, "Xe"], "g"]]], src: 58, lnhb: "8,0233 j",
+    nt: "Le xénon 131 est formé dans un état excité (*) : il se désexcite en émettant un γ. Un antineutrino est aussi émis (hors programme)." },
+  i125: { ty: "CE", lab: "Capture électronique (hors programme)", l: [[[[125, 53, "I"], E_], [[125, 52, "Te", 1]]], [[[125, 52, "Te", 1]], [[125, 52, "Te"], "g"]]], src: 55, lnhb: "59,388 j",
+    nt: "Ni α ni β : le noyau capture un électron de son propre cortège. Le bilan est le même qu'en β⁺ : Z diminue de 1, A ne change pas." },
+  ir192: { ty: "β⁻", lab: "Radioactivité β⁻ (95,13 %)", l: [[[[192, 77, "Ir"]], [[192, 78, "Pt", 1], E_]], [[[192, 78, "Pt", 1]], [[192, 78, "Pt"], "g"]]], src: 56, lnhb: "73,827 j",
+    nt: "Dans 4,87 % des cas : capture électronique, vers l'osmium 192 (Z = 76). Les γ émis par le platine excité sont ceux qu'on utilise en curiethérapie." },
+  co60: { ty: "β⁻", lab: "Radioactivité β⁻", l: [[[[60, 27, "Co"]], [[60, 28, "Ni", 1], E_]], [[[60, 28, "Ni", 1]], [[60, 28, "Ni"], "g"]]], src: 59, lnhb: "5,2711 ans",
+    nt: "Le nickel 60 est formé dans un état excité : ses γ sont ceux de la radiothérapie au cobalt." },
+  h3: { ty: "β⁻", lab: "Radioactivité β⁻", l: [[[[3, 1, "H"]], [[3, 2, "He"], E_]]], src: 60, lnhb: "12,312 ans",
+    nt: "100 %, directement vers l'hélium 3 dans son état fondamental : aucun γ. L'électron emporte au plus 18,6 keV, un bêta de très faible énergie." },
+  cs137: { ty: "β⁻", lab: "Radioactivité β⁻", l: [[[[137, 55, "Cs"]], [["137m", 56, "Ba"], E_]], [[["137m", 56, "Ba"]], [[137, 56, "Ba"], "g"]]], src: 61, lnhb: "30,018 ans",
+    nt: "Dans 94,57 % des cas, le baryum est formé dans un état excité métastable (137m), qui émet ensuite le γ : le « γ du césium 137 » est en fait émis par le baryum. Dans 5,43 % des cas, le baryum est formé directement dans son état fondamental." },
+  c14: { ty: "β⁻", lab: "Radioactivité β⁻", l: [[[[14, 6, "C"]], [[14, 7, "N"], E_]]], src: 62, lnhb: "5 700 ans",
+    nt: "100 %, directement vers l'azote 14 stable : aucun γ." },
+  pu239: { ty: "α", lab: "Radioactivité α", l: [[[[239, 94, "Pu"]], [[235, 92, "U"], HE_]]], src: 63, lnhb: "24 100 ans",
+    nt: "L'uranium 235 est surtout formé dans des états excités de faible énergie, qui émettent des γ." },
+  po210: { ty: "α", lab: "Radioactivité α", l: [[[[210, 84, "Po"]], [[206, 82, "Pb"], HE_]]], src: 64, lnhb: "138,3763 j",
+    nt: "Presque toujours directement vers l'état fondamental du plomb 206 (sauf 0,00124 %) : pratiquement aucun γ." },
+};
+const fmtZ = (z, plus) => (typeof z !== "number" ? z : z < 0 ? "−" + (-z) : plus && z > 0 ? "+" + z : String(z));
+const nzH = (t) => t === "g" ? "γ" : `<span class="nz"><span class="az"><span>${t[0]}</span><span>${fmtZ(t[1], t[0] === 0)}</span></span>${t[2]}${t[3] ? '<span class="ex">*</span>' : ""}</span>`;
+const sideH = (a) => a.map(nzH).join(" + ");
+const massNum = (t) => (t === "g" ? 0 : parseInt(t[0], 10));
+const zNum = (t) => (t === "g" ? 0 : t[1]);
+function transHTML(id, rad, open) {
+  if (rad === "be") return `<div class="ty"><span class="pill">β⁻</span>Émetteur bêta générique</div><div class="l">${nzH(["A", "Z", "X"])} → ${nzH(["A", "Z+1", "Y"])} + ${nzH(E_)}</div><p class="nt">Un neutron du noyau devient un proton : Z augmente de 1, A ne change pas.</p>`;
+  if (rad === "rx") return `<div class="ty"><span class="pill a">aucune</span>Pas de transformation nucléaire</div><p class="nt">Les rayons X d'un tube viennent d'électrons freinés dans la cible, pas d'un noyau qui se transforme : aucun noyau, donc pas de demi-vie.</p>`;
+  const e = EQ[id];
+  if (!e) return `<p class="nt">Demi-vie libre : pas de nucléide réel, donc pas d'équation.</p>`;
+  const lines = e.l.map(([g, d]) => `<div class="l">${sideH(g)} → ${sideH(d)}</div>`).join("");
+  const [g0, d0] = e.l[0], sum = (a, f) => a.reduce((s, t) => s + f(t), 0);
+  const Ag = g0.map(massNum).join(" + "), Ad = d0.map(massNum).join(" + "), Zg = g0.map((t) => fmtZ(zNum(t))).join(" + "), Zd = d0.map((t) => (zNum(t) < 0 ? "(" + fmtZ(zNum(t)) + ")" : fmtZ(zNum(t)))).join(" + ");
+  const cons = sum(g0, massNum) === sum(d0, massNum) && sum(g0, zNum) === sum(d0, zNum) ? `<p class="cons">Conservation : A ${Ag} = ${Ad} · Z ${Zg} = ${Zd}</p>` : "";
+  const n = NUC.find((x) => x.id === id);
+  const dv = n && n.src === e.src ? `<p class="nt">Demi-vie : ${e.lnhb} [${e.src}].</p>`
+    : n ? `<p class="nt">Demi-vie utilisée ici : ${nf(n.t, 5)} ${UL[n.u]} [${n.src}] ; table du LNHB : ${e.lnhb} [${e.src}].</p>` : `<p class="nt">Demi-vie selon la table du LNHB : ${e.lnhb} [${e.src}].</p>`;
+  return `<div class="ty"><span class="pill${e.ty === "α" ? " a" : ""}">${e.ty}</span>${e.lab}</div>${lines}${cons}<details${open ? " open" : ""}><summary>Détails et sources</summary><div><p class="nt">${e.nt}</p>${dv}</div></details>`;
+}
+const LADDER = [
+  [0.001, "Installation nucléaire, 1 an", "Installations nucléaires, à proximité des sites (par an)", "18"],
+  [0.03, "Vol Paris – New York", "Vol Paris – New York : 0,03 mSv selon l'ASNR, 0,08 mSv selon EDF", "19, 20"],
+  [0.1, "Radio du thorax", "Radiographie du thorax", "19"],
+  [0.3, "Tchernobyl, France 1986", "Retombées de Tchernobyl en France, moyenne 1986", "19"],
+  [1, "Limite public, 1 an", "Limite annuelle pour le public (hors médical)", "25"],
+  [4.5, "Moyenne France, 1 an", "Exposition moyenne en France, par an (bilan 2014-2019)", "22"],
+  [12, "Scanner abdominal", "Scanner abdominal", "19"],
+  [20, "Limite travailleurs, 1 an", "Limite annuelle pour les travailleurs", "25"],
+  [150, "Effets déterministes", "Premiers effets déterministes : 0,15 Gy", "26", true],
+  [4500, "DL50", "DL50, corps entier sans traitement : 4,5 Gy", "27", true],
+];
+
+// ---------- formatage et mesure du texte ----------
+const nf = (x, d = 3) => new Intl.NumberFormat("fr-FR", { maximumSignificantDigits: d }).format(x);
+const SUPD = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻" };
+const supStr = (e) => String(e).split("").map((c) => SUPD[c] || c).join("");
+function sci(x, d = 3) {
+  if (!isFinite(x)) return "–";
+  if (x === 0) return "0";
+  const a = Math.abs(x);
+  if (a >= 0.01 && a < 1e5) return nf(x, d);
+  let e = Math.floor(Math.log10(a)), m = +(x / 10 ** e).toPrecision(d);
+  if (Math.abs(m) >= 10) { m /= 10; e += 1; }
+  return nf(m, d) + " × 10" + supStr(e);
+}
+function pickUnit(x, units) { let u = units[0]; for (const v of units) if (Math.abs(x) >= v[0] * 0.9995) u = v; return u; }
+function unitFmt(x, units, d = 3) { if (x <= 0) return "0 " + units[Math.min(2, units.length - 1)][1]; const u = pickUnit(x, units); return sci(x / u[0], d) + " " + u[1]; }
+const DOSEU = [[1e-12, "pSv"], [1e-9, "nSv"], [1e-6, "µSv"], [1e-3, "mSv"], [1, "Sv"]];
+const RATEU = [[1e-12, "pSv/h"], [1e-9, "nSv/h"], [1e-6, "µSv/h"], [1e-3, "mSv/h"], [1, "Sv/h"]];
+const ACTU = [[1, "Bq"], [1e3, "kBq"], [1e6, "MBq"], [1e9, "GBq"], [1e12, "TBq"]];
+const DURU = [[1, "s"], [60, "min"], [3600, "h"], [86400, "j"], [U.a, "an"]];
+const DISTU = [[0.01, "cm"], [1, "m"]];
+const srcLink = (n) => SRC[n] ? `[${n}] <a href="${SRC[n][1]}" target="_blank" rel="noopener">${SRC[n][0]}</a>` : "";
+const col = (id) => getComputedStyle($(id)).color;
+const MCTX = document.createElement("canvas").getContext("2d");
+const FS = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--fs")) || 13;
+function tw(s, bold) { MCTX.font = (bold ? "700 " : "") + FS() + "px 'IBM Plex Sans', system-ui, sans-serif"; return MCTX.measureText(String(s)).width * 1.06; }
+function fit(s, w, bold) { s = String(s); if (tw(s, bold) <= w) return s; while (s.length > 3 && tw(s + "…", bold) > w) s = s.slice(0, -1); return s.trimEnd() + "…"; }
+const T = (x, y, txt, anchor = "start", cls = "") => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"${cls ? ` class="${cls}"` : ""}>${txt}</text>`;
+function ticks(a, b, n = 5) {
+  const span = b - a; if (span <= 0) return [a];
+  const raw = span / Math.max(1, n), mag = 10 ** Math.floor(Math.log10(raw)), f = raw / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  const out = []; for (let v = Math.ceil(a / step - 1e-9) * step; v <= b + 1e-9 * span; v += step) out.push(+v.toPrecision(12));
+  return out;
+}
+// étiquettes posées sur des lignes sans se chevaucher
+function rowLabels(items, x0, x1, rowY) {
+  const rows = []; let h = "";
+  items.forEach((l) => {
+    const w = tw(l.txt, true);
+    let a = l.side === "left" ? l.x - 6 - w : l.x + 6;
+    if (a + w > x1) a = l.x - 6 - w;
+    if (a < x0) a = Math.min(x0, x1 - w);
+    let r = 0; while ((rows[r] || []).some(([s, e]) => a < e + 8 && a + w > s - 8)) r++;
+    (rows[r] = rows[r] || []).push([a, a + w]);
+    h += T(a, rowY(r), l.txt, "start", l.cls);
+  });
+  return h;
+}
+// écarter verticalement des étiquettes (y croissants)
+function dodge(items, lo, hi, gap) {
+  items.sort((a, b) => a.y - b.y);
+  items.forEach((it, i) => { it.ly = Math.max(it.y, i ? items[i - 1].ly + gap : lo); });
+  for (let i = items.length - 1; i >= 0; i--) it2(i);
+  function it2(i) { const lim = i === items.length - 1 ? hi : items[i + 1].ly - gap; if (items[i].ly > lim) items[i].ly = lim; }
+  return items;
+}
+function xLabels(vals, X, y, fmt) {
+  const labs = vals.map(fmt), w = Math.max(...labs.map((l) => tw(l))) + 12;
+  const sp = vals.length > 1 ? Math.abs(X(vals[1]) - X(vals[0])) : w;
+  const stride = Math.max(1, Math.ceil(w / sp));
+  return vals.map((v, i) => i % stride ? "" : T(X(v), y, labs[i], "middle")).join("");
+}
+
+// ---------- onglets, projection ----------
+const views = ["decroissance", "experience", "radioprotection", "missions", "apropos"];
+function show(v) {
+  if (!views.includes(v)) v = "decroissance";
+  views.forEach((w) => { $("v-" + w).classList.toggle("on", w === v); $("t-" + w).setAttribute("aria-selected", w === v); });
+  requestAnimationFrame(drawAll);
+}
+document.querySelectorAll(".tabs [data-v]").forEach((b) => b.addEventListener("click", () => { location.hash = b.dataset.v; show(b.dataset.v); }));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+$("projBtn").addEventListener("click", () => {
+  const on = document.documentElement.classList.toggle("projection");
+  $("projBtn").setAttribute("aria-pressed", on);
+  requestAnimationFrame(drawAll);
+});
+function segGroup(id, attr, cb) {
+  $(id).querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    if (b.disabled) return;
+    $(id).querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    cb(b.dataset[attr]);
+  }));
+}
+
+// ---------- vue Décroissance ----------
+const TMAX = 8;
+const sel = $("nuc");
+sel.innerHTML = NUC.map((n) => `<option value="${n.id}">${n.nom}${n.src ? " – " + nf(n.t, 5) + " " + UL[n.u] : ""}</option>`).join("");
+sel.value = "i131";
+const STEPCH = [2, 3, 5, 10, 20, 50, 100, 200];
+const st = { N0: 200, hps: 0.7, S: 50, approx: false, mode: "N", tan: false, playing: false, acc: 0, half: false, saved: [] };
+let sim = null;
+function nuc() {
+  const n = NUC.find((x) => x.id === sel.value);
+  if (n.id === "libre") { n.t = Math.max(1e-3, +$("libT").value || 1); n.u = $("libU").value; }
+  return n;
+}
+function updOptions() {
+  const n = nuc();
+  $("oStep").innerHTML = STEPCH.map((S) => `<option value="${S}"${S === st.S ? " selected" : ""}>t½/${S} = ${nf(n.t / S, 3)} ${UL[n.u]}${S === 50 ? " (défaut)" : ""}</option>`).join("");
+  $("oSpeedO").textContent = nf(st.hps, 2) + " demi-vie par seconde (" + nf(st.hps * st.S, 2) + " pas/s)";
+}
+function newSim() {
+  const n = nuc(), N0 = st.N0, S = st.S, tS = n.t * U[n.u], lam = LN2 / tS, dtS = tS / S;
+  sim = { n, N0, S, step: 0, N: N0, alive: new Uint8Array(N0).fill(1), dAt: new Int16Array(N0).fill(-1), hist: [N0], dec: [0], ta: null, tb: null,
+    lam, dtS, approx: st.approx, p: st.approx ? lam * dtS : 1 - 2 ** (-1 / S) };
+  st.playing = false; $("play").textContent = "Lancer";
+  updOptions(); $("trans1").innerHTML = transHTML(n.id, null, $("trans1").querySelector("details[open]") !== null); render1();
+}
+function doStep() {
+  if (sim.step >= sim.S * TMAX) return false;
+  let d = 0; const s1 = sim.step + 1, p = sim.p;
+  for (let i = 0; i < sim.N0; i++) if (sim.alive[i] && Math.random() < p) { sim.alive[i] = 0; sim.dAt[i] = s1; d++; }
+  sim.N -= d; sim.step = s1; sim.hist.push(sim.N); sim.dec.push(d);
+  if (sim.ta === null && sim.N <= sim.N0 / 2) sim.ta = s1;
+  if (sim.tb === null && sim.N < sim.N0 / 2) sim.tb = s1;
+  return true;
+}
+// Demi-vie mesurée = médiane des durées de vie, en pas. Les d désintégrations du pas k sont réparties
+// régulièrement dans ce pas : la j-ième a lieu vers (k − 1) + (j − 0,5)/d. Sans cela, la mesure serait
+// trop longue d'un demi-pas en moyenne (+1 % avec t½/50, +0,5 % dans l'Expérience avec t½/100).
+function rankTime(hist, N0, r) {
+  for (let k = 1; k < hist.length; k++) {
+    const before = N0 - hist[k - 1], after = N0 - hist[k];
+    if (after >= r) return k - 1 + (r - before - 0.5) / (after - before);
+  }
+  return null;
+}
+function medianSteps(hist, N0) {
+  if (N0 % 2) return rankTime(hist, N0, (N0 + 1) / 2);
+  const a = rankTime(hist, N0, N0 / 2), b = rankTime(hist, N0, N0 / 2 + 1);
+  return a === null || b === null ? null : (a + b) / 2;
+}
+const tHalfMeas = () => { const m = medianSteps(sim.hist, sim.N0); return m === null ? null : m / sim.S; }; // en demi-vies
+function rgbOf(id) {
+  const c = getComputedStyle($(id)).color, n = (c.match(/[\d.]+/g) || [0, 0, 0]).map(Number);
+  return c.startsWith("color(") ? n.slice(0, 3).map((x) => Math.round(x * 255)) : n.slice(0, 3);
+}
+function drawGrid() {
+  const c = $("grid"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  if (!r.width || !r.height) return;
+  const Wd = Math.round(r.width * dpr), Hd = Math.round(r.height * dpr);
+  if (c.width !== Wd || c.height !== Hd) { c.width = Wd; c.height = Hd; }
+  const g = c.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, Wd, Hd);
+  const N0 = sim.N0, W = r.width, H = r.height;
+  const cols = Math.max(1, Math.ceil(Math.sqrt(N0 * W / H))), rows = Math.ceil(N0 / cols);
+  const cell = Math.min(W / cols, H / rows);
+  const ox = (W - cols * cell) / 2, oy = (H - rows * cell) / 2;
+  if (cell >= 3) {
+    g.scale(dpr, dpr);
+    const cy = col("probeCy"), or = col("probeOr"), li = col("probeLine"), gap = cell > 7 ? 1.5 : 0.6, s = cell - gap;
+    for (let i = 0; i < N0; i++) {
+      const x = ox + (i % cols) * cell, y = oy + Math.floor(i / cols) * cell;
+      g.fillStyle = sim.alive[i] ? cy : (sim.step - sim.dAt[i] < 4 ? or : li);
+      if (cell > 5) { g.beginPath(); g.roundRect(x, y, s, s, Math.min(3, s / 4)); g.fill(); } else g.fillRect(x, y, s, s);
+    }
+  } else {
+    const img = g.createImageData(Wd, Hd), d = img.data, A = rgbOf("probeCy"), B = rgbOf("probeOr"), L = rgbOf("probeLine");
+    const cs = cell * dpr, oxd = ox * dpr, oyd = oy * dpr;
+    for (let i = 0; i < N0; i++) {
+      const cx = i % cols, cr = (i / cols) | 0;
+      const x0 = Math.floor(oxd + cx * cs), y0 = Math.floor(oyd + cr * cs);
+      const x1 = Math.max(x0 + 1, Math.floor(oxd + (cx + 1) * cs)), y1 = Math.max(y0 + 1, Math.floor(oyd + (cr + 1) * cs));
+      const C = sim.alive[i] ? A : (sim.step - sim.dAt[i] < 4 ? B : L);
+      for (let y = y0; y < y1 && y < Hd; y++) { let p = (y * Wd + x0) * 4; for (let x = x0; x < x1 && x < Wd; x++) { d[p] = C[0]; d[p + 1] = C[1]; d[p + 2] = C[2]; d[p + 3] = 255; p += 4; } }
+    }
+    g.putImageData(img, 0, 0);
+  }
+  $("gN").textContent = nf(sim.N, 6) + " / " + nf(N0, 6);
+  $("gT").textContent = "pas " + sim.step + "/" + sim.S * TMAX + " · 1 noyau ≈ " + nf(cell, 2) + " px";
+  $("gT").title = cell < 3 ? "Moins de 3 px par noyau : on ne distingue plus chaque noyau, on lit une teinte." : "";
+}
+// Courbes gardées : six couleurs, toutes distinctes de l'orange de la simulation en cours.
+const SAVEC = ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6"];
+function drawChart() {
+  const s = $("chart"), W = s.clientWidth, H = s.clientHeight;
+  if (!W || !H) return;
+  const n = sim.n, lam = sim.lam, N0 = sim.N0, tM = TMAX * n.t, fs = FS(), S = sim.S, R = st.mode === "R", NR = st.mode === "N" || R;
+  let y0, y1, model, yName, yfmt;
+  const aSim = (k) => sim.dec[k] / sim.dtS;
+  if (st.mode === "N") { y0 = 0; y1 = N0; model = (t) => N0 * 2 ** (-t / n.t); yName = "N"; yfmt = (v) => nf(v, 4); }
+  else if (R) { y0 = 0; y1 = 1; model = (t) => 2 ** (-t / n.t); yName = "N/N₀"; yfmt = (v) => nf(v, 3); }
+  else if (st.mode === "A") {
+    let aMax = lam * N0; for (let k = 1; k <= sim.step; k++) aMax = Math.max(aMax, aSim(k));
+    y0 = 0; y1 = aMax * 1.05; model = (t) => lam * N0 * 2 ** (-t / n.t); yName = "A (Bq)"; yfmt = (v) => sci(v, 2);
+  } else { y1 = Math.log(N0) + 0.3; y0 = Math.log(N0) - TMAX * LN2 - 0.3; model = (t) => Math.log(N0) - LN2 * t / n.t; yName = "ln N"; yfmt = (v) => nf(v, 3); }
+  const val = (Nk) => (R ? Nk / N0 : Nk);
+  const yt = ticks(y0, y1, Math.max(3, Math.floor((H - 70) / (fs * 2.8)))), ylab = yt.map(yfmt);
+  const m = { l: Math.max(30, ...ylab.map((l) => tw(l))) + 12, r: 14, t: fs * 2 + 6, b: fs * 2.9 + 8 };
+  const X = (t) => m.l + (t / tM) * (W - m.l - m.r);
+  const Y = (v) => m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b);
+  const pw = W - m.l - m.r;
+  let h = `<defs><clipPath id="dclip"><rect x="${m.l}" y="${m.t - 4}" width="${pw}" height="${H - m.t - m.b + 8}"/></clipPath></defs>`;
+  yt.forEach((v, i) => { h += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/>` + T(m.l - 6, Y(v) + fs * 0.35, ylab[i], "end"); });
+  const xv = []; for (let k = 0; k <= TMAX; k++) xv.push(k * n.t);
+  xv.forEach((v) => { h += `<line x1="${X(v)}" x2="${X(v)}" y1="${H - m.b}" y2="${H - m.b + 5}" stroke="var(--muted)"/>`; });
+  h += xLabels(xv, X, H - m.b + fs + 6, (v) => nf(v, 3));
+  h += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>`;
+  h += T(W - m.r, H - 4, "t (" + UL[n.u] + ")", "end") + T(m.l - 6, fs + 2, yName, "end", "ink");
+  // repère N₀/2 (ou 1/2), toujours visible : c'est l'aide à la lecture graphique
+  const half = R ? 0.5 : N0 / 2, halfTxt = R ? "1/2" : "N₀/2 = " + nf(N0 / 2, 5);
+  if (NR) h += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(half)}" y2="${Y(half)}" stroke="var(--muted)" stroke-dasharray="2 4"/>` + T(W - m.r - 2, Y(half) - 6, halfTxt, "end");
+  // courbes gardées, en N/N₀ seulement (des N₀ différents ne tiennent pas sur le même axe N)
+  if (R) st.saved.forEach((c) => {
+    const k2t = c.dtS / U[n.u]; let p = "";
+    for (let k = 0; k < c.hist.length; k++) { const x = X(k * k2t).toFixed(1), yv = Y(c.hist[k] / c.N0).toFixed(1); p += k ? `H${x}V${yv}` : `M${x} ${yv}`; if (k * k2t > tM) break; }
+    h += `<path d="${p}" fill="none" stroke="var(${c.c})" stroke-width="2" stroke-linejoin="round" opacity=".9" clip-path="url(#dclip)"/>`;
+  });
+  const tm = tHalfMeas(), lab = [];
+  if (st.half) {
+    h += `<line x1="${X(n.t)}" x2="${X(n.t)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--cy)" stroke-dasharray="5 4" stroke-width="1.5"/>`;
+    lab.push({ x: X(n.t), txt: "t½ = " + nf(n.t, 4) + " " + UL[n.u], cls: "cy", side: "right" });
+    if (R) st.saved.forEach((c) => { if (c.tm === null) return; const x = X(c.tm * c.tS / U[n.u]); if (x <= W - m.r) h += `<circle cx="${x.toFixed(1)}" cy="${Y(0.5).toFixed(1)}" r="5" fill="var(${c.c})" stroke="var(--panel)" stroke-width="1.5"/>`; });
+    if (tm !== null) {
+      const xm = X(tm * n.t);
+      if (NR) h += `<path d="M${m.l} ${Y(half)}H${xm}V${H - m.b}" fill="none" stroke="var(--or)" stroke-width="2" stroke-dasharray="6 3"/><circle cx="${xm}" cy="${Y(half)}" r="5" fill="var(--or)" stroke="var(--panel)" stroke-width="2"/>`;
+      else h += `<line x1="${xm}" x2="${xm}" y1="${m.t}" y2="${H - m.b}" stroke="var(--or)" stroke-width="1.5"/>`;
+      lab.push({ x: Math.max(xm, X(n.t)), txt: "mesurée : " + nf(tm * n.t, 3) + " " + UL[n.u], cls: "or", side: "right" });
+    }
+  }
+  if (st.tan && NR) {
+    const tau = n.t / LN2;
+    h += `<line x1="${X(0)}" y1="${Y(R ? 1 : N0)}" x2="${X(tau)}" y2="${Y(0)}" stroke="var(--ink)" stroke-width="1.5"/><circle cx="${X(tau)}" cy="${Y(0)}" r="4" fill="var(--ink)"/>`;
+    lab.push({ x: X(tau), txt: "τ = 1/λ = " + nf(tau, 3) + " " + UL[n.u], cls: "bd", side: "right" });
+  }
+  // régression en ln N
+  if (st.mode === "L") {
+    let sx = 0, sy = 0, sxx = 0, sxy = 0, c = 0;
+    for (let k = 0; k <= sim.step; k++) { const Nk = sim.hist[k]; if (Nk <= 0) break; const t = k * sim.dtS, y = Math.log(Nk); sx += t; sy += y; sxx += t * t; sxy += t * y; c++; }
+    if (c >= 5 && sxx * c - sx * sx > 0) {
+      const a = (c * sxy - sx * sy) / (c * sxx - sx * sx), b0 = (sy - a * sx) / c, tE = (c - 1) * n.t / S;
+      h += `<line x1="${X(0)}" y1="${Y(b0)}" x2="${X(tE)}" y2="${Y(b0 + a * tE * U[n.u])}" stroke="var(--or)" stroke-width="1.5" opacity=".8"/>`;
+      lab.push({ x: W - m.r, txt: "pente mesurée : −λ = " + sci(a, 3) + " s⁻¹", cls: "or", side: "left" });
+    }
+  }
+  h += rowLabels(lab, m.l + 2, W - m.r, (r) => m.t + fs * 1.1 + r * fs * 1.4);
+  // modèle
+  let d = ""; for (let k = 0; k <= 200; k++) { const t = tM * k / 200; d += (k ? "L" : "M") + X(t).toFixed(1) + " " + Y(model(t)).toFixed(1); }
+  h += `<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>`;
+  // simulation et point courant
+  const tNow = sim.step * n.t / S;
+  let vNow = null;
+  if (st.mode === "A") {
+    for (let k = 1; k <= sim.step; k++) h += `<circle cx="${X(k * n.t / S).toFixed(1)}" cy="${Y(aSim(k)).toFixed(1)}" r="2.2" fill="var(--or)"/>`;
+    if (sim.step) { let a = 0, c = 0; for (let k = Math.max(1, sim.step - 4); k <= sim.step; k++) { a += aSim(k); c++; } vNow = a / c; }
+  } else {
+    let p = "";
+    for (let k = 0; k <= sim.step; k++) {
+      const Nk = sim.hist[k]; if (st.mode === "L" && Nk === 0) break;
+      const v = st.mode === "L" ? Math.log(Nk) : val(Nk), x = X(k * n.t / S).toFixed(1), yv = Y(v).toFixed(1);
+      p += k ? `H${x}V${yv}` : `M${x} ${yv}`;
+    }
+    h += `<path d="${p}" fill="none" stroke="var(--or)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    if (NR || sim.N > 0) vNow = st.mode === "L" ? Math.log(sim.N) : val(sim.N);
+  }
+  if (vNow !== null && sim.step > 0) {
+    const px = X(tNow), py = Y(vNow);
+    const txt = st.mode === "N" ? "N = " + nf(vNow, 6) : R ? "N/N₀ = " + nf(vNow, 3) : st.mode === "A" ? "A ≈ " + sci(vNow, 2) + " Bq" : "ln N = " + nf(vNow, 3);
+    const w = tw(txt, true);
+    let lx = px + 10 + w > W - m.r ? px - 10 - w : px + 10, ly = py - 10;
+    if (ly < m.t + fs * 3.5) ly = py + fs + 8;
+    if (NR && Math.abs(ly - (Y(half) - 6)) < fs + 2 && lx + w > W - m.r - tw(halfTxt) - 8) ly += fs + 6;
+    h += `<circle cx="${px}" cy="${py}" r="5" fill="var(--or)" stroke="var(--panel)" stroke-width="2"/>` + T(lx, ly, txt, "start", "or");
+  }
+  h += `<line id="cross" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="var(--muted)" visibility="hidden"/>`;
+  s.innerHTML = h;
+  // info-bulle à la souris et au doigt (iPad)
+  const hover = (e) => {
+    const r = s.getBoundingClientRect(), x = e.clientX - r.left;
+    const t = Math.min(tM, Math.max(0, (x - m.l) / pw * tM)), k = Math.min(sim.step, Math.round(t / n.t * S)), tk = k * n.t / S;
+    const cr = $("cross"); cr.setAttribute("x1", X(tk)); cr.setAttribute("x2", X(tk)); cr.setAttribute("visibility", "visible");
+    const tip = $("tip");
+    tip.innerHTML = `t = ${nf(tk, 4)} ${UL[n.u]}<br>N simulé = ${nf(sim.hist[k], 6)}${R ? " (N/N₀ = " + nf(sim.hist[k] / N0, 3) + ")" : ""}<br>N modèle = ${sci(N0 * 2 ** (-tk / n.t))}<br>A modèle = ${sci(lam * N0 * 2 ** (-tk / n.t))} Bq`;
+    tip.style.display = "block"; tip.style.left = Math.max(0, Math.min(W - 200, X(tk) + 10)) + "px"; tip.style.top = H - m.b - 90 + "px";
+  };
+  s.onpointermove = hover; s.onpointerdown = hover;
+  s.onpointerleave = () => { $("tip").style.display = "none"; const cr = $("cross"); if (cr) cr.setAttribute("visibility", "hidden"); };
+}
+function renderSaved() {
+  const box = $("savedBox"); box.hidden = !st.saved.length;
+  $("keepB").disabled = !sim || sim.step === 0;
+  if (!st.saved.length) return;
+  $("savedNote").textContent = st.mode === "R" ? "" : "(visibles avec la courbe N/N₀)";
+  $("savedTab").innerHTML = st.saved.map((c, i) => `<tr><td><i class="sw" style="--c:var(${c.c})"></i></td><td>${c.nom}</td><td>${nf(c.N0, 6)}</td><td>${!st.half ? "bouton t½" : c.tm === null ? "pas atteinte" : nf(c.tm * c.t, 3) + " " + UL[c.u]}</td><td><button class="x" data-i="${i}" aria-label="Retirer cette courbe">✕</button></td></tr>`).join("");
+  $("savedTab").querySelectorAll("[data-i]").forEach((b) => b.addEventListener("click", () => { st.saved.splice(+b.dataset.i, 1); renderSaved(); render1(); }));
+}
+function setMode(v) {
+  st.mode = v;
+  $("mode").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.m === v));
+  $("lgModel").innerHTML = v === "N" ? "Modèle N₀ e<sup>−λt</sup>" : v === "R" ? "Modèle e<sup>−λt</sup>" : v === "A" ? "Modèle λN₀ e<sup>−λt</sup>" : "Modèle ln N₀ − λt";
+  renderSaved(); render1();
+}
+function render1() {
+  if (!$("v-decroissance").classList.contains("on")) return;
+  drawGrid(); drawChart();
+  const n = sim.n, t = sim.step * n.t / sim.S, tm = tHalfMeas();
+  $("rT").textContent = nf(t, 4) + " " + UL[n.u];
+  $("rTh").textContent = nf(n.t, 5) + " " + UL[n.u];
+  $("rTm").textContent = !st.half ? "bouton « t½ »" : tm === null ? "pas encore" : nf(tm * n.t, 3) + " " + UL[n.u];
+  $("rL").textContent = sci(sim.lam) + " s⁻¹";
+  $("keepB").disabled = sim.step === 0;
+  const Nm = sim.N0 * 2 ** (-t / n.t);
+  $("calc1").innerHTML = `
+    <p><span class="eq">λ = ln 2 / t½ = 0,693 / (${sci(n.t * U[n.u], 4)} s) = ${sci(sim.lam)} s⁻¹</span></p>
+    <p>À t = ${nf(t, 4)} ${UL[n.u]} : <span class="eq">N<sub>modèle</sub> = N₀ e<sup>−λt</sup> = ${nf(sim.N0, 6)} × e<sup>−${nf(sim.lam * t * U[n.u], 3)}</sup> = ${sci(Nm, 4)}</span></p>
+    <p>N simulé = ${nf(sim.N, 6)}${Nm > 0 ? " ; écart au modèle : " + nf(100 * (sim.N - Nm) / Nm, 2) + " %" : ""}</p>
+    <p><span class="eq">A = λN = ${sci(sim.lam)} × ${nf(sim.N, 6)} = ${sci(sim.lam * sim.N)} Bq</span></p>
+    <p><span class="eq">Δt = t½/${sim.S} = ${sci(sim.dtS, 3)} s ; ${sim.approx ? "p ≈ λΔt" : "p = 1 − e<sup>−λΔt</sup>"} = ${nf(sim.p, 3)}</span>${sim.approx ? ` (valeur exacte : ${nf(1 - 2 ** (-1 / sim.S), 3)})` : ""}</p>
+    ${st.half && tm !== null ? `<p>Demi-vie mesurée : ${nf(tm * n.t, 3)} ${UL[n.u]}, écart de ${nf(100 * (tm - 1), 2)} % avec la valeur du nucléide.</p>` : ""}`;
+  $("src1").innerHTML = n.src ? `<p>Demi-vie du ${n.nom.toLowerCase()} : ${srcLink(n.src)}${n.ctx ? " (dans l'appli : " + n.ctx + ")" : ""}.</p>${EQ[n.id] ? `<p>Équation de transformation : ${srcLink(EQ[n.id].src)}.</p>` : ""}<p>Simulation : ${srcLink(3)}.</p><p>Version finale : toutes les périodes viendront de ${srcLink(4)}.</p>` : `<p>Demi-vie libre choisie par l'utilisateur. Simulation : ${srcLink(3)}.</p>`;
+}
+$("halfB").addEventListener("click", () => {
+  st.half = !st.half; $("halfB").setAttribute("aria-pressed", st.half); $("halfB").textContent = st.half ? "Masquer t½" : "Afficher t½";
+  renderSaved(); render1();
+});
+$("keepB").addEventListener("click", () => {
+  if (!sim || sim.step === 0) return;
+  if (st.saved.length >= SAVEC.length) st.saved.shift();
+  const used = st.saved.map((c) => c.c), c = SAVEC.find((x) => !used.includes(x));
+  st.saved.push({ c, nom: sim.n.nom, N0: sim.N0, hist: sim.hist.slice(), dtS: sim.dtS, tS: sim.n.t * U[sim.n.u], t: sim.n.t, u: sim.n.u, tm: tHalfMeas() });
+  if (st.mode !== "R") setMode("R"); else { renderSaved(); render1(); }
+});
+$("savedClr").addEventListener("click", () => { st.saved = []; renderSaved(); render1(); });
+sel.addEventListener("change", () => { $("libreBox").hidden = sel.value !== "libre"; newSim(); });
+["libT", "libU"].forEach((id) => $(id).addEventListener("change", newSim));
+const n0FromSlider = () => Math.max(1, Math.round(10 ** +$("n0").value));
+function setN0(v, fromSlider) { st.N0 = Math.min(100000, Math.max(1, Math.round(v || 1))); $("n0n").value = st.N0; if (!fromSlider) $("n0").value = Math.log10(st.N0); newSim(); }
+$("n0").addEventListener("input", () => setN0(n0FromSlider(), true));
+$("n0n").addEventListener("change", () => setN0(+$("n0n").value, false));
+$("play").addEventListener("click", () => {
+  if (sim.step >= sim.S * TMAX) newSim();
+  st.playing = !st.playing; $("play").textContent = st.playing ? "Pause" : "Reprendre";
+});
+$("stepB").addEventListener("click", () => { st.playing = false; $("play").textContent = "Reprendre"; doStep(); render1(); });
+$("reset").addEventListener("click", () => { newSim(); st.playing = true; $("play").textContent = "Pause"; });
+$("tan").addEventListener("change", (e) => { st.tan = e.target.checked; render1(); });
+$("oSpeed").addEventListener("input", () => { st.hps = 10 ** +$("oSpeed").value; updOptions(); });
+$("oStep").addEventListener("change", () => { st.S = +$("oStep").value; newSim(); });
+$("oProb").addEventListener("change", () => { st.approx = $("oProb").value === "approx"; newSim(); });
+segGroup("mode", "m", setMode);
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (st.playing && sim) {
+    st.acc += dt * st.hps * sim.S;
+    const cap = Math.max(1, Math.floor(4e6 / sim.N0)); let moved = 0;
+    while (st.acc >= 1 && moved < cap) { st.acc -= 1; if (!doStep()) { st.playing = false; $("play").textContent = "Relancer"; break; } moved++; }
+    if (moved >= cap) st.acc = 0;
+    if (moved) render1();
+  }
+  requestAnimationFrame(loop);
+}
+
+// ---------- vue Expérience ----------
+const xs = { sel: [10, 100, 1000, 10000], all: [1, 10, 100, 1000, 10000], res: {}, queue: [], busy: false };
+function renderChips() {
+  $("chips").innerHTML = xs.all.map((v) => `<button data-n="${v}" aria-pressed="${xs.sel.includes(v)}">${nf(v, 6)}</button>`).join("");
+  $("chips").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    const v = +b.dataset.n; xs.sel = xs.sel.includes(v) ? xs.sel.filter((x) => x !== v) : [...xs.sel, v].sort((a, c) => a - c);
+    renderChips(); drawX();
+  }));
+}
+$("addNB").addEventListener("click", () => {
+  const v = Math.round(+$("addN").value);
+  if (v >= 1 && v <= 100000 && !xs.all.includes(v)) { xs.all = [...xs.all, v].sort((a, c) => a - c); xs.sel = [...xs.sel, v].sort((a, c) => a - c); renderChips(); drawX(); }
+});
+function trial(N0) {
+  // même mesure que la vue Décroissance (médiane interpolée), avec Δt = t½/100
+  const p = 1 - 2 ** (-1 / 100), hist = [N0]; let N = N0;
+  while (hist.length < 3001) {
+    let d = 0; for (let i = 0; i < N; i++) if (Math.random() < p) d++;
+    N -= d; hist.push(N);
+    if (N < N0 / 2) return medianSteps(hist, N0) / 100;
+  }
+  return 30;
+}
+function xEnqueue() { const nT = +$("nTr").value; xs.sel.forEach((N0) => { for (let i = 0; i < nT; i++) xs.queue.push(N0); }); if (!xs.busy) xWork(); }
+function xWork() {
+  xs.busy = true; const t0 = performance.now();
+  while (xs.queue.length && performance.now() - t0 < 14) { const N0 = xs.queue.shift(); (xs.res[N0] = xs.res[N0] || []).push(trial(N0)); }
+  drawX();
+  if (xs.queue.length) setTimeout(xWork, 0); else xs.busy = false;
+}
+function xClear() { xs.res = {}; xs.queue = []; drawX(); }
+$("xRun").addEventListener("click", () => { xs.res = {}; xs.queue = []; xEnqueue(); });
+$("xMore").addEventListener("click", xEnqueue);
+$("xClr").addEventListener("click", xClear);
+const stats = (a) => {
+  const n = a.length, s = [...a].sort((x, y) => x - y), mean = a.reduce((x, y) => x + y, 0) / n;
+  const med = n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
+  const sd = n > 1 ? Math.sqrt(a.reduce((x, y) => x + (y - mean) ** 2, 0) / (n - 1)) : 0;
+  const u = n > 1 ? sd / Math.sqrt(n) : null, z = u ? Math.abs(mean - 1) / u : null; // t½ de référence = 1 (en demi-vies)
+  return { n, mean, med, sd, u, z };
+};
+function drawX() {
+  if (!$("v-experience").classList.contains("on")) return;
+  const n = nuc(); $("xNuc").textContent = n.nom + " (t½ = " + nf(n.t, 5) + " " + UL[n.u] + ")";
+  if (xs.eqFor !== n.id) { xs.eqFor = n.id; $("trans2").innerHTML = transHTML(n.id); }
+  const s = $("xChart"), W = s.clientWidth, H = s.clientHeight; if (!W || !H) return;
+  const fs = FS(), cols = xs.sel;
+  let yMax = 2; cols.forEach((c) => (xs.res[c] || []).forEach((v) => { if (v > yMax) yMax = v; }));
+  yMax = Math.ceil(yMax * 1.05 * 2) / 2;
+  const yt = ticks(0, yMax * n.t, Math.max(3, Math.floor((H - 80) / (fs * 2.8)))), ylab = yt.map((v) => nf(v, 4));
+  const m = { l: Math.max(30, ...ylab.map((l) => tw(l))) + 12, r: 12, t: fs * 2 + 6, b: fs * 4.7 + 16 };
+  const Y = (v) => m.t + (1 - v / yMax) * (H - m.t - m.b);
+  const cw = (W - m.l - m.r) / Math.max(1, cols.length), X = (i) => m.l + cw * (i + 0.5);
+  let h = "";
+  yt.forEach((v, i) => { const yv = Y(v / n.t); h += `<line x1="${m.l}" x2="${W - m.r}" y1="${yv}" y2="${yv}" stroke="var(--line)"/>` + T(m.l - 6, yv + fs * 0.35, ylab[i], "end"); });
+  h += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(1)}" y2="${Y(1)}" stroke="var(--cy)" stroke-width="2" stroke-dasharray="6 4"/>`;
+  h += T(m.l - 6, fs + 2, "t½ mesurée (" + UL[n.u] + ")", "start", "ink");
+  const tl = "t½ = " + nf(n.t, 4) + " " + UL[n.u];
+  h += T(W - m.r, fs + 2, tl, "end", "cy");
+  let rows = "";
+  const short = cw < Math.max(tw("N₀ = 10 000"), tw("méd. 30,1 ans")) + 10;
+  cols.forEach((c, i) => {
+    const r = xs.res[c] || [];
+    h += T(X(i), H - m.b + fs + 6, (short ? "" : "N₀ = ") + nf(c, 6), "middle", "ink");
+    let seed = 7 + i * 131;
+    r.forEach((v, k) => { seed = (seed * 16807) % 2147483647; const j = (seed / 2147483647 - 0.5) * Math.min(cw * 0.55, 70);
+      h += `<circle cx="${(X(i) + j).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="4" fill="var(--or)" fill-opacity=".55"><title>N₀ = ${nf(c, 6)}, essai ${k + 1} : ${nf(v * n.t, 3)} ${UL[n.u]}</title></circle>`; });
+    if (r.length) {
+      const q = stats(r), hw = Math.min(cw * 0.38, 46);
+      h += `<line x1="${X(i) - hw}" x2="${X(i) + hw}" y1="${Y(q.med)}" y2="${Y(q.med)}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`;
+      h += T(X(i), H - m.b + fs * 2.3 + 8, (short ? "" : "méd. ") + nf(q.med * n.t, 3), "middle", "or");
+      if (q.u) {
+        // moyenne ± 2u : z ≤ 2 exactement quand ce trait coupe la ligne de t½
+        const bx = X(i) + Math.min(cw * 0.42, hw + 12), lo = Math.max(0, q.mean - 2 * q.u), hi = Math.min(yMax, q.mean + 2 * q.u);
+        h += `<line x1="${bx}" x2="${bx}" y1="${Y(lo)}" y2="${Y(hi)}" stroke="var(--c2)" stroke-width="3"/><line x1="${bx - 5}" x2="${bx + 5}" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--c2)" stroke-width="2"/><line x1="${bx - 5}" x2="${bx + 5}" y1="${Y(hi)}" y2="${Y(hi)}" stroke="var(--c2)" stroke-width="2"/><rect x="${bx - 4}" y="${Y(q.mean) - 4}" width="8" height="8" fill="var(--c2)" transform="rotate(45 ${bx} ${Y(q.mean)})"><title>Moyenne ${nf(q.mean * n.t, 3)} ${UL[n.u]}, u = ${nf(q.u * n.t, 2)} ${UL[n.u]}</title></rect>`;
+        h += T(X(i), H - m.b + fs * 3.6 + 10, (short ? "z " : "z = ") + nf(q.z, 2) + (q.z <= 2 ? " ✓" : " ✗"), "middle", q.z <= 2 ? "cy" : "or");
+      }
+      rows += `<tr><td>${nf(c, 6)}</td><td>${q.n}</td><td>${nf(q.med * n.t, 3)}</td><td>${nf(q.mean * n.t, 3)}</td><td>${nf(q.sd * n.t, 2)}</td><td>${q.n > 1 ? nf(100 * q.sd / q.mean, 2) + " %" : "–"}</td><td>${q.u ? nf(q.u * n.t, 2) : "–"}</td><td>${q.u ? `<span class="${q.z <= 2 ? "zok" : "zko"}">${nf(q.z, 2)}</span>` : "–"}</td></tr>`;
+    }
+  });
+  h += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>`;
+  if (!cols.length) h += T(W / 2, H / 2, "Choisissez au moins une valeur de N₀", "middle");
+  s.innerHTML = h;
+  $("xTab").tBodies[0].innerHTML = rows || `<tr><td colspan="8" style="text-align:left">Appuyez sur « Lancer ».</td></tr>`;
+  const tot = cols.reduce((a, c) => a + (xs.res[c] || []).length, 0);
+  $("xStat").textContent = xs.queue.length ? `Simulation en cours… ${tot} essais faits.` : tot ? `${tot} essais. Sous chaque colonne : N₀, la médiane des demi-vies mesurées (${UL[n.u]}) et le z-score de la moyenne par rapport à t½ (compatible si z ≤ 2).` : "";
+}
+
+// ---------- vue Radioprotection ----------
+$("rSrc").innerHTML = RSRC.map((r) => `<option value="${r.id}">${r.nom}</option>`).join("");
+const rs = { cda: "cnrs", chart: "dist", mat: "pb" };
+segGroup("cdaRef", "r", (v) => { rs.cda = v; drawR(); });
+segGroup("chartSeg", "c", (v) => { rs.chart = v; drawR(); });
+segGroup("matSeg", "t", (v) => { rs.mat = v; drawR(); });
+const PRESETS = {
+  ir: [["Source de curiethérapie HDR : 370 GBq [38]", 370e9]],
+  cs: [["Source de Goiânia en 1987 : ≈ 51 TBq [43]", 51e12]],
+};
+const rSource = () => RSRC.find((r) => r.id === $("rSrc").value);
+function rPresets() {
+  const p = PRESETS[$("rSrc").value] || [];
+  $("presets").innerHTML = p.length ? p.map((x, i) => `<button class="b" data-i="${i}">${x[0]}</button>`).join("") : `<span class="note">Aucun pour cette source.</span>`;
+  $("presets").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { $("act").value = Math.log10(p[+b.dataset.i][1]); drawR(); }));
+}
+function computeR() {
+  const r = rSource(), A = 10 ** +$("act").value, d = 10 ** +$("dist").value, T = 10 ** +$("dur").value;
+  const pap = $("sPap").checked, al = +$("sAl").value, pb = +$("sPb").value, be = +$("sBe").value * 10;
+  const o = { r, A, d, T, pap, al, pb, be, rate: null, dose: null, msg: "", stop: null, trans: 1, f: 1, cdaUsed: null, lam: 0 };
+  if (r.type === "g") {
+    const ref = (rs.cda === "osha" && r.cda.osha) ? r.cda.osha : r.cda.cnrs;
+    o.cdaUsed = { ref: (rs.cda === "osha" && r.cda.osha) ? "OSHA [12]" : "CNRS [11]", pb: ref[0], be: ref[1] };
+    o.tPb = 2 ** (-pb / ref[0]); o.tBe = 2 ** (-be / ref[1]); o.trans = o.tPb * o.tBe;
+    o.rate0 = r.gam * A / (d * d) * 3600; o.rate = o.rate0 * o.trans;
+    o.lam = LN2 / (r.t * U[r.u]);
+    const lt = o.lam * T; o.decay = $("oDecay").checked;
+    o.f = o.decay && lt > 1e-12 ? (1 - Math.exp(-lt)) / lt : 1;
+    o.dose = o.rate * T / 3600 * o.f;
+    o.msg = o.trans < 1 ? `Les écrans divisent le débit par ${sci(1 / o.trans, 3)}.` : "Aucun écran efficace contre le gamma : seuls la distance et le temps protègent.";
+    if ((pap || al > 0) && pb === 0 && be === 0) o.msg += " Le papier et l'aluminium n'arrêtent pas le gamma.";
+    if (o.decay && o.f < 0.99) o.msg += ` La source perd ${nf(100 * (1 - Math.exp(-lt)), 2)} % de son activité pendant l'exposition.`;
+  } else if (r.type === "a") {
+    if (pap || al > 0 || pb > 0 || be > 0) { o.stop = "écran"; o.msg = "L'alpha est arrêté par le premier écran : une feuille de papier suffit [10]."; }
+    else if (d > 0.0384) { o.stop = "air"; o.msg = "L'alpha du Po-210 parcourt 3,84 cm dans l'air [9] : il n'atteint pas la personne."; }
+    else o.msg = "À moins de 3,84 cm et sans écran, l'alpha atteint la peau. Dose non calculée. Le vrai danger de l'alpha est la contamination interne (ingestion, inhalation).";
+  } else if (r.type === "b") {
+    if (al >= 4 || pb > 0 || be > 0) { o.stop = "écran"; o.msg = "Le bêta est arrêté par l'aluminium (4 mm sur le schéma du CNRS) [9, 10]."; }
+    else o.msg = (pap ? "Le bêta traverse le papier [10]. " : "") + (al > 0 ? "Aluminium trop mince dans ce modèle (moins de 4 mm). " : "") + "Il atteint la personne ; sa dose n'est pas calculée.";
+  } else {
+    const on = $("xOn").checked; o.stop = on ? null : "off";
+    o.msg = on ? "Le tube émet des rayons X tant qu'il est sous tension. Débit non calculé : il dépend de la tension et du courant du tube." : "Tube hors tension : plus aucun rayonnement. Une source radioactive, elle, n'a pas d'interrupteur.";
+  }
+  return o;
+}
+function drawBench(o) {
+  const s = $("benchSvg"), W = s.clientWidth, H = s.clientHeight; if (!W || !H) return;
+  const fs = FS(), gnd = H - fs * 2.2 - 8, sx = Math.max(40, W * 0.08), px = W - Math.max(48, W * 0.08);
+  const sc = Math.min(1, (gnd - fs * 4) / 150);
+  const slabs = [];
+  if (o.pap) slabs.push(["Papier", 4, "#f4f1e8", "#bdb7a6"]);
+  if (o.al > 0) slabs.push(["Alu " + nf(o.al, 2) + " mm", 4 + o.al * 1.6, "#cfd6de", "#8e9aa8"]);
+  if (o.pb > 0) slabs.push(["Plomb " + nf(o.pb, 3) + " mm", 6 + o.pb * 0.45, "#5c6573", "#3c4350"]);
+  if (o.be > 0) slabs.push(["Béton " + nf(o.be / 10, 3) + " cm", 8 + o.be * 0.06, "#b9b4aa", "#8c877d"]);
+  let h = `<rect x="0" y="${gnd}" width="${W}" height="${H - gnd}" fill="var(--line)"/>`;
+  const cyS = gnd - 36 * sc;
+  h += `<rect x="${sx - 18}" y="${gnd - 58 * sc}" width="36" height="${58 * sc}" rx="6" fill="var(--navy)"/><circle cx="${sx}" cy="${cyS}" r="11" fill="#ffd400"/>`;
+  for (let k = 0; k < 3; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 3, a1 = a - 0.52, a2 = a + 0.52, R = 9.5, ri = 2.8;
+    h += `<path d="M${sx + ri * Math.cos(a1)} ${cyS + ri * Math.sin(a1)}L${sx + R * Math.cos(a1)} ${cyS + R * Math.sin(a1)}A${R} ${R} 0 0 1 ${sx + R * Math.cos(a2)} ${cyS + R * Math.sin(a2)}L${sx + ri * Math.cos(a2)} ${cyS + ri * Math.sin(a2)}Z" fill="#111"/>`; }
+  h += T(sx - 18, gnd - 58 * sc - 6, o.r.court, "start", "ink");
+  const slabH = 120 * sc, zoneW = px - sx - 90, tot = slabs.reduce((a, b) => a + Math.min(b[1], 60) + 12, 0);
+  let x = sx + 50 + Math.max(0, (zoneW - tot) / 2);
+  const slabX = [], labs = [];
+  slabs.forEach((sl) => { const w = Math.min(sl[1], 60); h += `<rect x="${x}" y="${gnd - slabH}" width="${w}" height="${slabH}" fill="${sl[2]}" stroke="${sl[3]}"/>`; labs.push({ x: x + w / 2 - tw(sl[0], true) / 2 - 6, txt: sl[0], cls: "ink", side: "right" }); slabX.push(x); x += w + 12; });
+  h += rowLabels(labs, 4, W - 4, (r) => gnd - slabH - 6 - r * (fs * 1.3));
+  let stopX = px - 22;
+  if (o.stop === "écran" && slabX.length) stopX = slabX[0];
+  if (o.stop === "air") stopX = sx + 46;
+  if (o.stop === "off") stopX = sx + 20;
+  const rayC = o.r.type === "a" ? "var(--or)" : o.r.type === "b" ? "var(--cy)" : "var(--ink)";
+  const dash = o.r.type === "a" ? "3 6" : o.r.type === "b" ? "6 6" : "10 6";
+  const firstX = slabX.length ? slabX[0] : px - 22;
+  const after = o.r.type === "g" ? (o.trans >= 1 ? 1 : Math.max(0.12, 1 + Math.log10(o.trans) / 4)) : 0;
+  if (stopX > sx + 20) for (let k = -2; k <= 2; k++) {
+    const y = cyS - 4 + k * 9 * sc, x2 = o.r.type === "g" ? firstX : stopX;
+    h += `<line class="ray" x1="${sx + 22}" y1="${cyS}" x2="${x2}" y2="${y}" stroke="${rayC}" stroke-width="2" stroke-dasharray="${dash}"/>`;
+    if (o.r.type === "g" && slabX.length) h += `<line class="ray" x1="${firstX}" y1="${y}" x2="${px - 22}" y2="${y}" stroke="${rayC}" stroke-width="2" stroke-dasharray="${dash}" opacity="${after.toFixed(2)}"/>`;
+  }
+  const hy = gnd - 118 * sc;
+  h += `<g fill="var(--muted)"><circle cx="${px}" cy="${hy}" r="${13 * sc}"/><rect x="${px - 15 * sc}" y="${hy + 16 * sc}" width="${30 * sc}" height="${54 * sc}" rx="${12 * sc}"/><rect x="${px - 13 * sc}" y="${hy + 64 * sc}" width="${11 * sc}" height="${54 * sc}" rx="5"/><rect x="${px + 2 * sc}" y="${hy + 64 * sc}" width="${11 * sc}" height="${54 * sc}" rx="5"/></g>`;
+  h += `<rect x="${px - 6 * sc}" y="${hy + 26 * sc}" width="${12 * sc}" height="${16 * sc}" rx="2" fill="var(--or)"/>`;
+  h += `<line x1="${sx}" x2="${px}" y1="${H - 6}" y2="${H - 6}" stroke="var(--muted)"/><line x1="${sx}" x2="${sx}" y1="${H - 11}" y2="${H - 1}" stroke="var(--muted)"/><line x1="${px}" x2="${px}" y1="${H - 11}" y2="${H - 1}" stroke="var(--muted)"/>`;
+  h += T((sx + px) / 2, H - 11, "d = " + unitFmt(o.d, DISTU, 3) + " (schéma pas à l'échelle)", "middle", "bd");
+  s.innerHTML = h;
+}
+function rMsgChart(s, W, H, txt) { s.innerHTML = T(W / 2, H / 2, fit(txt, W - 20), "middle"); }
+function drawRChart(o) {
+  const s = $("rChart"), W = s.clientWidth, H = s.clientHeight; if (!W || !H) return;
+  const fs = FS();
+  $("matSeg").style.visibility = rs.chart === "ecran" ? "visible" : "hidden";
+  if (o.r.type !== "g") { rMsgChart(s, W, H, "Graphes disponibles pour les sources gamma"); return; }
+  let xs0 = 0, xs1, yMax, f, xName, xfmt, pts = [], extra = "", yUnits = RATEU, yName = "Ḋ";
+  if (rs.chart === "dist") {
+    xs1 = 4 * o.d; yMax = 3 * o.rate; f = (x) => o.rate * (o.d / x) ** 2; xName = "d (m)"; xfmt = (v) => nf(v, 3);
+    pts = [{ x: o.d, y: o.rate, txt: "Ḋ = " + unitFmt(o.rate, RATEU) + " à " + unitFmt(o.d, DISTU), cls: "or" },
+      { x: 2 * o.d, y: o.rate / 4, txt: "÷ 4 à " + unitFmt(2 * o.d, DISTU) + " : " + unitFmt(o.rate / 4, RATEU), cls: "bd" }];
+  } else if (rs.chart === "ecran") {
+    const pbm = rs.mat === "pb", cda = pbm ? o.cdaUsed.pb : o.cdaUsed.be, cur = pbm ? o.pb : o.be, tThis = pbm ? o.tPb : o.tBe;
+    const base = o.rate / tThis, k = pbm ? 1 : 10;
+    xs1 = Math.max(6 * cda, cur + 2 * cda) / k; yMax = base * 1.05; f = (x) => base * 2 ** (-x * k / cda);
+    xName = pbm ? "plomb (mm)" : "béton (cm)"; xfmt = (v) => nf(v, 3);
+    pts = [{ x: cur / k, y: o.rate, txt: "Ḋ = " + unitFmt(o.rate, RATEU) + " avec " + nf(cur / k, 3) + (pbm ? " mm" : " cm"), cls: "or" }];
+    extra = { cda: cda / k, ref: o.cdaUsed.ref };
+  } else {
+    const T0 = o.T; xs1 = 2 * T0; const du = pickUnit(xs1, DURU);
+    const doseAt = (t) => { const lt = o.lam * t; return o.rate * t / 3600 * (o.decay && lt > 1e-12 ? (1 - Math.exp(-lt)) / lt : 1); };
+    const lin = (t) => o.rate * t / 3600;
+    yMax = Math.max(doseAt(xs1), o.decay ? lin(xs1) : 0) * 1.05; f = doseAt; yUnits = DOSEU; yName = "D";
+    xName = "durée (" + du[1] + ")"; xfmt = (v) => nf(v / du[0], 3);
+    pts = [{ x: T0, y: o.dose, txt: "D = " + unitFmt(o.dose, DOSEU) + " en " + unitFmt(T0, DURU, 2), cls: "or" }];
+    extra = { lin, show: o.decay && doseAt(xs1) < 0.99 * lin(xs1) };
+  }
+  const yu = pickUnit(pts[0].y > 0 ? pts[0].y : yMax, yUnits);
+  const yt = ticks(0, yMax / yu[0], Math.max(3, Math.floor((H - 70) / (fs * 2.8)))), ylab = yt.map((v) => nf(v, 3));
+  const m = { l: Math.max(30, ...ylab.map((l) => tw(l))) + 12, r: 14, t: fs * 2 + 6, b: fs * 2.9 + 8 };
+  const X = (x) => m.l + (x - xs0) / (xs1 - xs0) * (W - m.l - m.r), Y = (y) => m.t + (1 - y / yMax) * (H - m.t - m.b);
+  let h = `<defs><clipPath id="rclip"><rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}"/></clipPath></defs>`;
+  yt.forEach((v, i) => { h += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v * yu[0])}" y2="${Y(v * yu[0])}" stroke="var(--line)"/>` + T(m.l - 6, Y(v * yu[0]) + fs * 0.35, ylab[i], "end"); });
+  const xt = rs.chart === "duree" ? ticks(0, xs1 / pickUnit(xs1, DURU)[0], 5).map((v) => v * pickUnit(xs1, DURU)[0]) : ticks(xs0, xs1, 5);
+  xt.forEach((v) => { h += `<line x1="${X(v)}" x2="${X(v)}" y1="${H - m.b}" y2="${H - m.b + 5}" stroke="var(--muted)"/>`; });
+  h += xLabels(xt, X, H - m.b + fs + 6, xfmt);
+  h += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>`;
+  h += T(W - m.r, H - 4, xName, "end") + T(m.l - 6, fs + 2, yName + " (" + yu[1] + ")", "start", "ink");
+  let d = "", first = true;
+  const x0c = rs.chart === "dist" ? o.d / Math.sqrt(3.2) : xs0;
+  for (let k = 0; k <= 160; k++) { const xv = x0c + (xs1 - x0c) * k / 160; d += (first ? "M" : "L") + X(xv).toFixed(1) + " " + Y(f(xv)).toFixed(1); first = false; }
+  h += `<path d="${d}" fill="none" stroke="var(--cy)" stroke-width="2.2" clip-path="url(#rclip)"/>`;
+  const lab = [];
+  if (rs.chart === "ecran") {
+    const sp = X(extra.cda) - X(0), wl = tw("÷ 8", true) + 8;
+    for (let k = 1; k * extra.cda <= xs1; k++) {
+      h += `<line x1="${X(k * extra.cda)}" x2="${X(k * extra.cda)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--muted)" stroke-dasharray="2 4"/>`;
+      if (sp >= wl && k <= 4) h += T(X(k * extra.cda), m.t + fs, "÷ " + 2 ** k, "middle", "bd");
+    }
+    lab.push({ x: X(extra.cda), txt: "CDA = " + nf(extra.cda, 3) + (rs.mat === "pb" ? " mm" : " cm") + " (" + extra.ref + ")", cls: "bd", side: "right" });
+  }
+  if (rs.chart === "duree" && extra.show) {
+    let dl = ""; for (let k = 0; k <= 40; k++) { const xv = xs1 * k / 40; dl += (k ? "L" : "M") + X(xv).toFixed(1) + " " + Y(extra.lin(xv)).toFixed(1); }
+    h += `<path d="${dl}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
+    lab.push({ x: W - m.r, txt: "tirets : sans décroissance", cls: "", side: "left" });
+  }
+  h += rowLabels(lab, m.l + 2, W - m.r, (r) => m.t + fs * (rs.chart === "ecran" ? 2.4 : 1.1) + r * fs * 1.4);
+  const used = [];
+  pts.forEach((p) => {
+    if (p.x > xs1) return;
+    const px = X(p.x), py = Y(p.y), w = tw(p.txt, true);
+    let lx = px + 10 + w > W - m.r ? px - 10 - w : px + 10, ly = py - 10;
+    if (ly < m.t + fs * 3) ly = py + fs + 10;
+    if (lx < m.l + 2) lx = m.l + 2;
+    while (used.some(([a, b, c]) => Math.abs(ly - c) < fs + 4 && lx < b + 6 && lx + w > a - 6)) ly += fs + 4;
+    if (ly > H - m.b - 4) ly = py - 10 - (fs + 4);
+    used.push([lx, lx + w, ly]);
+    h += `<circle cx="${px}" cy="${py}" r="5" fill="${p.cls === "or" ? "var(--or)" : "var(--ink)"}" stroke="var(--panel)" stroke-width="2"/>` + T(lx, ly, p.txt, "start", p.cls);
+  });
+  s.innerHTML = h;
+}
+function drawScale(o) {
+  const s = $("scale"), W = s.clientWidth, H = s.clientHeight; if (!W || !H) return;
+  const fs = FS(), top = fs, bot = H - fs * 0.6, lo = -7, hi = 1;
+  const Y = (l) => top + (hi - l) / (hi - lo) * (bot - top);
+  const ax = tw("100 mSv") + 14;
+  const dec = (e) => unitFmt(10 ** e, DOSEU, 1).replace(/ /g, " ");
+  let h = `<line x1="${ax}" x2="${ax}" y1="${top}" y2="${bot}" stroke="var(--muted)" stroke-width="1.5"/>`;
+  const per = (bot - top) / (hi - lo), every = per < fs * 1.5 ? 2 : 1;
+  for (let e = lo; e <= hi; e++) { h += `<line x1="${ax - 5}" x2="${ax}" y1="${Y(e)}" y2="${Y(e)}" stroke="var(--muted)"/>`; if ((e - lo) % every === 0) h += T(ax - 8, Y(e) + fs * 0.35, dec(e), "end"); }
+  const items = LADDER.map((l) => ({ y: Y(Math.log10(l[0] / 1000)), txt: (l[4] ? nf(l[0] / 1000, 3) + " Gy" : nf(l[0], 3) + " mSv") + " · " + l[1], tip: l[2] + " [" + l[3] + "]", cls: "" }));
+  if (o.dose !== null) {
+    const lv = Math.log10(Math.max(o.dose, 1e-30)), out = lv < lo ? " (sous l'échelle)" : lv > hi ? " (au-delà)" : "";
+    items.push({ y: Y(Math.min(hi, Math.max(lo, lv))), txt: "Dose calculée : " + unitFmt(o.dose, DOSEU).replace(/ /g, " ") + out, tip: "Dose calculée ici", cls: "or", you: true });
+  }
+  dodge(items, top + fs * 0.4, bot, fs + 5);
+  const lx = ax + 22, maxW = W - lx - 4;
+  items.forEach((it) => {
+    h += `<line x1="${ax}" x2="${ax + 6}" y1="${it.y}" y2="${it.y}" stroke="${it.you ? "var(--or)" : "var(--muted)"}" stroke-width="${it.you ? 4 : 1.5}"/><path d="M${ax + 6} ${it.y}L${lx - 4} ${it.ly}" stroke="var(--line)" fill="none"/>`;
+    h += `<text x="${lx}" y="${(it.ly + fs * 0.35).toFixed(1)}" class="${it.you ? "or" : "ink"}"><title>${it.tip}</title>${fit(it.txt, maxW, it.you)}</text>`;
+  });
+  s.innerHTML = h;
+}
+function drawR() {
+  const r = rSource();
+  $("xBoxOn").hidden = r.type !== "x"; $("actBox").hidden = r.type === "x";
+  $("cdaRef").querySelector('[data-r="osha"]').disabled = r.type === "g" && !r.cda.osha;
+  const o = computeR();
+  $("actO").textContent = unitFmt(o.A, ACTU, 3); $("dO").textContent = unitFmt(o.d, DISTU, 3);
+  $("tO").textContent = unitFmt(o.T, DURU, 2); $("sAlO").textContent = nf(o.al, 2) + " mm"; $("sPbO").textContent = nf(o.pb, 3) + " mm"; $("sBeO").textContent = nf(o.be / 10, 3) + " cm";
+  if (o.rate !== null) { $("rate").textContent = unitFmt(o.rate, RATEU); $("dose").textContent = unitFmt(o.dose, DOSEU); }
+  else { $("rate").textContent = o.stop ? "0" : "non calculé"; $("dose").textContent = o.stop ? "0" : "non calculée"; }
+  $("rMsg").textContent = o.msg;
+  const z = $("zone");
+  if (o.rate !== null) {
+    const v = o.rate * 1000; z.hidden = false;
+    if (v >= 100) { z.textContent = "Zone rouge : ≥ 100 mSv en 1 h [14]"; z.style.borderColor = "#d0021b"; }
+    else if (v >= 2) { z.textContent = "Zone orange : 2 à 100 mSv en 1 h [14]"; z.style.borderColor = "#f08a00"; }
+    else { z.textContent = "Moins de 2 mSv en 1 h : jaune au plus [14]"; z.style.borderColor = "var(--line)"; }
+  } else z.hidden = true;
+  if (!$("v-radioprotection").classList.contains("on")) return;
+  drawBench(o); drawRChart(o); drawScale(o);
+  $("ladder").innerHTML = LADDER.map((l) => `<li><b>${l[4] ? nf(l[0] / 1000, 3) + " Gy" : nf(l[0], 3) + " mSv"}</b><span>${l[2]} [${l[3]}]</span></li>`).join("");
+  if (r.type === "g") {
+    const dec = o.decay && o.f < 0.9999;
+    $("calc3").innerHTML = `
+      <p>Débit à 1 m pour 1 Bq : ${sci(r.gam)} Sv/s ${srcLink(r.gsrc)}.</p>
+      <p><span class="eq">Ḋ₀ = Γ × A / d² = ${sci(r.gam)} × ${sci(o.A)} / ${nf(o.d, 3)}² = ${unitFmt(o.rate0, RATEU)}</span></p>
+      <p>Épaisseurs moitié (${o.cdaUsed.ref}) : plomb ${nf(o.cdaUsed.pb, 3)} mm, béton ${nf(o.cdaUsed.be, 3)} mm.</p>
+      <p><span class="eq">Plomb : 2<sup>−${nf(o.pb, 3)}/${nf(o.cdaUsed.pb, 3)}</sup> = ${sci(o.tPb, 3)} ; béton : 2<sup>−${nf(o.be, 3)}/${nf(o.cdaUsed.be, 3)}</sup> = ${sci(o.tBe, 3)}</span></p>
+      <p><span class="eq">Ḋ = Ḋ₀ × ${sci(o.trans, 3)} = ${unitFmt(o.rate, RATEU)}</span></p>
+      ${dec ? `<p>Décroissance pendant l'exposition (t½ = ${nf(r.t, 4)} ${UL[r.u]} ${"[" + r.tsrc + "]"}) : <span class="eq">D = Ḋ (1 − e<sup>−λΔt</sup>) / λ = ${unitFmt(o.dose, DOSEU)}</span>, au lieu de ${unitFmt(o.rate * o.T / 3600, DOSEU)} sans décroissance.</p>`
+        : `<p><span class="eq">D = Ḋ × Δt = ${unitFmt(o.rate, RATEU)} × ${unitFmt(o.T, DURU, 3)} = ${unitFmt(o.dose, DOSEU)}</span></p>`}`;
+  } else $("calc3").innerHTML = `<p>${o.msg}</p><p>Pour l'alpha, le bêta et le tube à rayons X, ce prototype montre seulement si le rayonnement atteint la personne.</p>`;
+}
+["act", "dist", "dur", "sAl", "sPb", "sBe"].forEach((id) => $(id).addEventListener("input", drawR));
+["sPap", "xOn", "oDecay"].forEach((id) => $(id).addEventListener("change", drawR));
+const RNUC = { cs: "cs137", co: "co60", ir: "ir192", po: "po210" };
+const rTrans = () => { const id = $("rSrc").value; $("trans3").innerHTML = transHTML(RNUC[id], id); };
+$("rSrc").addEventListener("change", () => { rPresets(); rTrans(); drawR(); });
+
+// ---------- missions ----------
+const MS_KEY = "radio-missions-v3";
+let mprog = {}, teacher = false;
+try { mprog = JSON.parse(localStorage.getItem(MS_KEY) || "{}") || {}; teacher = localStorage.getItem(MS_KEY + "-prof") === "1"; } catch (e) { mprog = {}; }
+const saveM = () => { try { localStorage.setItem(MS_KEY, JSON.stringify(mprog)); localStorage.setItem(MS_KEY + "-prof", teacher ? "1" : "0"); } catch (e) { /* pas de stockage */ } };
+const IR_RATE = 3.75e-17 * 370e9 * 3600 * 1000; // mSv/h à 1 m
+const GO_RATE = 2.75e-17 * 51e12 * 3600; // Sv/h à 1 m
+function parseNum(s) {
+  const sup = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" };
+  s = String(s).trim().replace(/[\s  ]/g, "").replace(/,/g, ".").replace(/[−–]/g, "-");
+  s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g, (m) => "^" + [...m].map((c) => sup[c]).join(""));
+  const m = s.match(/^([-+]?\d*\.?\d+)(?:[eE]([-+]?\d+)|[x×*·]10\^?\(?([-+]?\d+)\)?)?$/);
+  if (!m) return NaN;
+  return parseFloat(m[1]) * 10 ** (+(m[2] ?? m[3] ?? 0));
+}
+const MISSIONS = [
+  { id: "iode", titre: "Le compte à rebours de l'iode 131", onglets: "Décroissance", intro: "Combien de temps l'iode 131 rejeté à Tchernobyl reste-t-il présent ?", qs: [
+    { type: "pari", q: "Pari : l'activité de l'iode 131 rejeté à Tchernobyl est divisée par 1 000 au bout de…", opts: ["quelques jours", "quelques mois", "quelques années", "plusieurs siècles"], good: 1, sol: "quelques mois (environ 80 jours)" },
+    { type: "num", q: "Quelle est la demi-vie de l'iode 131 utilisée par l'appli ?", unit: "j", ans: 8.04, tol: 0.005, sol: "8,04 j",
+      hints: ["Onglet Décroissance.", "Menu « Nucléide », ou encadré « Demi-vie du nucléide ».", "Choisissez « Iode 131 » et lisez la valeur en jours."], expl: "Valeur de la fiche « Radioactivité » de l'ANCCLI.", src: [5] },
+    { type: "choice", q: "Quel organisme publie la fiche d'où vient cette valeur ?", opts: ["L'INRS", "L'ANCCLI", "Le CNRS", "La CCSN"], good: 1, sol: "L'ANCCLI",
+      hints: ["Onglet Décroissance, iode 131 choisi.", "Ouvrez le panneau « Sources » (niveau 3).", "Lisez l'organisme au début de la référence."], expl: "L'ANCCLI fédère les commissions locales d'information placées auprès des installations nucléaires.", src: [5] },
+    { type: "num", q: "Calculez la constante radioactive λ de l'iode 131. Écriture acceptée : 9,9e-7 ou 9,9 × 10^-7.", unit: "s⁻¹", ans: LN2 / (8.04 * 86400), tol: 0.01, sol: "λ = ln 2 / t½ ≈ 9,98 × 10⁻⁷ s⁻¹",
+      hints: ["λ = ln 2 / t½, avec t½ en secondes.", "1 j = 86 400 s.", "Vérification possible dans le panneau « Calcul »."], expl: "λ = 0,693 / (8,04 × 86 400 s) ≈ 9,98 × 10⁻⁷ s⁻¹.", src: [5] },
+    { type: "num", q: "L'iode 131 a disparu de la plupart des produits agricoles fin juillet 1986 [39]. Du 26 avril au 31 juillet 1986, il s'écoule 96 jours. Par combien son activité a-t-elle été divisée ?", unit: "", ans: 2 ** (96 / 8.04), tol: 0.08, sol: "2^(96/8,04) ≈ 3,9 × 10³",
+      hints: ["Combien de demi-vies dans 96 jours ?", "À chaque demi-vie, l'activité est divisée par 2.", "Calculez 2^(96/8,04)."], expl: "96 / 8,04 ≈ 11,9 demi-vies : l'activité est divisée par 2¹¹·⁹ ≈ 3 900.", src: [39, 8] },
+    { type: "num", pari: 0, q: "Retour au pari. Combien de jours faut-il pour que l'activité de l'iode 131 soit divisée par 1 000 ?", unit: "j", ans: 8.04 * Math.log2(1000), ok: (v) => v >= 76 && v <= 84, sol: "≈ 80 j, environ 10 demi-vies (2¹⁰ ≈ 1 000)",
+      hints: ["Combien de fois faut-il diviser par 2 pour atteindre 1 000 ?", "2¹⁰ = 1 024.", "10 demi-vies de 8,04 j."], expl: "Environ 80 jours, un peu moins de 3 mois." },
+    { type: "open", q: "À nombre de noyaux égal, lequel est le plus actif : l'iode 131 ou le césium 137 ? Lequel pose problème le plus longtemps ? Justifiez avec A = λN.", sugg: "À N égal, l'iode 131 est environ 1 370 fois plus actif (λ inversement proportionnel à t½) ; le césium 137 (30,1 ans) reste présent des décennies." },
+  ] },
+  { id: "mesure", titre: "Mesurer une demi-vie", onglets: "Décroissance, Expérience", intro: "Le hasard donne-t-il toujours la même demi-vie ?", qs: [
+    { type: "pari", q: "Pari : avec 10 noyaux au lieu de 10 000, la demi-vie mesurée sera…", opts: ["plus courte", "plus longue", "la même en moyenne, mais plus variable"], good: 2, sol: "la même en moyenne, plus variable" },
+    { type: "num", q: "Choisissez le césium 137 et N₀ = 1 000, appuyez sur « Nouveau tirage » et attendez que la demi-vie mesurée s'affiche. Quelle valeur obtenez-vous ?", unit: "ans",
+      pre: () => (sim.n.id !== "cs137" || sim.N0 !== 1000) ? "Réglez d'abord le césium 137 et N₀ = 1 000 dans l'onglet Décroissance." : tHalfMeas() === null ? "La demi-vie mesurée ne s'affiche pas encore : laissez tourner la simulation." : null,
+      ans: () => +(tHalfMeas() * 30.1).toPrecision(3), tol: 0.006, sol: "Valeur différente à chaque tirage, proche de 30,1 ans",
+      hints: ["Onglet Décroissance.", "Tapez 1000 dans le champ N₀.", "Appuyez sur « Afficher t½ », au-dessus du graphe : lisez l'étiquette orange, ou l'encadré « Demi-vie mesurée »."], expl: "Chaque tirage donne une valeur un peu différente de 30,1 ans : c'est l'effet du hasard.", src: [8] },
+    { type: "choice", q: "Onglet Expérience : comparez N₀ = 10 et N₀ = 10 000. Pour N₀ = 10, les points sont…", opts: ["moins étalés", "aussi étalés", "beaucoup plus étalés"], good: 2, sol: "beaucoup plus étalés",
+      hints: ["Onglet « Expérience t½ et N₀ ».", "Si le graphe est vide, appuyez sur « Lancer ».", "Le « Tableau des mesures » donne l'écart relatif."], expl: "Avec 10 noyaux, les demi-vies mesurées s'étalent beaucoup ; avec 10 000, elles sont presque toutes égales à la demi-vie du nucléide.", src: [3] },
+    { type: "choice", q: "D'après « Modèle et hypothèses » de l'onglet Expérience, multiplier N₀ par 100 divise la dispersion par environ…", opts: ["2", "10", "100", "1 000"], good: 1, sol: "10",
+      hints: ["Onglet Expérience.", "Panneau « Modèle et hypothèses » (niveau 2).", "La dispersion varie comme 1/√N₀ : que vaut √100 ?"], expl: "√100 = 10 (hors programme)." },
+    { type: "choice", pari: 0, q: "Retour au pari. Sur le graphe de l'onglet Expérience, où sont les médianes pour N₀ = 10 et N₀ = 10 000 ?", opts: ["Plus bas pour N₀ = 10", "Plus haut pour N₀ = 10", "À peu près à la même hauteur, avec des points plus étalés pour N₀ = 10"], good: 2, sol: "À la même hauteur",
+      hints: ["Onglet Expérience : regardez les traits noirs.", "Comparez-les à la ligne en tirets.", "Les valeurs des médianes sont écrites sous chaque colonne."], expl: "La demi-vie ne dépend pas de N₀ : seule la précision de la mesure change." },
+    { type: "open", q: "Un noyau isolé de césium 137 : peut-on prévoir l'instant de sa désintégration ? Que peut-on en dire ?", sugg: "Non. On sait seulement qu'il a une chance sur deux de se désintégrer pendant une demi-vie (30,1 ans)." },
+  ] },
+  { id: "graphes", titre: "Tangente, logarithme et pas de temps", onglets: "Décroissance (menu Options)", intro: "Retrouver λ sur un graphe, et voir ce que change le pas de la simulation.", qs: [
+    { type: "num", q: "Iode 131 : dans le menu Options, cochez « Tangente à l'origine ». À quelle date la tangente coupe-t-elle l'axe des temps ?", unit: "j", ans: 8.04 / LN2, tol: 0.03, sol: "τ = t½ / ln 2 ≈ 11,6 j",
+      hints: ["Onglet Décroissance, menu Options.", "La tangente coupe l'axe des temps en τ = 1/λ.", "τ = t½ / ln 2 = 8,04 / 0,693."], expl: "τ = 1/λ ≈ 11,6 j. Au bout de τ, il reste N₀/e, soit environ 37 % des noyaux." },
+    { type: "choice", q: "Options → Courbe « ln N ». Que représente la pente de la droite en tirets ?", opts: ["λ", "−λ", "t½", "−1/t½"], good: 1, sol: "−λ",
+      hints: ["Onglet Décroissance, menu Options, bouton « ln N ».", "ln N(t) = ln N₀ − λt.", "Comparez avec la « pente mesurée » affichée en orange."], expl: "ln N(t) = ln N₀ − λt : droite de pente −λ. L'appli affiche aussi la pente mesurée par régression sur la simulation." },
+    { type: "num", q: "En une demi-vie, de combien ln N diminue-t-il ?", unit: "", ans: LN2, tol: 0.03, sol: "ln 2 ≈ 0,693",
+      hints: ["Mode « ln N ».", "Comparez la droite en tirets à t = 0 et à t = t½.", "En une demi-vie, N est divisé par 2."], expl: "ln(N₀/2) = ln N₀ − ln 2 : la droite perd ln 2 ≈ 0,693 à chaque demi-vie." },
+    { type: "pari", q: "Pari : avec un pas de temps très grand (t½/5) et la probabilité approchée p = λΔt, la courbe simulée…", opts: ["suivra toujours le modèle", "décroîtra plus vite que le modèle", "décroîtra plus lentement que le modèle"], good: 1, sol: "plus vite" },
+    { type: "choice", pari: 3, q: "Retour au pari. Options : pas t½/5, probabilité approchée, courbe N(t). Mettez N₀ = 10 000 et lancez. Que fait la courbe simulée ?", opts: ["Elle suit le modèle", "Elle décroît plus vite que le modèle", "Elle décroît plus lentement que le modèle"], good: 1, sol: "plus vite",
+      pre: () => (sim.S !== 5 || !sim.approx) ? "Réglez d'abord, dans Options : pas t½/5 et probabilité approchée." : null,
+      hints: ["Onglet Décroissance, menu Options.", "Comparez la courbe orange et la courbe en tirets.", "Le panneau Calcul compare p approchée et p exacte."], expl: "λΔt = ln 2 / 5 ≈ 0,139, alors que la vraie probabilité vaut 1 − 2⁻⁰·² ≈ 0,129 : on surestime p, la simulation décroît trop vite." },
+    { type: "open", q: "Pourquoi l'approximation p ≈ λΔt devient-elle mauvaise quand Δt est grand ?", sugg: "p = 1 − e^(−λΔt) ≈ λΔt seulement si λΔt ≪ 1. Avec Δt = t½/5, λΔt ≈ 0,14 et l'approximation surestime p." },
+  ] },
+  { id: "curie", titre: "Protéger l'équipe de curiethérapie", onglets: "Radioprotection, Décroissance", intro: "En curiethérapie à haut débit, une source d'iridium 192 est déplacée dans des tubes implantés chez le patient.", qs: [
+    { type: "pari", q: "Pari : à 1 m de la source, qu'est-ce qui protège le mieux l'équipe : reculer à 5 m, ou ajouter 1 cm de plomb ?", opts: ["Reculer à 5 m", "Ajouter 1 cm de plomb", "C'est à peu près pareil"], good: 0, sol: "Reculer à 5 m" },
+    { type: "num", q: "Quelle activité a la source de curiethérapie citée dans l'appli ?", unit: "GBq", ans: 370, tol: 0.005, sol: "370 GBq",
+      hints: ["Onglet Radioprotection, source « Iridium 192 ».", "Menu Options.", "Lisez le bouton « Préréglages »."], expl: "Activité citée dans le retour d'expérience d'un service hospitalier.", src: [38] },
+    { type: "num", q: "Appliquez ce préréglage. À 1 m, sans écran, quel débit de dose donne l'appli ?", unit: "mSv/h", ans: IR_RATE, tol: 0.03, sol: "≈ 50 mSv/h (59 avec la valeur CCSN)",
+      hints: ["Distance 1 m, aucun écran.", "Lisez « Débit de dose reçu » ou le point orange du graphe « Distance ».", "Ḋ = Γ × A / d²."], expl: "Ḋ = 3,75 × 10⁻¹⁷ × 3,70 × 10¹¹ × 3 600 ≈ 50 mSv/h. Avec la valeur de la CCSN, on trouverait 59 mSv/h.", src: [13, 7] },
+    { type: "choice", q: "Dans quelle zone réglementaire se trouve-t-on à 1 m ?", opts: ["Zone bleue", "Zone verte", "Zone jaune", "Zone orange", "Zone rouge"], good: 3, sol: "Zone orange",
+      hints: ["Étiquette en haut à droite du banc.", "Seuils horaires : 2 mSv puis 100 mSv en une heure.", "50 mSv/h est entre 2 et 100."], expl: "Entre 2 et 100 mSv sur une heure : zone orange. À 50 cm, le débit est quatre fois plus grand : zone rouge.", src: [14] },
+    { type: "num", q: "Épaisseurs moitié du CNRS : quelle épaisseur minimale de plomb faut-il, à 1 m, pour descendre sous 2 mSv/h ? (au mm près)", unit: "mm", ans: 17, ok: (v) => v >= 16.2 && v <= 18, sol: "17 mm (3,5 × ln 25 / ln 2 ≈ 16,3 mm)",
+      hints: ["Curseur « Plomb », ou graphe « Écran ».", "Chaque CDA (3,5 mm) divise le débit par 2.", "Il faut diviser par 25 : 2⁴ = 16 ne suffit pas, 2⁵ = 32 suffit."], expl: "2^(x/3,5) = 25 donne x ≈ 16,3 mm : il faut 17 mm.", src: [11] },
+    { type: "num", q: "Sans écran, à quelle distance minimale faut-il se placer pour descendre sous 2 mSv/h ?", unit: "m", ans: Math.sqrt(IR_RATE / 2), ok: (v) => v >= 4.95 && v <= 5.4, sol: "≈ 5,0 m",
+      hints: ["Curseur « Distance », ou graphe « Distance ».", "Le débit varie comme 1/d².", "Pour diviser par 25, par combien multiplier d ?"], expl: "Diviser le débit par 25 demande d = √25 = 5 m." },
+    { type: "num", pari: 0, q: "Retour au pari. Par combien 1 cm de plomb divise-t-il le débit (CDA du CNRS) ?", unit: "", ans: 2 ** (10 / 3.5), tol: 0.06, sol: "2^(10/3,5) ≈ 7",
+      hints: ["1 cm = 10 mm.", "Nombre de CDA : 10 / 3,5.", "Calculez 2^(10/3,5)."], expl: "1 cm de plomb divise par environ 7 ; reculer de 1 m à 5 m divise par 25 : ici, la distance l'emporte.", src: [11] },
+    { type: "num", q: "Une séance durait 5 min avec la source neuve. Combien de temps doit durer la même séance 74 jours plus tard ?", unit: "min", ans: 10, tol: 0.02, sol: "10 min",
+      hints: ["74 jours : c'est la demi-vie de l'iridium 192 (onglet Décroissance).", "L'activité est divisée par 2.", "Même dose : deux fois plus de temps."], expl: "Au bout d'une demi-vie, l'activité est divisée par 2 : la séance dure deux fois plus. La source est remplacée par le fournisseur selon une procédure décrite par l'INRS.", src: [7, 37] },
+    { type: "choice", q: "Pendant la séance, le personnel quitte la salle. Pourquoi ?", opts: ["La source cesse d'émettre quand personne n'est là", "Distance et murs : la salle est en zone rouge, interdite au personnel", "Le gamma ne traverse pas plus de quelques centimètres d'air"], good: 1, sol: "Distance et murs (zone rouge)",
+      hints: ["Une source radioactive peut-elle s'arrêter d'émettre ?", "Relisez « Modèle et hypothèses ».", "Trois leviers : temps, distance, écrans."], expl: "La salle est en zone rouge, interdite au personnel pendant l'irradiation.", src: [37] },
+  ] },
+  { id: "passe", titre: "Alpha, bêta, gamma : qui passe ?", onglets: "Radioprotection", intro: "Chaque rayonnement a son écran.", qs: [
+    { type: "pari", q: "Pari : quel écran arrête complètement le gamma du césium 137 ?", opts: ["Une feuille de papier", "4 mm d'aluminium", "1 cm de plomb", "Aucun : un écran atténue le gamma sans l'arrêter complètement"], good: 3, sol: "Aucun" },
+    { type: "num", q: "Quel est le parcours dans l'air des particules alpha du polonium 210 ?", unit: "cm", ans: 3.84, tol: 0.005, sol: "3,84 cm",
+      hints: ["Onglet Radioprotection, source « Polonium 210 ».", "Panneau « Modèle et hypothèses ».", "Paragraphe « Alpha et bêta »."], expl: "Valeur pour des alpha de 5,3 MeV.", src: [9] },
+    { type: "choice", q: "Polonium 210 à 1 m, sans écran : l'alpha atteint-il la personne ?", opts: ["Oui", "Non"], good: 1, sol: "Non",
+      hints: ["Source Po-210, distance 1 m.", "Où s'arrêtent les traits orange du banc ?", "1 m, c'est bien plus que 3,84 cm."], expl: "Quelques centimètres d'air l'arrêtent. Son danger, c'est la contamination interne.", src: [9] },
+    { type: "num", q: "Émetteur bêta : quelle épaisseur d'aluminium l'arrête dans ce modèle ?", unit: "mm", ans: 4, tol: 0.001, sol: "4 mm",
+      hints: ["Source « Émetteur bêta ».", "Augmentez l'aluminium jusqu'à ce que les traits s'arrêtent.", "Ou lisez « Modèle et hypothèses »."], expl: "4 mm sur le schéma du CNRS.", src: [9, 10] },
+    { type: "choice", q: "Césium 137 : on ajoute une feuille de papier. Le débit de dose…", opts: ["est divisé par 2", "ne change pas", "tombe à zéro"], good: 1, sol: "ne change pas",
+      hints: ["Source Cs-137.", "Cochez « Papier » et regardez le débit.", "Lisez le message sous la dose."], expl: "Le papier arrête l'alpha, pas le gamma.", src: [10] },
+    { type: "choice", pari: 0, q: "Retour au pari. Césium 137 : mettez 100 mm de plomb. Le débit…", opts: ["tombe exactement à zéro", "devient très faible, mais pas nul", "ne change pas"], good: 1, sol: "très faible, pas nul",
+      hints: ["Curseur « Plomb » au maximum.", "Regardez le débit et le graphe « Écran ».", "2^(−100/6) est-il nul ?"], expl: "Chaque CDA divise par 2 : le débit tend vers 0 sans jamais l'atteindre.", src: [11] },
+    { type: "choice", q: "Tube à rayons X : que se passe-t-il quand on coupe la tension ?", opts: ["Il continue d'émettre, comme une source radioactive", "Il n'émet plus rien : un tube n'est pas radioactif", "Il émet moitié moins à chaque demi-vie"], good: 1, sol: "Il n'émet plus rien",
+      hints: ["Source « Tube à rayons X ».", "Décochez « Tube sous tension ».", "Lisez le message."], expl: "Rayonnement ionisant ne veut pas dire radioactivité." },
+    { type: "open", q: "Pourquoi l'alpha, inoffensif à 1 m, est-il dangereux s'il est ingéré ou inhalé ?", sugg: "À l'intérieur du corps, aucun écran : toute l'énergie est déposée dans les tissus tout proches." },
+  ] },
+  { id: "goiania", titre: "Goiânia, 1987 : une source oubliée", onglets: "Décroissance, Radioprotection", intro: "En 1987 à Goiânia (Brésil), une source de radiothérapie au césium 137 abandonnée est volée puis ouverte.", qs: [
+    { type: "pari", q: "Pari : 16 ans après 1971, quelle part de son activité la source avait-elle encore ?", opts: ["moins de 10 %", "environ la moitié", "plus des deux tiers"], good: 2, sol: "plus des deux tiers (≈ 69 %)" },
+    { type: "num", pari: 0, q: "La source avait une activité de 74 TBq en 1971 [43]. Avec la demi-vie du césium 137 donnée par l'appli, calculez son activité en 1987.", unit: "TBq", ans: 74 * 2 ** (-16 / 30.1), tol: 0.03, sol: "74 × 2^(−16/30,1) ≈ 51 TBq",
+      hints: ["Demi-vie du césium 137 : onglet Décroissance.", "16 ans entre 1971 et 1987.", "A = A₀ × 2^(−t/t½)."], expl: "51 TBq, soit 69 % de l'activité de 1971. Valeur de 1971 à recouper avec le rapport de l'AIEA.", src: [43, 8] },
+    { type: "num", q: "Préréglage « Source de Goiânia » : quel débit de dose à 1 m, sans écran ?", unit: "Sv/h", ans: GO_RATE, tol: 0.04, sol: "≈ 5 Sv/h",
+      hints: ["Source Cs-137.", "Menu Options, « Préréglages ».", "Distance 1 m, aucun écran."], expl: "Ḋ = 2,75 × 10⁻¹⁷ × 5,1 × 10¹³ × 3 600 ≈ 5 Sv/h.", src: [52] },
+    { type: "num", q: "À ce débit, combien de temps faut-il pour recevoir 4,5 Gy, la DL50 ?", unit: "min", ans: 4.5 / GO_RATE * 60, ok: (v) => v >= 50 && v <= 57, sol: "≈ 53 min",
+      hints: ["Durée = dose ÷ débit.", "Gamma sur tout le corps : Gy ≈ Sv.", "4,5 ÷ 5 ≈ 0,9 h."], expl: "Δt ≈ 0,89 h ≈ 53 min. La DL50 est la dose qui, sans traitement, entraîne la mort de la moitié des personnes exposées.", src: [27] },
+    { type: "choice", q: "D'où vient la valeur de la DL50 utilisée par l'appli ?", opts: ["Fiche 4 du guide de radioprotection du CNRS", "Code du travail", "Fiche « Radioactivité » de l'ANCCLI"], good: 0, sol: "Fiche 4 du CNRS",
+      hints: ["Échelle des doses : survolez l'étiquette.", "Ou panneau « Repères de dose et sources ».", "Onglet Sources, numéro [27]."], src: [27] },
+    { type: "open", q: "Que retenir sur les sources oubliées ?", sugg: "Avec une demi-vie de 30 ans, une source reste dangereuse des décennies : il faut suivre et récupérer les sources." },
+  ] },
+  { id: "reperes", titre: "Repères de dose", onglets: "Radioprotection", intro: "Placer une dose parmi des valeurs connues.", qs: [
+    { type: "pari", q: "Pari : une radiographie du thorax, c'est plus ou moins que la dose moyenne reçue en un an en France ?", opts: ["plus", "moins", "à peu près pareil"], good: 1, sol: "moins" },
+    { type: "num", q: "Selon l'appli, quelle est l'exposition moyenne d'une personne en France, par an ?", unit: "mSv", ans: 4.5, tol: 0.005, sol: "4,5 mSv (bilan 2014-2019)",
+      hints: ["Onglet Radioprotection.", "Échelle des doses.", "Ligne « Moyenne France, 1 an »."], expl: "Bilan 2014-2019 ; un nouveau bilan 2020-2024 est paru en septembre 2026.", src: [22, 23] },
+    { type: "num", q: "Quelle est la limite annuelle de dose pour le public, hors médical ?", unit: "mSv", ans: 1, tol: 0.005, sol: "1 mSv",
+      hints: ["Échelle des doses.", "Ligne « Limite public ».", "En mSv."], src: [25] },
+    { type: "num", q: "Avec les valeurs de l'ASNR, une radiographie du thorax équivaut à combien de vols Paris – New York ?", unit: "vols", ans: 0.1 / 0.03, ok: (v) => v >= 3 && v <= 3.5, sol: "0,1 / 0,03 ≈ 3",
+      hints: ["Échelle des doses.", "Radiographie : 0,1 mSv ; vol : 0,03 mSv.", "Divisez."], expl: "Avec la valeur d'EDF (0,08 mSv), à peine plus d'un vol.", src: [19, 20] },
+    { type: "choice", q: "Pourquoi l'appli donne-t-elle deux valeurs pour le vol Paris – New York ?", opts: ["C'est une erreur", "Deux sources (ASNR et EDF) ne donnent pas la même valeur", "La dose dépend du sens du vol"], good: 1, sol: "Deux sources",
+      hints: ["Panneau « Repères de dose et sources ».", "Ligne du vol.", "Numéros [19] et [20]."], expl: "Quand deux sources divergent, l'appli le dit.", src: [19, 20] },
+    { type: "num", pari: 0, q: "Retour au pari. Combien de radiographies du thorax faudrait-il pour atteindre la dose moyenne annuelle en France ?", unit: "", ans: 45, tol: 0.03, sol: "4,5 / 0,1 = 45",
+      hints: ["Moyenne : 4,5 mSv.", "Radiographie : 0,1 mSv.", "Divisez."], expl: "45 radiographies : une seule est bien en dessous de la moyenne annuelle.", src: [22, 19] },
+    { type: "num", q: "Réglage de départ : césium 137, 10 GBq, 1 m, 1 h, sans écran. Quelle dose reçoit-on ?", unit: "µSv", ans: 2.75e-17 * 1e10 * 3600 * 1e6, tol: 0.03, sol: "≈ 990 µSv",
+      hints: ["Onglet Radioprotection, source Cs-137.", "10 GBq, 1 m, 1 h, aucun écran.", "Lisez « Dose » ou la ligne orange de l'échelle."], expl: "≈ 990 µSv : presque la limite annuelle du public en une heure.", src: [52, 25] },
+  ] },
+];
+let cur = null;
+const mp = (m) => (mprog[m.id] = mprog[m.id] || { f: 0, st: {}, pari: {}, notes: {} });
+function mCounts(m) { const p = mp(m), v = Object.values(p.st); return { ok: v.filter((x) => x === "ok").length, su: v.filter((x) => x === "su").length, no: v.filter((x) => x === "no").length, pa: v.filter((x) => x === "pa").length }; }
+function renderMList() {
+  $("mlist").innerHTML = MISSIONS.map((m) => {
+    const p = mp(m), c = mCounts(m), n = m.qs.length, w = (k) => (100 * k / n).toFixed(1) + "%";
+    const started = p.f > 0, done = p.f >= n;
+    return `<div class="card mcard"><h2>${m.titre}</h2><p>${m.intro}</p><p>Onglets : ${m.onglets}</p>
+      <div class="prog" aria-label="Progression"><i style="width:${w(c.ok + c.pa)};background:var(--cy)"></i><i style="width:${w(c.no)};background:var(--navy)"></i><i style="width:${w(c.su)};background:var(--or)"></i></div>
+      <p>${started ? `${Math.min(p.f, n)} étapes sur ${n} vues · ${c.ok} réussies${c.su ? " · " + c.su + " en suspens" : ""}${c.no ? " · " + c.no + " à discuter" : ""}` : `${n} étapes`}</p>
+      <div class="btns"><button class="b main" data-go="${m.id}">${!started ? "Commencer" : done ? "Revoir" : "Reprendre"}</button></div>
+      ${teacher ? `<details class="corr"><summary>Corrigé</summary><ol>${m.qs.map((q) => `<li>${q.type === "open" ? "Piste : " + q.sugg : q.sol}</li>`).join("")}</ol></details>` : ""}</div>`;
+  }).join("");
+  $("mlist").querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => openMission(b.dataset.go)));
+  const notes = MISSIONS.flatMap((m) => Object.entries(mp(m).notes).filter(([, t]) => t).map(([k, t]) => ({ m, q: m.qs[+k], t })));
+  $("notesList").innerHTML = notes.length ? notes.map((x) => `<p><b>${x.m.titre}</b> – ${x.q.q}<br>${x.t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</p>`).join("") : "<p>Aucune réponse enregistrée.</p>";
+}
+function openMission(id) {
+  const m = MISSIONS.find((x) => x.id === id), p = mp(m);
+  cur = { m, k: Math.min(p.f, m.qs.length), h: 0, tries: 0 };
+  $("mdock").hidden = false; $("mdock").classList.remove("min"); $("mMin").textContent = "Réduire";
+  document.body.classList.add("has-m"); document.body.classList.remove("mmin");
+  renderDock();
+}
+function goFrontier() { const p = mp(cur.m); cur.k = p.f; cur.h = 0; cur.tries = 0; renderDock(); renderMList(); }
+function advance() { const p = mp(cur.m); if (cur.k === p.f) p.f++; saveM(); goFrontier(); }
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function fb(kind, html) { $("mFb").innerHTML = `<div class="mfb ${kind}">${html}</div>`; }
+const srcNote = (q) => q.src && q.src.length ? `<br><span class="note">Source${q.src.length > 1 ? "s" : ""} : ${q.src.map((n) => "[" + n + "]").join(" ")} (onglet Sources).</span>` : "";
+function contBtn() { const b = document.createElement("button"); b.className = "b main"; b.textContent = "Continuer"; b.addEventListener("click", advanceOrBack); $("mActs").innerHTML = ""; $("mActs").appendChild(b); b.focus(); }
+function advanceOrBack() { const p = mp(cur.m); if (cur.k < p.f) goFrontier(); else advance(); }
+function verdict(q) {
+  if (q.pari == null) return "";
+  const p = mp(cur.m), bet = p.pari[q.pari], pq = cur.m.qs[q.pari];
+  if (bet == null) return "";
+  if (p.st[q.pari] === "pa") p.st[q.pari] = "ok";
+  return bet === pq.good ? `<br><b>Votre pari était juste.</b>` : `<br><b>Votre pari est à revoir</b> : la bonne réponse était « ${pq.opts[pq.good]} ».`;
+}
+function success(q) {
+  const p = mp(cur.m); p.st[cur.k] = "ok"; const v = verdict(q); saveM(); renderMList();
+  fb("ok", `<b>Juste.</b> ${q.expl || ""}${v}${srcNote(q)}`); contBtn(); renderDots();
+}
+function renderDots() {
+  const m = cur.m, p = mp(m);
+  const cls = (i) => i === cur.k ? "cur" : p.st[i] === "ok" ? "ok" : p.st[i] === "su" ? "su" : p.st[i] === "pa" ? "pa" : p.st[i] === "no" ? "no" : "";
+  $("mDots").innerHTML = m.qs.map((q, i) => i <= p.f || p.st[i] ? `<i class="${cls(i)}" title="Étape ${i + 1}"></i>` : `<i title="À venir"></i>`).join("") + `<small>${Math.min(p.f, m.qs.length)} / ${m.qs.length}</small>`;
+}
+function renderDock() {
+  const m = cur.m, p = mp(m), n = m.qs.length;
+  $("mTitle").textContent = m.titre; $("mCount").textContent = cur.k < n ? `Étape ${cur.k + 1} / ${n}` : "Terminée";
+  const pend = m.qs.map((q, i) => i).filter((i) => p.st[i] === "su" && i !== cur.k);
+  let h = `<div class="dots" id="mDots"></div>`;
+  if (pend.length) h += `<div class="pend">En suspens : ${pend.map((i) => `<button class="b" data-back="${i}">question ${i + 1}</button>`).join("")}</div>`;
+  if (cur.k >= n) {
+    const c = mCounts(m);
+    h += `<p class="mq"><b>Mission terminée.</b> ${c.ok} réussies${c.su ? ", " + c.su + " en suspens" : ""}${c.no ? ", " + c.no + " question(s) ouverte(s) à discuter en classe" : ""}.</p><div class="mnav"><button class="b main" id="mList">Liste des missions</button></div>`;
+    $("mbody").innerHTML = h; renderDots(); bindPend();
+    $("mList").addEventListener("click", () => { location.hash = "missions"; show("missions"); });
+    return;
+  }
+  const q = m.qs[cur.k], st0 = p.st[cur.k];
+  const tag = q.type === "pari" ? `<span class="mtag pari">Pari</span>` : q.type === "open" ? `<span class="mtag">Question ouverte</span>` : "";
+  const betLine = q.pari != null && p.pari[q.pari] != null ? `<div class="mfb hint" style="margin:0 0 8px">Votre pari : « ${m.qs[q.pari].opts[p.pari[q.pari]]} »</div>` : "";
+  h += `${tag}${betLine}<p class="mq">${q.q}</p>`;
+  if (q.type === "num") h += `<div class="mans"><input type="text" inputmode="decimal" id="mIn" autocomplete="off" aria-label="Votre réponse"><span>${q.unit || ""}</span><button class="b main" id="mChk">Vérifier</button></div>`;
+  else if (q.type === "open") h += `<textarea id="mTxt" aria-label="Votre réponse">${esc(p.notes[cur.k] || "")}</textarea><div class="mnav"><button class="b main" id="mSave">Enregistrer</button></div>`;
+  else h += `<div class="mopts">${q.opts.map((o, k) => `<button class="b" data-k="${k}"${q.type === "pari" && p.pari[cur.k] === k ? ' aria-pressed="true"' : ""}>${o}</button>`).join("")}</div>`;
+  h += `<div id="mHints"></div><div id="mFb"></div><div class="mnav" id="mActs">`;
+  if (q.hints) h += `<button class="b" id="mHint">Indice 1 / 3</button>`;
+  if (q.type !== "pari") h += `<button class="b" id="mSusp">Laisser en suspens</button>`;
+  h += `</div>`;
+  $("mbody").innerHTML = h; renderDots(); bindPend();
+  if (q.type === "num") { const go = () => checkNum(q); $("mChk").addEventListener("click", go); $("mIn").addEventListener("keydown", (e) => { if (e.key === "Enter") go(); }); }
+  if (q.type === "open") $("mSave").addEventListener("click", () => {
+    const t = $("mTxt").value.trim(); if (!t) { fb("hint", "Écrivez d'abord une réponse, ou laissez la question en suspens."); return; }
+    p.notes[cur.k] = t; p.st[cur.k] = "no"; saveM(); renderMList();
+    fb("hint", `Réponse enregistrée : elle sera discutée en classe.${teacher ? "<br><b>Piste :</b> " + q.sugg : ""}`); contBtn(); renderDots();
+  });
+  if (q.type === "pari") $("mbody").querySelectorAll("[data-k]").forEach((b) => b.addEventListener("click", () => {
+    p.pari[cur.k] = +b.dataset.k; p.st[cur.k] = "pa"; saveM();
+    $("mbody").querySelectorAll("[data-k]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    fb("hint", "Pari noté. La réponse viendra plus loin dans la mission."); contBtn(); renderDots();
+  }));
+  if (q.type === "choice") $("mbody").querySelectorAll("[data-k]").forEach((b) => b.addEventListener("click", () => {
+    if (q.pre) { const e = q.pre(); if (e) { fb("hint", e); return; } }
+    if (+b.dataset.k === q.good) { b.setAttribute("aria-pressed", "true"); success(q); }
+    else { cur.tries++; b.disabled = true; fb("ko", "Pas cette réponse." + (cur.tries >= 2 && q.hints ? " Un indice peut aider." : "")); }
+  }));
+  if (q.hints) $("mHint").addEventListener("click", () => {
+    if (cur.h < 3) cur.h++;
+    $("mHints").innerHTML = `<div class="mfb hint">${q.hints.slice(0, cur.h).map((t, k) => `Indice ${k + 1} : ${t}`).join("<br>")}</div>`;
+    $("mHint").textContent = cur.h < 3 ? `Indice ${cur.h + 1} / 3` : "Tous les indices";
+  });
+  if ($("mSusp")) $("mSusp").addEventListener("click", () => { if (p.st[cur.k] !== "ok" && p.st[cur.k] !== "no") p.st[cur.k] = "su"; advanceOrBack(); });
+  if (st0 === "ok") { fb("ok", `<b>Déjà réussie.</b> Réponse : ${q.sol}.`); contBtn(); }
+  else if (st0 === "pa") { fb("hint", "Pari déjà noté."); contBtn(); }
+  else if (st0 === "no") { fb("hint", `Réponse enregistrée.${teacher ? "<br><b>Piste :</b> " + q.sugg : ""}`); }
+}
+function bindPend() { $("mbody").querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => { cur.k = +b.dataset.back; cur.h = 0; cur.tries = 0; renderDock(); })); }
+function checkNum(q) {
+  const v = parseNum($("mIn").value);
+  if (isNaN(v)) { fb("hint", "Écrivez un nombre, par exemple 9,98e-7 ou 9,98 × 10^-7."); return; }
+  if (q.pre) { const e = q.pre(); if (e) { fb("hint", e); return; } }
+  const a = typeof q.ans === "function" ? q.ans() : q.ans;
+  if (q.ok ? q.ok(v) : Math.abs(v - a) <= q.tol * Math.abs(a)) { success(q); return; }
+  cur.tries++;
+  let msg = "Pas encore. " + (v > a ? "Votre valeur est trop grande." : "Votre valeur est trop petite.");
+  const ratio = v / a; if (Math.abs(ratio - 1000) < 50 || Math.abs(ratio - 0.001) < 0.00005 || Math.abs(ratio - 60) < 3 || Math.abs(ratio - 1 / 60) < 0.001) msg += " Vérifiez l'unité.";
+  if (cur.tries >= 3) msg += ` <button class="b" id="mSol">Voir la réponse</button>`;
+  fb("ko", msg);
+  const s = $("mSol"); if (s) s.addEventListener("click", () => fb("hint", `Réponse : ${q.sol}.${q.expl ? " " + q.expl : ""}`));
+}
+$("mMin").addEventListener("click", () => { const mn = $("mdock").classList.toggle("min"); $("mMin").textContent = mn ? "Ouvrir" : "Réduire"; document.body.classList.toggle("mmin", mn); });
+$("mClose").addEventListener("click", () => { $("mdock").hidden = true; document.body.classList.remove("has-m", "mmin"); cur = null; });
+$("mReset").addEventListener("click", () => { mprog = {}; saveM(); renderMList(); if (cur) { cur.k = 0; renderDock(); } });
+// Mode professeur : case cachée aux élèves, affichée avec l'adresse …/radioactivite/?prof (ce n'est pas une protection)
+$("teachBox").hidden = !(teacher || new URLSearchParams(location.search).has("prof"));
+$("teach").checked = teacher;
+$("teach").addEventListener("change", (e) => { teacher = e.target.checked; saveM(); renderMList(); if (cur) renderDock(); });
+$("copyNotes").addEventListener("click", async () => {
+  const txt = MISSIONS.flatMap((m) => Object.entries(mp(m).notes).filter(([, t]) => t).map(([k, t]) => `${m.titre} – ${m.qs[+k].q}\n${t}`)).join("\n\n");
+  try { await navigator.clipboard.writeText(txt || "(aucune réponse)"); $("copyMsg").textContent = "Copié."; } catch (e) { $("copyMsg").textContent = "Copie impossible ici : sélectionnez le texte à la main."; }
+});
+
+// ---------- sources ----------
+$("srcList").innerHTML = Object.keys(SRC).map((k) => `<li>${srcLink(+k)}</li>`).join("");
+
+// ---------- démarrage ----------
+function drawAll() {
+  if ($("v-decroissance").classList.contains("on") && sim) render1();
+  if ($("v-experience").classList.contains("on")) drawX();
+  if ($("v-radioprotection").classList.contains("on")) drawR();
+}
+const ro = new ResizeObserver(() => drawAll());
+document.querySelectorAll(".fig").forEach((f) => ro.observe(f));
+st.N0 = n0FromSlider(); $("n0n").value = st.N0;
+renderChips(); rPresets(); rTrans(); renderMList();
+newSim();
+show(location.hash.slice(1));
+for (let k = 0; k < 60; k++) doStep();
+render1(); drawR();
+for (let k = 0; k < 20; k++) [10, 100, 1000, 10000].forEach((N0) => (xs.res[N0] = xs.res[N0] || []).push(trial(N0)));
+requestAnimationFrame((t) => { last = t; loop(t); });
+}
+</script>
+</body>
+</html>

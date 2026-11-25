@@ -11,6 +11,24 @@
      · public : 'prof' (seul public prévu pour l'instant). */
 window.RESONANCE_NOUVEAUTES = [
   {
+    n: 2,
+    date: '2026-11-24',
+    titre: 'Une animation sur la radioactivité',
+    public: 'prof',
+    points: [
+      {
+        titre: 'Outils → Radioactivité',
+        texte: 'Des noyaux qui se désintègrent au hasard, la demi-vie lue sur la courbe, l’équation de chaque transformation et la radioprotection. Bouton « Projection » pour la classe ; les élèves de terminale la manipulent seuls, guidés par des missions.',
+        visuel:
+          '<div class="nv-ecran">' +
+            '<div class="nv-titre">Radioactivité</div>' +
+            '<div class="nv-ligne"><span>¹³¹I → ¹³¹Xe + e⁻</span><span class="nv-puce">β⁻</span></div>' +
+            '<div class="nv-choix"><span class="nv-bouton">Afficher t½</span> <span class="nv-bouton">Garder la courbe</span></div>' +
+          '</div>'
+      }
+    ]
+  },
+  {
     n: 1,
     date: '2026-11-11',
     titre: 'Vos élèves, votre affichage, un mot à M. Van Hoorde',

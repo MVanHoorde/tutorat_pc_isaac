@@ -18,3 +18,6 @@ supabase/.temp/
 
 # Audits internes du parcours Python : décrivent les fichiers du professeur, restent sur son PC
 outils/python/audit/
+
+# Captures du banc de l'animation radioactivité (tests/captures.py)
+outils/radioactivite/tests/captures/
