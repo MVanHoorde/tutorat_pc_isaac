@@ -29,9 +29,9 @@ Mode professeur : la case n'apparaît qu'avec l'adresse `…/outils/radioactivit
   depuis N₀/2 ; « Garder la courbe » (6 au plus) et courbe N/N₀ pour comparer des N₀ différents ; info-bulle au doigt.
 - Demi-vie mesurée = médiane des durées de vie, interpolée dans le pas. L'ancienne mesure (milieu du palier) était
   trop longue d'un demi-pas : +1 % en Décroissance, +0,5 % dans l'Expérience (vérifié sur 10⁴ à 2 × 10⁵ essais).
-- Expérience : u = s/√n et z-score de la moyenne par rapport à t½, sous chaque colonne et dans le tableau ; trait
-  « moyenne ± 2u ». Limite connue : pour N₀ ≤ 10, la moyenne est biaisée (1,44 t½ à N₀ = 1, 1,08 t½ à N₀ = 10),
-  z peut dépasser 2 avec beaucoup d'essais ; expliqué dans « Modèle et hypothèses ».
+- Expérience : un z-score (moyenne / t½, u = s/√n) a été ajouté puis retiré le 25/11/2026 à la demande de M. Van Hoorde
+  (commit 52f79d5 pour le retrouver). Limite connue s'il revient : pour N₀ ≤ 10, la moyenne est biaisée
+  (1,44 t½ à N₀ = 1, 1,08 t½ à N₀ = 10) et z dépasse 2 avec beaucoup d'essais.
 - Couleurs sans `light-dark()` (Safari < 17.5), en-tête et légende de grille qui ne débordent plus sur téléphone.
 
 ---

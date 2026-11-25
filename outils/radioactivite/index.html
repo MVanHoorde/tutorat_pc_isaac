@@ -148,8 +148,6 @@ th{color:var(--muted);font-weight:600}
 .saved table td:first-child{width:26px}
 .saved i.sw{display:inline-block;width:18px;height:0;border-top:3px solid var(--c);vertical-align:middle}
 .saved button.x{font:600 14px var(--ff);background:none;border:0;color:var(--muted);min-height:32px;min-width:32px;cursor:pointer}
-.zok{color:var(--cy);font-weight:700}
-.zko{color:var(--or);font-weight:700}
 /* missions */
 .mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:12px;align-content:start}
 .mcard{gap:6px}
@@ -296,7 +294,7 @@ body.has-m.mmin main{padding-bottom:64px}
 <section class="view" id="v-experience">
   <div class="scene sc-exp">
     <div class="card">
-      <div class="cardhead legend"><span style="--c:var(--or)">Une demi-vie mesurée (un essai)</span><span style="--c:var(--ink)">Médiane</span><span style="--c:var(--c2)">Moyenne ± 2u</span><span class="dash" style="--c:var(--cy)">Demi-vie du nucléide</span></div>
+      <div class="cardhead legend"><span style="--c:var(--or)">Une demi-vie mesurée (un essai)</span><span style="--c:var(--ink)">Médiane</span><span class="dash" style="--c:var(--cy)">Demi-vie du nucléide</span></div>
       <div class="fig" id="xBox"><svg id="xChart" role="img" aria-label="Demi-vies mesurées selon N0"></svg><div class="tip" id="xTip"></div></div>
       <p class="note" id="xStat" style="margin:4px 0 0"></p>
     </div>
@@ -312,22 +310,19 @@ body.has-m.mmin main{padding-bottom:64px}
     <details class="menu"><summary>Options</summary><div>
       <label class="ctl">Ajouter un N₀<span style="display:flex;gap:6px"><input type="number" id="addN" min="1" max="100000" step="1" value="50"><button class="b" id="addNB">Ajouter</button></span></label>
     </div></details>
-    <details open><summary>Tableau des mesures</summary><div><div class="scroll"><table id="xTab"><thead><tr><th>N₀</th><th>Essais</th><th>Médiane</th><th>Moyenne</th><th>Écart-type</th><th>Écart relatif</th><th>u(moyenne)</th><th>z-score</th></tr></thead><tbody></tbody></table></div>
-      <p class="note">z-score : <span class="eq">z = |moyenne − t½| / u</span>, avec <span class="eq">u = s / √n</span>. Si z ≤ 2, la moyenne mesurée est compatible avec la demi-vie du nucléide.</p></div></details>
+    <details open><summary>Tableau des mesures</summary><div><div class="scroll"><table id="xTab"><thead><tr><th>N₀</th><th>Essais</th><th>Médiane</th><th>Moyenne</th><th>Écart-type</th><th>Écart relatif</th></tr></thead><tbody></tbody></table></div></div></details>
     <details><summary>Ce qu'il faut constater<span class="tag">après l'expérience</span></summary><div class="obs">
-      <p>La demi-vie ne dépend pas de N₀ : quel que soit N₀, les mesures se regroupent autour de la même valeur, et le z-score reste inférieur à 2 : chaque série est compatible avec la demi-vie du nucléide.</p>
+      <p>La demi-vie ne dépend pas de N₀ : quel que soit N₀, les mesures se regroupent autour de la même valeur.</p>
       <p>Plus N₀ est petit, plus les mesures sont dispersées : la loi exponentielle décrit une grande population, pas un noyau isolé.</p>
     </div></details>
     <details><summary>Calcul<span class="tag">niveau 1</span></summary><div>
       <p>Pour chaque essai : N₀ noyaux, pas Δt = t½/100, probabilité <span class="eq">p = 1 − 2<sup>−1/100</sup> ≈ 0,0069</span> par pas. Demi-vie mesurée : instant où N franchit N₀/2.</p>
       <p>Le tirage ne dépend que du rapport Δt/t½ : les mêmes essais valent pour tous les nucléides, seule l'unité change.</p>
       <p>Écart relatif = écart-type ÷ moyenne. Médiane : la moitié des essais est en dessous, l'autre moitié au-dessus.</p>
-      <p>Incertitude-type sur la moyenne de n essais : <span class="eq">u = s / √n</span> (s : écart-type expérimental). z-score : <span class="eq">z = |moyenne − t½<sub>ref</sub>| / u</span> ; la mesure est jugée compatible avec la référence si z ≤ 2. Sur le graphe, le trait violet va de moyenne − 2u à moyenne + 2u : z ≤ 2 quand il coupe la ligne en tirets.</p>
     </div></details>
     <details><summary>Modèle et hypothèses<span class="tag">niveau 2, hors programme</span></summary><div>
       <p>La dispersion relative diminue à peu près comme 1/√N₀ : multiplier N₀ par 100 divise environ la dispersion par 10.</p>
       <p>Avec N₀ = 1, la demi-vie mesurée est l'instant où l'unique noyau se désintègre : sa médiane vaut t½, mais sa moyenne vaut environ 1,44 t½ (la constante de temps τ). C'est pourquoi le graphe montre la médiane.</p>
-      <p>Le z-score repose sur la moyenne. Pour un très petit N₀ (1, 2 ou 3 noyaux, et un peu encore à 10), la moyenne des demi-vies mesurées dépasse t½ (environ 1,44 t½ pour N₀ = 1 et 1,08 t½ pour N₀ = 10) : avec beaucoup d'essais, z finit par dépasser 2. Ce n'est pas la demi-vie qui change, c'est la mesure « instant où N franchit N₀/2 » qui n'est plus un bon estimateur avec si peu de noyaux. Dès N₀ = 100, l'écart est inférieur à 1 %.</p>
     </div></details>
   </div>
 </section>
@@ -409,7 +404,7 @@ body.has-m.mmin main{padding-bottom:64px}
     <h2>Transparence</h2>
     <p>Version de travail, construite d'après le cahier des charges v0.1 du 24 novembre 2026. Les numéros entre crochets sont ceux du cahier des charges ; [52] à [64] sont nouveaux. Les équations de transformation viennent des tables du LNHB [54] à [64], qui donnent aussi des demi-vies un peu différentes de celles utilisées ici : les deux sont affichées sous chaque équation.</p>
     <p class="ver">© 2026 M. Van Hoorde – « du cahier au laboratoire ». Prototype réalisé avec l'aide de Claude (Claude Opus 5.5, Anthropic) : code, recherche documentaire et mise en forme. Choix pédagogiques, vérification des données et validation : M. Van Hoorde.</p>
-    <p class="ver">v0.4 (dans Résonance) : équations de transformation pour chaque nucléide et chaque source (fluor 18 ajouté, émetteur β⁺), bouton « Afficher t½ » et construction graphique, courbes gardées et mode N/N₀, z-score dans l'Expérience, demi-vie mesurée sans biais de demi-pas, polices de Résonance, info-bulle au doigt sur tablette.</p>
+    <p class="ver">v0.4 (dans Résonance) : équations de transformation pour chaque nucléide et chaque source (fluor 18 ajouté, émetteur β⁺), bouton « Afficher t½ » et construction graphique, courbes gardées et mode N/N₀, demi-vie mesurée sans biais de demi-pas, polices de Résonance, info-bulle au doigt sur tablette.</p>
     <p class="ver">v0.3 : écran partagé, valeurs mesurées sur les graphes, missions progressives, vitesse et pas de temps réglables. v0.2 : missions, N₀ jusqu'à 100 000. v0.1 : première version.</p>
   </div>
 </section>
@@ -938,8 +933,7 @@ const stats = (a) => {
   const n = a.length, s = [...a].sort((x, y) => x - y), mean = a.reduce((x, y) => x + y, 0) / n;
   const med = n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
   const sd = n > 1 ? Math.sqrt(a.reduce((x, y) => x + (y - mean) ** 2, 0) / (n - 1)) : 0;
-  const u = n > 1 ? sd / Math.sqrt(n) : null, z = u ? Math.abs(mean - 1) / u : null; // t½ de référence = 1 (en demi-vies)
-  return { n, mean, med, sd, u, z };
+  return { n, mean, med, sd };
 };
 function drawX() {
   if (!$("v-experience").classList.contains("on")) return;
@@ -950,7 +944,7 @@ function drawX() {
   let yMax = 2; cols.forEach((c) => (xs.res[c] || []).forEach((v) => { if (v > yMax) yMax = v; }));
   yMax = Math.ceil(yMax * 1.05 * 2) / 2;
   const yt = ticks(0, yMax * n.t, Math.max(3, Math.floor((H - 80) / (fs * 2.8)))), ylab = yt.map((v) => nf(v, 4));
-  const m = { l: Math.max(30, ...ylab.map((l) => tw(l))) + 12, r: 12, t: fs * 2 + 6, b: fs * 4.7 + 16 };
+  const m = { l: Math.max(30, ...ylab.map((l) => tw(l))) + 12, r: 12, t: fs * 2 + 6, b: fs * 3.4 + 12 };
   const Y = (v) => m.t + (1 - v / yMax) * (H - m.t - m.b);
   const cw = (W - m.l - m.r) / Math.max(1, cols.length), X = (i) => m.l + cw * (i + 0.5);
   let h = "";
@@ -971,21 +965,15 @@ function drawX() {
       const q = stats(r), hw = Math.min(cw * 0.38, 46);
       h += `<line x1="${X(i) - hw}" x2="${X(i) + hw}" y1="${Y(q.med)}" y2="${Y(q.med)}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`;
       h += T(X(i), H - m.b + fs * 2.3 + 8, (short ? "" : "méd. ") + nf(q.med * n.t, 3), "middle", "or");
-      if (q.u) {
-        // moyenne ± 2u : z ≤ 2 exactement quand ce trait coupe la ligne de t½
-        const bx = X(i) + Math.min(cw * 0.42, hw + 12), lo = Math.max(0, q.mean - 2 * q.u), hi = Math.min(yMax, q.mean + 2 * q.u);
-        h += `<line x1="${bx}" x2="${bx}" y1="${Y(lo)}" y2="${Y(hi)}" stroke="var(--c2)" stroke-width="3"/><line x1="${bx - 5}" x2="${bx + 5}" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--c2)" stroke-width="2"/><line x1="${bx - 5}" x2="${bx + 5}" y1="${Y(hi)}" y2="${Y(hi)}" stroke="var(--c2)" stroke-width="2"/><rect x="${bx - 4}" y="${Y(q.mean) - 4}" width="8" height="8" fill="var(--c2)" transform="rotate(45 ${bx} ${Y(q.mean)})"><title>Moyenne ${nf(q.mean * n.t, 3)} ${UL[n.u]}, u = ${nf(q.u * n.t, 2)} ${UL[n.u]}</title></rect>`;
-        h += T(X(i), H - m.b + fs * 3.6 + 10, (short ? "z " : "z = ") + nf(q.z, 2) + (q.z <= 2 ? " ✓" : " ✗"), "middle", q.z <= 2 ? "cy" : "or");
-      }
-      rows += `<tr><td>${nf(c, 6)}</td><td>${q.n}</td><td>${nf(q.med * n.t, 3)}</td><td>${nf(q.mean * n.t, 3)}</td><td>${nf(q.sd * n.t, 2)}</td><td>${q.n > 1 ? nf(100 * q.sd / q.mean, 2) + " %" : "–"}</td><td>${q.u ? nf(q.u * n.t, 2) : "–"}</td><td>${q.u ? `<span class="${q.z <= 2 ? "zok" : "zko"}">${nf(q.z, 2)}</span>` : "–"}</td></tr>`;
+      rows += `<tr><td>${nf(c, 6)}</td><td>${q.n}</td><td>${nf(q.med * n.t, 3)}</td><td>${nf(q.mean * n.t, 3)}</td><td>${nf(q.sd * n.t, 2)}</td><td>${q.n > 1 ? nf(100 * q.sd / q.mean, 2) + " %" : "–"}</td></tr>`;
     }
   });
   h += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>`;
   if (!cols.length) h += T(W / 2, H / 2, "Choisissez au moins une valeur de N₀", "middle");
   s.innerHTML = h;
-  $("xTab").tBodies[0].innerHTML = rows || `<tr><td colspan="8" style="text-align:left">Appuyez sur « Lancer ».</td></tr>`;
+  $("xTab").tBodies[0].innerHTML = rows || `<tr><td colspan="6" style="text-align:left">Appuyez sur « Lancer ».</td></tr>`;
   const tot = cols.reduce((a, c) => a + (xs.res[c] || []).length, 0);
-  $("xStat").textContent = xs.queue.length ? `Simulation en cours… ${tot} essais faits.` : tot ? `${tot} essais. Sous chaque colonne : N₀, la médiane des demi-vies mesurées (${UL[n.u]}) et le z-score de la moyenne par rapport à t½ (compatible si z ≤ 2).` : "";
+  $("xStat").textContent = xs.queue.length ? `Simulation en cours… ${tot} essais faits.` : tot ? `${tot} essais. Sous chaque colonne : N₀, la médiane des demi-vies mesurées (${UL[n.u]}).` : "";
 }
 
 // ---------- vue Radioprotection ----------

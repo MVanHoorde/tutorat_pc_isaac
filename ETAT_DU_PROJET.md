@@ -2,7 +2,7 @@
 
 Tutorat entre pairs en physique-chimie (première et terminale spécialité), lycée Isaac de l'Étoile, Poitiers.
 
-*Dernière mise à jour : 24 novembre 2026*
+*Dernière mise à jour : 25 novembre 2026*
 
 ## En ligne
 
@@ -37,7 +37,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `supabase/migrations/006_signalements.sql` | Table `signalements` (« J'ai vu un bug ») : l'élève écrit les siens sans les relire, vingt par jour au plus ; l'enseignant lit, traite, supprime ceux de ses classes ; +0,5 réservé aux terminales ; deux fonctions rendent à l'élève ses bonus non vus |
 | `docs/plan-test-refonte.md` | Plan de test manuel de l'accueil à trois entrées, du parcours Python relié et des signalements |
 | `outils/python/` | Parcours Python de terminale (rubrique Outils) : `index.html` (les 5 niveaux), `niveau-1.html` à `niveau-5.html` (le 3 se génère depuis `sources/niveau-3/`), moteur `parcours.js` + `py-worker.js` + `py-prelude.py`, `parcours.css`, `polices/` auto-hébergées, `fiches/` (mémos PDF), `PARCOURS.md` (structure des niveaux), `A-VALIDER.md` (points de fond à trancher), `progression-resonance.js` (enregistre les réussites de l'élève connecté) |
-| `outils/radioactivite/` | Animation « Radioactivité » (terminale) : décroissance, expérience t½ et N₀ avec z-score, équations de transformation (tables du LNHB), radioprotection, missions. Page autonome, sans compte ni serveur ; `PASSATION.md` (historique, sources, règles), `tests/captures.py` (captures Playwright, sorties ignorées par Git) |
+| `outils/radioactivite/` | Animation « Radioactivité » (terminale) : décroissance, expérience t½ et N₀, équations de transformation (tables du LNHB), radioprotection, missions. Page autonome, sans compte ni serveur ; `PASSATION.md` (historique, sources, règles), `tests/captures.py` (captures Playwright, sorties ignorées par Git) |
 | `vendor/pyodide/`, `vendor/codemirror/`, `vendor/katex/` | Python dans le navigateur (Pyodide 314.0.7 : numpy, matplotlib, friendly-traceback), l'éditeur de code et le rendu des formules LaTeX (KaTeX 0.18.9, chargé seulement sur une page qui porte une formule), auto-hébergés ; voir leur `LISEZMOI.md` |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public. Exceptions, par leur propre `.gitignore` : `outils/python/fiches/*.pdf` et `vendor/pyodide/pyodide-lock.json` |
 | `ETAT_DU_PROJET.md` | Ce fichier |
@@ -136,7 +136,6 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 - **Animation « Radioactivité »** (24/11/2026), dans Outils → « Radioactivité ». Prototype v0.3 de M. Van Hoorde, repris en v0.4 (détail dans `outils/radioactivite/PASSATION.md`).
   - Décroissance : t½ affichée seulement au bouton « Afficher t½ », avec la construction graphique depuis N₀/2 ; « Garder la courbe » et courbe N/N₀ pour montrer que t½ ne dépend pas de N₀.
-  - Expérience t½ et N₀ : z-score de la moyenne par rapport à t½ (u = s/√n), sous chaque colonne et dans le tableau.
   - Équation de transformation (α, β⁻, β⁺, γ, capture électronique) et bilan de conservation pour chaque nucléide et chaque source ; fluor 18 ajouté pour le β⁺.
   - Demi-vie mesurée sans le biais d'un demi-pas de l'ancienne mesure ; polices de Résonance, couleurs lisibles sur les iPad sous Safari < 17.5.
   - Vérifié dans Chromium (PC, tablette, téléphone) : aucune erreur JavaScript.
@@ -210,7 +209,8 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 
 ## Journal
 
-- **24/11/2026** — Animation « Radioactivité » dans Outils (`outils/radioactivite/`) : bouton t½, courbes gardées, z-score, équations de transformation du LNHB.
+- **25/11/2026** — Radioactivité : z-score de l'Expérience retiré.
+- **24/11/2026** — Animation « Radioactivité » dans Outils (`outils/radioactivite/`) : bouton t½, courbes gardées, équations de transformation du LNHB.
 - **11/11/2026** — Gestion entre collègues : Mes élèves (masquer, demander une suppression), affichage personnalisable, « Écrire à M. Van Hoorde », section Gestion du site, fenêtre des nouveautés (migration `008`, `gestion.js`, `nouveautes.js`).
 - **31/10/2026** — Les enseignants sans classe de terminale (M. Perche, par exemple) n'ont plus que Tutorat et Tableau de bord. Banc Chromium sur base simulée : 7 profils (enseignants terminale / premières / sans classe / profil illisible, élèves première / terminale), aucune erreur JS. Bandeau « Vue enseignant », carte et bloc « Parcours Python » du Tableau de bord ajustés à l’espace.
 - **31/10/2026** — Les deux groupes de première spé repris par M. Perche (`1re spé COUVRAT1`, `1re spé COUVRAT2`) : trombis reçus en captures PNG, d'où `trombi_png_vers_liste.py` et la lecture de listes CSV / Excel par `generer_identifiants.py` (encodage Windows-1252, plage de cellules périmée).
