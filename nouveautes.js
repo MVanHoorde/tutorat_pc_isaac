@@ -11,6 +11,24 @@
      · public : 'prof' (seul public prévu pour l'instant). */
 window.RESONANCE_NOUVEAUTES = [
   {
+    n: 3,
+    date: '2026-11-26',
+    titre: 'Un labo de titrage',
+    public: 'prof',
+    points: [
+      {
+        titre: 'Outils → Labo de titrage',
+        texte: 'Une paillasse à manipuler : on verse au robinet, la courbe se trace, une vue microscopique montre l’équivalence. Un labo libre, puis le TP9 (pH-métrie : tangentes, dérivée) et le TP10 (conductimétrie : deux droites). Mesures simulées.',
+        visuel:
+          '<div class="nv-ecran">' +
+            '<div class="nv-titre">Labo de titrage</div>' +
+            '<div class="nv-choix"><span class="nv-bouton">Labo libre</span> <span class="nv-bouton">TP9 · pH</span> <span class="nv-bouton">TP10 · σ</span></div>' +
+            '<div class="nv-ligne"><span>V<sub>B</sub> = 13,3 mL</span><span class="nv-puce">équivalence</span></div>' +
+          '</div>'
+      }
+    ]
+  },
+  {
     n: 2,
     date: '2026-11-24',
     titre: 'Une animation sur la radioactivité',

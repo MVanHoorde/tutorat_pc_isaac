@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo de titrage · Résonance</title>
+<meta name="description" content="Labo numérique de titrage : suivi pH-métrique et conductimétrique, vue microscopique, TP9 et TP10. Terminale spécialité physique-chimie.">
+<link rel="icon" href="../../icone-192.png">
+<!-- Polices auto-hébergées de Résonance : aucune requête vers Google (RGPD). -->
+<link rel="stylesheet" href="../../polices/polices.css">
+<style>
+/* VOICE: un manuel de TP clair et calme, pour des élèves de Terminale.
+   IDEA: la paillasse vue de face, comme une planche de manuel qu'on peut manipuler.
+   PICTURE: la paillasse entière — potence, burette cliquable, bécher, agitateur, sonde, PC qui trace la courbe.
+   COLOUR: bandeau marine de Résonance, accent orange, bleu/rouge du chapitre (espèce titrée / titrante).
+   TYPE: IBM Plex Sans et Bricolage Grotesque (polices de Résonance).
+   COLOURS: jetons explicites + prefers-color-scheme (pas de light-dark() : Safari < 17.5 sur les iPad). */
+:root{color-scheme:light;--bg:#F3F5F8;--ink:#1B2430;--muted:#5A6573;--card:#FFFFFF;--line:#D5DBE3;--acc:#E08A2E;--acc-ink:#1B1206;--navy:#1F3A5F;--band:#1B2A4A;--canvas:#F7FAFD;
+  --ph-av:#D6E6F5;--ph-eq:#FBE3C8;--ph-ap:#F6D2CE;
+  --ff:"IBM Plex Sans",system-ui,sans-serif;--fh:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#11151B;--ink:#E5E9EF;--muted:#9AA6B4;--card:#1A2029;--line:#2C3440;--navy:#9DB8DD;--band:#0a1120;--canvas:#0F141A;--ph-av:#1C2A3A;--ph-eq:#3A2A16;--ph-ap:#3A1E1C}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#11151B;--ink:#E5E9EF;--muted:#9AA6B4;--card:#1A2029;--line:#2C3440;--navy:#9DB8DD;--band:#0a1120;--canvas:#0F141A;--ph-av:#1C2A3A;--ph-eq:#3A2A16;--ph-ap:#3A1E1C}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--ff);overflow-x:clip}
+h1,h2,.read{font-family:var(--fh);letter-spacing:-.01em}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:2px 16px;padding:4px max(2vw,12px);background:var(--band);color:#fff}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{margin:0;font-size:20px;line-height:1.1}
+.brand p{margin:0;font-size:13px;color:#c9d4e6}
+.balmer{display:flex;gap:4px;height:28px}.balmer i{width:3px;border-radius:2px}
+.back{color:#fff;text-decoration:none;font:600 14px var(--ff);border:1px solid rgba(255,255,255,.4);border-radius:8px;min-height:40px;padding:4px 10px;display:inline-flex;align-items:center}
+.back:hover{background:rgba(255,255,255,.12)}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;flex:1}
+.tabs button{font:600 15px var(--ff);color:#c9d4e6;background:none;border:0;border-bottom:3px solid transparent;padding:8px 10px;min-height:44px;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--acc)}
+.band{padding:clamp(12px,2vw,24px) max(3vw,14px)}
+.sub{margin:0;color:var(--muted);max-width:80ch}
+.lab{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:20px;align-items:start;max-width:1400px}
+@media(max-width:1000px){.lab{grid-template-columns:minmax(0,1fr)}}
+.scene{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.scene svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
+.grp>span{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn,select,input[type=number]{font:inherit;font-size:16px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 12px;cursor:pointer}
+input[type=number]{width:4.6em;cursor:text;padding:8px 6px}
+#regGrp .row{gap:6px;flex-wrap:nowrap}#regGrp .row>span{min-width:0!important;white-space:nowrap}
+.seg button[aria-pressed=true]{background:var(--navy);color:var(--card);border-color:var(--navy)}
+select{width:100%}
+.btn.main{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 auto}
+label.chk{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
+label.chk input{width:22px;height:22px;accent-color:var(--acc);flex:none}
+input[type=range]{width:100%;accent-color:var(--acc);min-height:44px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.info{font-size:15px;color:var(--muted);margin:0}
+.read{font-size:clamp(22px,2.6vw,30px);font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy);margin:0;line-height:1.2}
+.hint{font-size:14px;color:var(--muted);margin:0}
+.msg{font-size:14px;color:var(--acc);min-height:1.4em;margin:0}
+.res{font-size:15px;margin:0;padding:8px 10px;border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums}
+.res:empty{display:none}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0;display:grid;gap:8px}
+legend{font-weight:600;font-size:14px;padding:0 6px}
+[hidden]{display:none!important}
+#micro{position:fixed;left:20px;bottom:20px;width:min(430px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 48px rgba(10,20,35,.28);z-index:20}
+#micro header{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;background:var(--band);color:#fff;cursor:move;touch-action:none;border-radius:14px 14px 0 0}
+#micro header h2{font-size:17px;margin:0;flex:1}
+#micro header button{background:transparent;border:0;color:inherit;font:inherit;font-size:22px;min-width:44px;min-height:44px;cursor:pointer;border-radius:8px}
+#micro .in{padding:12px 16px 16px;display:grid;gap:10px}
+#micro canvas{width:100%;aspect-ratio:440/280;background:var(--canvas);border:1px solid var(--line);border-radius:10px;display:block}
+.eq{font-weight:700;text-align:center;margin:0;font-size:16px}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
+.leg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.cpt{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px}
+.cpt div{background:var(--bg);border-radius:8px;padding:6px 8px;font-size:13px;line-height:1.25}
+.cpt b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.phase{margin:0;padding:10px 12px;border-radius:10px;font-size:15px;background:var(--ph-av)}
+.phase.eqv{background:var(--ph-eq)}.phase.apres{background:var(--ph-ap)}
+.note{font-size:12px;color:var(--muted);margin:0}
+@media(max-width:600px){#micro{left:12px;bottom:12px}.tabs{flex-basis:100%}.tabs button{padding:8px 6px;font-size:14px}.brand p{display:none}.back{margin-left:auto}}
+.read span{display:inline-block;white-space:nowrap;margin-right:.5em}
+details{max-width:1400px}
+summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.proto{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 16px 10px;margin-top:14px;max-width:1400px}
+.proto ol{margin:4px 0 6px;padding-left:22px}.proto li{margin:3px 0}
+.scroll{overflow-x:auto;max-height:280px;overflow-y:auto}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums}
+td,th{padding:4px 14px;border-bottom:1px solid var(--line);text-align:right}
+footer{color:var(--muted);font-size:13px}
+#robinet{cursor:pointer}
+#robinet:focus{outline:none}
+#robinet:focus-visible .ring{stroke:#E08A2E;stroke-width:4}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin .6s linear infinite}
+@keyframes spin{0%{transform:scaleX(1)}50%{transform:scaleX(.18)}100%{transform:scaleX(1)}}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.8;transform:scale(1.12)}}
+@media(prefers-reduced-motion:reduce){.spin,.pulse{animation:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="balmer" aria-hidden="true"><i style="background:#ff3b30"></i><i style="background:#30c8e0"></i><i style="background:#4d5bff"></i><i style="background:#8b3dff"></i></div>
+    <div><h1>Labo de titrage</h1><p>Terminale spécialité · M. Van Hoorde</p></div>
+  </div>
+  <a class="back" href="../../index.html#outils" title="Revenir aux Outils de Résonance">← Résonance</a>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-v="libre" aria-selected="true">Labo libre</button>
+    <button role="tab" data-v="tp9" aria-selected="false">TP9 · pH-métrie</button>
+    <button role="tab" data-v="tp10" aria-selected="false">TP10 · conductimétrie</button>
+  </nav>
+</header>
+
+<div class="band" style="padding-bottom:0">
+  <p class="sub" id="intro">Versez la solution titrante en cliquant sur le robinet de la burette, et regardez la courbe se tracer sur l'écran. Les mesures sont calculées : ce sont des valeurs simulées.</p>
+</div>
+
+<main class="band lab">
+  <div class="scene">
+    <svg id="sc" viewBox="0 0 1200 700" role="img" aria-labelledby="scT">
+      <title id="scT">Paillasse de titrage : potence, burette, bécher sur agitateur, sonde, appareil de mesure et ordinateur</title>
+      <defs>
+        <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9EEF3"/><stop offset="1" stop-color="#D9E1E9"/></linearGradient>
+        <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7E8893"/><stop offset=".45" stop-color="#C9D0D7"/><stop offset="1" stop-color="#8B95A0"/></linearGradient>
+        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset=".3" stop-color="#FFFFFF" stop-opacity=".15"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".45"/></linearGradient>
+        <clipPath id="clipPlot"><rect x="762" y="152" width="383" height="300"/></clipPath>
+      </defs>
+      <rect width="1200" height="610" fill="url(#wall)"/>
+      <g stroke="#CBD4DD" stroke-width="1" id="tiles"></g>
+      <!-- paillasse -->
+      <rect y="600" width="1200" height="16" fill="#66717F"/>
+      <rect y="616" width="1200" height="84" fill="#36404B"/>
+      <!-- flacon décoratif -->
+      <g><rect x="52" y="500" width="58" height="100" rx="8" fill="#F6D2CE" stroke="#8C97A3" stroke-width="2"/><rect x="66" y="478" width="30" height="24" rx="3" fill="#D64545"/><rect x="56" y="535" width="50" height="34" rx="3" fill="#FFFFFF"/><text id="flacon" x="81" y="557" text-anchor="middle" font-size="12" fill="#333">titrant</text></g>
+      <!-- potence -->
+      <rect x="120" y="588" width="220" height="12" rx="3" fill="#4A4F57"/>
+      <rect x="168" y="40" width="10" height="548" fill="url(#metal)"/>
+      <!-- bras de la sonde (derrière la burette) -->
+      <rect x="160" y="311" width="26" height="20" rx="3" fill="#444B54"/>
+      <rect x="186" y="318" width="160" height="6" fill="url(#metal)"/>
+      <!-- noix + pince de burette -->
+      <rect x="160" y="141" width="26" height="20" rx="3" fill="#444B54"/>
+      <rect x="186" y="148" width="104" height="6" fill="url(#metal)"/>
+      <!-- burette -->
+      <rect x="292" y="40" width="16" height="348" rx="3" fill="#FFFFFF" fill-opacity=".35"/>
+      <rect id="bLiq" x="294" y="64" width="12" height="324" fill="#F6D2CE"/>
+      <rect x="292" y="40" width="16" height="348" rx="3" fill="url(#glass)" stroke="#6E7B88" stroke-width="2"/>
+      <g id="grad" font-size="11" fill="#4C5764"></g>
+      <rect x="286" y="144" width="28" height="14" rx="3" fill="#444B54"/>
+      <text x="318" y="34" font-size="14" fill="#4C5764">burette graduée (25 mL)</text>
+      <!-- pointe -->
+      <path d="M295 402 L305 402 L302 442 L298 442 Z" fill="#F6D2CE" stroke="#6E7B88" stroke-width="2"/>
+      <!-- robinet -->
+      <g id="robinet" tabindex="0" role="button" aria-label="Robinet de la burette : verser">
+        <circle class="ring pulse" cx="300" cy="396" r="30" fill="none" stroke="#E08A2E" stroke-width="3"/>
+        <circle cx="300" cy="396" r="34" fill="#FFFFFF" fill-opacity=".01"/>
+        <rect x="289" y="386" width="22" height="20" rx="5" fill="#E6EBF0" stroke="#6E7B88" stroke-width="2"/>
+        <rect id="poignee" x="276" y="392" width="48" height="9" rx="4" fill="#2F6FB5"/>
+      </g>
+      <text x="258" y="401" font-size="14" fill="#4C5764" text-anchor="end">robinet</text>
+      <!-- agitateur -->
+      <rect x="228" y="540" width="164" height="8" rx="2" fill="#B8BEC6"/>
+      <rect x="220" y="548" width="180" height="52" rx="6" fill="#DADFE5" stroke="#9AA3AD" stroke-width="2"/>
+      <circle cx="255" cy="575" r="9" fill="#5A6573"/><circle cx="365" cy="575" r="9" fill="#5A6573"/><circle cx="310" cy="575" r="4" fill="#3FA34D"/>
+      <!-- bécher -->
+      <rect id="liqBase" x="247" y="500" width="126" height="40" fill="#C3DAF0" fill-opacity=".9"/>
+      <rect id="liqInd" x="247" y="500" width="126" height="40" fill="#D6E6F5" fill-opacity="0"/>
+      <rect id="barreau" class="spin" x="297" y="531" width="26" height="7" rx="3.5" fill="#F7F7F7" stroke="#7F8994" stroke-width="1.5"/>
+      <path d="M241 424 L247 430 L247 540 Q247 542 250 542 L370 542 Q373 542 373 540 L373 430 L379 424" fill="url(#glass)" stroke="#6E7B88" stroke-width="2.5"/>
+      <g id="bGrad" stroke="#8C97A3" stroke-width="1.5"></g>
+      <text id="becCap" x="252" y="446" font-size="11" fill="#5A6573">100 mL</text>
+      <text x="236" y="482" font-size="14" fill="#4C5764" text-anchor="end">bécher</text>
+      <!-- sonde -->
+      <g id="sondePH">
+        <rect x="343" y="300" width="14" height="222" rx="5" fill="#F2F5F8" stroke="#7A8794" stroke-width="2"/>
+        <circle cx="350" cy="524" r="8" fill="#E3EEF7" stroke="#7A8794" stroke-width="2"/>
+      </g>
+      <g id="sondeCond" style="display:none">
+        <rect x="342" y="300" width="16" height="214" rx="4" fill="#2C3138"/>
+        <rect x="342" y="512" width="16" height="22" fill="none" stroke="#2C3138" stroke-width="3"/>
+        <rect x="346" y="516" width="2.5" height="14" fill="#B9C2CB"/><rect x="351.5" y="516" width="2.5" height="14" fill="#B9C2CB"/>
+      </g>
+      <rect x="341" y="288" width="18" height="16" rx="3" fill="#2C3138"/>
+      <path d="M350 288 C350 262 380 262 420 262 L505 262 C567 262 575 272 575 290 L575 470" fill="none" stroke="#2C3138" stroke-width="4"/>
+      <text id="sondeTxt" x="366" y="300" font-size="13" fill="#4C5764">sonde pH-métrique</text>
+      <!-- appareil de mesure -->
+      <rect x="440" y="470" width="180" height="130" rx="10" fill="#E3E7EC" stroke="#9AA3AD" stroke-width="2"/>
+      <rect x="455" y="485" width="150" height="58" rx="5" fill="#0F2A20"/>
+      <text id="lcd" x="595" y="526" font-size="30" fill="#7CFFB0" text-anchor="end" font-family="ui-monospace,Menlo,Consolas,monospace">–,––</text>
+      <text id="lcdU" x="530" y="566" font-size="14" fill="#3A4450" text-anchor="middle">pH</text>
+      <circle cx="465" cy="585" r="6" fill="#8C97A3"/><circle cx="485" cy="585" r="6" fill="#8C97A3"/>
+      <text x="310" y="648" font-size="15" fill="#CDD5DE" text-anchor="middle">agitateur magnétique</text>
+      <text id="appTxt" x="530" y="648" font-size="15" fill="#CDD5DE" text-anchor="middle">pH-mètre</text>
+      <!-- câble vers PC -->
+      <path d="M620 560 C660 560 670 590 720 590 L900 590" fill="none" stroke="#2C3138" stroke-width="4"/>
+      <!-- ordinateur -->
+      <rect x="905" y="520" width="40" height="58" fill="#2A313B"/>
+      <rect x="850" y="576" width="150" height="24" rx="6" fill="#2A313B"/>
+      <rect x="690" y="90" width="490" height="432" rx="14" fill="#1F2630"/>
+      <rect x="705" y="105" width="460" height="400" rx="4" fill="#FBFCFD"/>
+      <rect x="705" y="105" width="460" height="30" rx="4" fill="#2F6FB5"/>
+      <text id="appTitle" x="718" y="125" font-size="14" fill="#FFFFFF">Acquisition — pH = f(V)</text>
+      <g id="chart" font-size="12" fill="#4C5764"></g>
+      <g id="cross" pointer-events="none"></g>
+      <g id="drops"></g>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <div class="grp" id="modeGrp"><span>Suivi</span>
+      <div class="seg" id="mode"><button data-v="ph" aria-pressed="true">pH-métrique</button><button data-v="cond" aria-pressed="false">conductimétrique</button></div>
+    </div>
+    <div class="grp" id="sysGrp"><span><label for="sys">Solution titrée</label></span>
+      <select id="sys"><option value="hcl">Acide chlorhydrique</option><option value="acoh">Acide éthanoïque</option><option value="nh3">Ammoniac</option></select>
+    </div>
+    <p class="info" id="desc"></p>
+    <div class="grp" id="indGrp"><span><label for="ind">Indicateur coloré</label></span>
+      <select id="ind"></select>
+    </div>
+    <label class="chk" id="eauGrp" hidden><input type="checkbox" id="eau" checked> 190 mL d'eau distillée ajoutés dans le bécher</label>
+    <div class="grp"><span>Volume versé à chaque clic</span>
+      <div class="seg" id="inc"></div>
+    </div>
+    <p class="read" id="read" aria-live="polite">V = 0,00 mL</p>
+    <div class="row"><button class="btn main" id="verser">Verser</button><button class="btn" id="reset">Recommencer</button></div>
+    <p class="hint">Astuce : maintenez le robinet enfoncé pour un écoulement continu, goutte à goutte. Survolez ou touchez l'écran de l'ordinateur : le réticule affiche le point mesuré le plus proche.</p>
+    <div class="row"><button class="btn" id="microBtn" aria-expanded="false" aria-controls="micro">Ouvrir la vue microscopique</button></div>
+
+    <fieldset id="exPH">
+      <legend>Repérer l'équivalence</legend>
+      <label class="chk"><input type="checkbox" id="tang"> Méthode des tangentes</label>
+      <div id="tangGrp" hidden>
+        <label for="tangV" class="hint">Point de contact de la première tangente : V₁ = <b id="tangVv">5,0</b> mL (ou cliquez sur la courbe)</label>
+        <input type="range" id="tangV" min="0.5" max="24.5" step="0.1" value="5">
+      </div>
+      <p class="res" id="tangRes" aria-live="polite"></p>
+      <label class="chk"><input type="checkbox" id="der"> Courbe dérivée dpH/dV</label>
+      <p class="res" id="derRes" aria-live="polite"></p>
+    </fieldset>
+
+    <fieldset id="exCond" hidden>
+      <legend>Modéliser par deux droites</legend>
+      <label class="chk"><input type="checkbox" id="reg"> Tracer les deux droites</label>
+      <div id="regGrp" hidden>
+        <div class="row"><span style="min-width:5.5em">Droite 1 :</span> de <input type="number" id="r1a" value="0" min="0" max="25" step="0.5" aria-label="Droite 1, premier volume (mL)"> à <input type="number" id="r1b" value="5" min="0" max="25" step="0.5" aria-label="Droite 1, dernier volume (mL)"> mL</div>
+        <div class="row"><span style="min-width:5.5em">Droite 2 :</span> de <input type="number" id="r2a" value="15" min="0" max="25" step="0.5" aria-label="Droite 2, premier volume (mL)"> à <input type="number" id="r2b" value="20" min="0" max="25" step="0.5" aria-label="Droite 2, dernier volume (mL)"> mL</div>
+        <p class="hint">Chaque droite est la droite de régression (« courbe de tendance linéaire » du tableur) des points mesurés dans l'intervalle.</p>
+      </div>
+      <p class="res" id="regRes" aria-live="polite"></p>
+    </fieldset>
+
+    <label class="chk" id="theoGrp"><input type="checkbox" id="theo"> Superposer la courbe calculée complète</label>
+    <div class="row"><button class="btn" id="copy">Copier les mesures (pour le tableur)</button></div>
+    <p class="msg" id="msg" aria-live="polite"></p>
+  </div>
+</main>
+
+<section id="micro" role="dialog" aria-labelledby="microT" hidden>
+  <header id="microHead"><h2 id="microT">Vue microscopique du bécher</h2><button id="microX" aria-label="Fermer la vue microscopique">×</button></header>
+  <div class="in">
+    <p class="eq" id="microEq"></p>
+    <canvas id="cv" width="440" height="280" aria-label="Animation des entités chimiques dans le bécher"></canvas>
+    <ul class="leg" id="microLeg"></ul>
+    <div class="cpt" id="microCpt"></div>
+    <p class="phase" id="microPhase" aria-live="polite"></p>
+    <div class="row"><button class="btn main" id="microVerser">Verser</button></div>
+    <details class="note"><summary>Comment lire cette animation ?</summary><span id="microNote"></span></details>
+  </div>
+</section>
+
+<div class="band" style="padding-top:0">
+  <details class="proto" id="proto" hidden><summary id="protoT">Rappel du protocole</summary><div id="protoC"></div></details>
+  <details style="margin-top:10px"><summary>Tableau des mesures</summary><div class="scroll"><table id="tab"><thead><tr><th id="tabV">V (mL)</th><th id="tabH">pH</th></tr></thead><tbody></tbody></table></div></details>
+</div>
+<footer class="band" style="padding-top:0">©2026 Loïc Van Hoorde – CC BY-NC 4.0 · Choix pédagogiques, conception, relecture et correction : Loïc Van Hoorde. Développement et mise en forme assistés par Claude (Claude Opus 5.5, Anthropic). · Valeurs simulées, calculées à 25 °C : électroneutralité pour le pH, loi de Kohlrausch pour la conductivité. Rien n'est enregistré ni envoyé.</footer>
+
+<script>
+{
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+// ===== MOTEUR CHIMIQUE : début (ne pas déplacer ce repère) =====
+const KE = 1e-14;
+// conductivités ioniques molaires en mS·m²·mol⁻¹ (tableau 2 du TP10 pour H₃O⁺, HO⁻, Na⁺, Cl⁻)
+const LAM = {H:35.0, HO:19.9, Na:5.01, Cl:7.63, Ac:4.09, NH4:7.34};
+const SYS = {
+  hcl: {nom:"acide chlorhydrique", type:"af", pKa:null, titrant:"soude"},
+  acoh:{nom:"acide éthanoïque", type:"aw", pKa:4.8, titrant:"soude"},
+  nh3: {nom:"ammoniac", type:"bw", pKa:9.2, titrant:"acide chlorhydrique"},
+  naoh:{nom:"hydroxyde de sodium", type:"bf", pKa:null, titrant:"acide chlorhydrique"}
+};
+const MODES = {
+  ph:  {Va:20, ca:1.0e-2, cb:2.0e-2, eau:0,   capEau:100, cap:100},
+  cond:{Va:10, ca:1.0e-1, cb:1.0e-1, eau:190, capEau:250, cap:50}
+};
+// Scénarios des TP (concentrations calées sur les corrigés de M. Van Hoorde) :
+// TP9 : vinaigre à 8° (C = 8,0 / 60 / 0,100 = 1,333 mol·L⁻¹), dilué 10 fois → C′ = 0,1333 ; soude 0,10 → V_E = 13,3 mL.
+// TP10 : déboucheur C₀ = 2,45 mol·L⁻¹, dilué 50 fois → C_B = 4,90×10⁻² ; HCl 5,00×10⁻² → V_E vrai = 9,80 mL.
+//   Cette valeur redonne le tableau 1 du corrigé à 0,02 mS·cm⁻¹ près (σ = 0,552 à 10 mL ; 2,149 à 20 mL) ;
+//   les droites de régression (0–9 mL, 11–20 mL) se coupent à 9,6 mL, comme dans le corrigé (effet de la dilution).
+const SCEN = {
+  tp9: {mode:"ph",   sys:"acoh", Va:10, ca:8.0 / 60 / 0.100 / 10, cb:0.10, eau:100, cap:250, vl:"B", titrant:"soude"},
+  tp10:{mode:"cond", sys:"naoh", Va:10, ca:2.45 / 50, cb:5.00e-2, eau:100, cap:250, vl:"A", titrant:"HCl", cm:true}
+};
+const S = {scen:"libre", mode:"ph", sys:"hcl", ind:"aucun", eau:true, inc:1, V:0, pts:[], theo:false};
+function params(){
+  if (S.scen !== "libre") return SCEN[S.scen];
+  const m = MODES[S.mode];
+  return {Va:m.Va, ca:m.ca, cb:m.cb, eau: S.mode === "cond" && S.eau ? m.eau : 0};
+}
+function etat(V){
+  const s = SYS[S.sys], p = params();
+  const Vt = p.Va + p.eau + V;
+  const C0 = p.ca * p.Va / Vt, Ct = p.cb * V / Vt;
+  const Ka = s.pKa === null ? 0 : 10 ** -s.pKa;
+  const ions = h => {
+    const r = {H:h, HO:KE / h, Na:0, Cl:0, Ac:0, NH4:0};
+    if (s.type === "af") { r.Cl = C0; r.Na = Ct; }
+    else if (s.type === "bf") { r.Na = C0; r.Cl = Ct; }
+    else if (s.type === "aw") { r.Ac = C0 * Ka / (Ka + h); r.Na = Ct; }
+    else { r.NH4 = C0 * h / (Ka + h); r.Cl = Ct; }
+    return r;
+  };
+  const g = pH => { const r = ions(10 ** -pH); return r.H + r.Na + r.NH4 - r.HO - r.Cl - r.Ac; };
+  let lo = -1, hi = 15;
+  for (let i = 0; i < 70; i++) { const mid = (lo + hi) / 2; if (g(mid) > 0) lo = mid; else hi = mid; }
+  const pH = (lo + hi) / 2, r = ions(10 ** -pH);
+  let sigma = 0; for (const k in LAM) sigma += LAM[k] * r[k] * 1000;
+  return {pH, sigma, Vt};
+}
+// valeur affichée : pH, σ en mS·m⁻¹ (labo libre) ou en mS·cm⁻¹ (TP10, comme le conductimètre du lycée)
+const CM = () => S.scen !== "libre" && SCEN[S.scen].cm;
+const mesure = V => { const e = etat(V); return S.mode === "ph" ? e.pH : CM() ? e.sigma / 100 : e.sigma; };
+const VEq = () => { const p = params(); return p.ca * p.Va / p.cb; };
+// ===== MOTEUR CHIMIQUE : fin =====
+
+const VMAX = 25, Y0 = 64, PXML = 12;
+const IND_LIBRE = {
+  hel: {nom:"Hélianthine", lo:3.1, hi:4.4,  c:["#D2302A","#E8702A","#F2B51E"]},
+  rm:  {nom:"Rouge de méthyle", lo:4.2, hi:6.2,  c:["#D3263A","#EE7A24","#F2D31E"]},
+  bbt: {nom:"Bleu de bromothymol", lo:6.0, hi:7.6,  c:["#E9D21C","#3FA34D","#2457C8"]},
+  phph:{nom:"Phénolphtaléine", lo:8.2, hi:10.0, c:["#FFFFFF","#F4B7D6","#D6338A"], incolore:true}
+};
+// tableau 1 du TP9
+const IND_TP9 = {
+  hel: {nom:"Hélianthine", lo:3.1, hi:4.4, c:["#D2302A","#E8702A","#F2B51E"]},
+  vbc: {nom:"Vert de bromocrésol", lo:3.8, hi:5.4, c:["#E9D21C","#5BA86A","#2D63C8"]},
+  rm:  {nom:"Rouge de méthyle", lo:4.2, hi:6.3, c:["#D3263A","#EE7A24","#F2D31E"]},
+  bbt: {nom:"Bleu de bromothymol", lo:6.0, hi:7.6, c:["#E9D21C","#3FA34D","#2457C8"]},
+  rc:  {nom:"Rouge de crésol", lo:7.2, hi:8.8, c:["#E9C81C","#E8862A","#C8232E"]},
+  phph:{nom:"Phénolphtaléine", lo:8.2, hi:10.0, c:["#FFFFFF","#F4B7D6","#D6338A"], incolore:true},
+  ja:  {nom:"Jaune d'alizarine R", lo:10.1, hi:12.0, c:["#E9D21C","#EE9A24","#D9481E"]}
+};
+const INDS = () => S.scen === "tp9" ? IND_TP9 : IND_LIBRE;
+
+const fmt = (x, d) => x.toFixed(d).replace(".", ",").replace(/^-/, "−");
+const sup = n => String(n).replace("-", "⁻").replace(/\d/g, c => "⁰¹²³⁴⁵⁶⁷⁸⁹"[c]);
+const sci = x => { const e = Math.floor(Math.log10(x)); const m = x / 10 ** e; return fmt(m, 1) + "×10" + sup(e); };
+const fmtY = v => S.mode === "ph" ? fmt(v, 2) : CM() ? fmt(v, 3) : (v < 100 ? fmt(v, 1) : fmt(v, 0));
+const uY = () => S.mode === "ph" ? "" : CM() ? "mS·cm⁻¹" : "mS·m⁻¹";
+const vl = () => S.scen === "libre" ? "" : SCEN[S.scen].vl;
+const vHTML = () => vl() ? `V<sub>${vl()}</sub>` : "V";
+const vSVG = () => vl() ? `V<tspan baseline-shift="sub" font-size="9">${vl()}</tspan>` : "V";
+const vTXT = () => vl() ? "V" + vl() : "V";
+
+// ---------- décor statique ----------
+{
+  let t = ""; for (let x = 0; x <= 1200; x += 60) t += `<line x1="${x}" y1="0" x2="${x}" y2="600"/>`;
+  for (let y = 0; y <= 600; y += 60) t += `<line x1="0" y1="${y}" x2="1200" y2="${y}"/>`;
+  $("tiles").innerHTML = t;
+  let gr = "";
+  for (let v = 0; v <= VMAX; v++) {
+    const y = Y0 + v * PXML, long = v % 5 === 0;
+    gr += `<line x1="${long ? 292 : 300}" y1="${y}" x2="308" y2="${y}" stroke="#4C5764" stroke-width="1"/>`;
+    if (long) gr += `<text x="313" y="${y + 4}">${v}</text>`;
+  }
+  $("grad").innerHTML = gr;
+  let bg = ""; for (let i = 1; i <= 4; i++) { const y = 540 - i * 20; bg += `<line x1="249" y1="${y}" x2="${i % 2 ? 258 : 264}" y2="${y}"/>`; }
+  $("bGrad").innerHTML = bg;
+}
+
+// ---------- couleurs ----------
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, t) => { const A = hex(a), B = hex(b); return "rgb(" + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",") + ")"; };
+function couleurInd(pH){
+  const d = INDS()[S.ind]; if (!d) return null;
+  const mid = (d.lo + d.hi) / 2, k = 2 / (d.hi - d.lo);
+  const a = 1 / (1 + 10 ** (-(pH - mid) * k));
+  const col = a < .5 ? mix(d.c[0], d.c[1], a * 2) : mix(d.c[1], d.c[2], a * 2 - 1);
+  return {col, op: d.incolore ? .88 * a : .82};
+}
+
+// ---------- scène ----------
+function niveau(){
+  const e = etat(S.V);
+  let cap;
+  if (S.scen !== "libre") cap = SCEN[S.scen].cap;
+  else { const m = MODES[S.mode]; cap = S.mode === "cond" ? (S.eau ? m.capEau : m.cap) : m.capEau; }
+  return {h: Math.min(104, e.Vt / cap * 100), cap};
+}
+function scene(){
+  const yl = Y0 + S.V * PXML;
+  $("bLiq").setAttribute("y", yl); $("bLiq").setAttribute("height", Math.max(0, 388 - yl));
+  const {h, cap} = niveau();
+  for (const id of ["liqBase", "liqInd"]) { $(id).setAttribute("y", 540 - h); $(id).setAttribute("height", h); }
+  $("becCap").textContent = cap + " mL";
+  const v = mesure(S.V);
+  const c = S.mode === "ph" ? couleurInd(v) : null;
+  $("liqInd").setAttribute("fill", c ? c.col : "#C3DAF0");
+  $("liqInd").setAttribute("fill-opacity", c ? c.op : 0);
+  const ph = S.mode === "ph";
+  $("lcd").textContent = fmtY(v);
+  $("lcdU").textContent = ph ? "pH" : uY();
+  $("read").innerHTML = `<span>${vHTML()} = ${fmt(S.V, 2)} mL</span><span>` + (ph ? `pH = ${fmt(v, 2)}` : `σ = ${fmtY(v)} ${uY()}`) + "</span>";
+  $("verser").disabled = S.V >= VMAX - 1e-9;
+}
+
+// ---------- écran d'acquisition ----------
+const PX0 = 762, PX1 = 1145, PY0 = 152, PY1 = 452;
+function pas(max){ const r = max / 5, p = 10 ** Math.floor(Math.log10(r)); for (const k of [1, 2, 2.5, 5, 10]) if (k * p >= r) return k * p; return 10 * p; }
+let YMAX = 14, YSTEP = 2;
+function echelle(){
+  if (S.mode === "ph") { YMAX = 14; YSTEP = 2; return; }
+  let mx = 0; for (let v = 0; v <= VMAX; v += .25) mx = Math.max(mx, mesure(v));
+  YSTEP = pas(mx * 1.08); YMAX = Math.ceil(mx * 1.08 / YSTEP) * YSTEP;
+}
+const decStep = s => Math.abs(s * 10 - Math.round(s * 10)) > 1e-9 ? 2 : Math.abs(s - Math.round(s)) > 1e-9 ? 1 : 0;
+const X = v => PX0 + v / VMAX * (PX1 - PX0);
+const Y = y => PY1 - y / YMAX * (PY1 - PY0);
+const Vof = x => (x - PX0) / (PX1 - PX0) * VMAX;
+
+// outils d'exploitation
+const T = {tang:false, V1:5, der:false, reg:false};
+const dmes = V => (mesure(Math.min(VMAX, V + .005)) - mesure(Math.max(0, V - .005))) / (Math.min(VMAX, V + .005) - Math.max(0, V - .005));
+function bisect(f, a, b){
+  let fa = f(a); if (fa * f(b) > 0) return null;
+  for (let i = 0; i < 60; i++) { const m = (a + b) / 2, fm = f(m); if (fa * fm <= 0) b = m; else { a = m; fa = fm; } }
+  return (a + b) / 2;
+}
+function calcTangentes(){
+  const ve = VEq(), V1 = T.V1;
+  if (Math.abs(V1 - ve) < .6) return {err:"Ce point est dans le saut de pH : choisissez un point de contact nettement avant ou après le saut."};
+  const s = dmes(V1);
+  let V2;
+  if (V1 < ve) {
+    if (dmes(VMAX) > s) return {err:"Aucune tangente parallèle après le saut : choisissez un point de contact plus proche du saut."};
+    V2 = bisect(V => dmes(V) - s, ve + .02, VMAX);
+  } else {
+    let vmin = .1, dmin = Infinity; for (let v = .1; v < ve - .05; v += .05) { const d = dmes(v); if (d < dmin) { dmin = d; vmin = v; } }
+    if (dmin > s) return {err:"Aucune tangente parallèle avant le saut : choisissez un point de contact plus proche du saut."};
+    V2 = bisect(V => dmes(V) - s, vmin, ve - .02);
+  }
+  if (V2 === null) return {err:"Tangente parallèle introuvable : déplacez le point de contact."};
+  const Va = Math.min(V1, V2), Vb = Math.max(V1, V2);
+  if (S.V < Vb - 1e-9) return {err:`Poursuivez le titrage au moins jusqu'à ${fmt(Math.ceil(Vb * 2) / 2, 1)} mL pour tracer la seconde tangente.`};
+  const y1 = mesure(V1), y2 = mesure(V2), b1 = y1 - s * V1, b2 = y2 - s * V2, bm = (b1 + b2) / 2;
+  const VE = bisect(V => mesure(V) - (s * V + bm), Va, Vb);
+  if (VE === null) return {err:"Intersection introuvable : déplacez le point de contact."};
+  return {s, V1, V2, y1, y2, b1, b2, bm, VE, pHE: mesure(VE)};
+}
+function derivee(){
+  const p = S.pts, d = [];
+  for (let i = 0; i + 1 < p.length; i++) { const dv = p[i + 1][0] - p[i][0]; if (dv > 1e-9) d.push([(p[i][0] + p[i + 1][0]) / 2, (p[i + 1][1] - p[i][1]) / dv]); }
+  return d;
+}
+function regression(a, b){
+  const q = S.pts.filter(p => p[0] >= Math.min(a, b) - 1e-9 && p[0] <= Math.max(a, b) + 1e-9);
+  if (q.length < 2) return null;
+  const n = q.length, mx = q.reduce((s, p) => s + p[0], 0) / n, my = q.reduce((s, p) => s + p[1], 0) / n;
+  let sxx = 0, sxy = 0; for (const p of q) { sxx += (p[0] - mx) ** 2; sxy += (p[0] - mx) * (p[1] - my); }
+  if (sxx < 1e-12) return null;
+  const k = sxy / sxx; return {a:k, b:my - k * mx, n};
+}
+const sig3 = x => { if (x === 0) return "0"; const d = Math.max(0, 2 - Math.floor(Math.log10(Math.abs(x)))); return fmt(x, Math.min(d, 6)); };
+const droite = (a, b, col, dash) => `<line x1="${X(0)}" y1="${Y(b)}" x2="${X(VMAX)}" y2="${Y(a * VMAX + b)}" stroke="${col}" stroke-width="2" ${dash ? `stroke-dasharray="${dash}"` : ""} clip-path="url(#clipPlot)"/>`;
+
+function graphe(){
+  const ph = S.mode === "ph";
+  $("appTitle").innerHTML = (ph ? "Acquisition — pH = f(" : "Acquisition — σ = f(") + vSVG() + ")";
+  let g = `<rect x="${PX0}" y="${PY0}" width="${PX1 - PX0}" height="${PY1 - PY0}" fill="#FFFFFF" stroke="#BFC7D0"/>`;
+  const dy = decStep(YSTEP);
+  for (let v = 0; v <= VMAX; v += 5) g += `<line x1="${X(v)}" y1="${PY0}" x2="${X(v)}" y2="${PY1}" stroke="#E3E8ED"/><text x="${X(v)}" y="${PY1 + 18}" text-anchor="middle">${v}</text>`;
+  for (let y = 0; y <= YMAX + 1e-9; y += YSTEP) g += `<line x1="${PX0}" y1="${Y(y)}" x2="${PX1}" y2="${Y(y)}" stroke="#E3E8ED"/><text x="${PX0 - 8}" y="${Y(y) + 4}" text-anchor="end">${fmt(y, dy)}</text>`;
+  g += `<text x="${(PX0 + PX1) / 2}" y="${PY1 + 40}" text-anchor="middle" font-size="13">${vSVG()} (mL)</text>`;
+  g += `<text transform="rotate(-90 724 ${(PY0 + PY1) / 2})" x="724" y="${(PY0 + PY1) / 2}" text-anchor="middle" font-size="13">${ph ? "pH" : "σ (" + uY() + ")"}</text>`;
+  if (S.theo && S.scen === "libre") {
+    let p = ""; for (let v = 0; v <= VMAX + 1e-9; v += .05) p += `${X(v).toFixed(1)},${Y(mesure(v)).toFixed(1)} `;
+    g += `<polyline points="${p}" fill="none" stroke="#B9C1CA" stroke-width="2" stroke-dasharray="5 4"/>`;
+  }
+  // courbe dérivée (pH)
+  $("derRes").textContent = "";
+  if (ph && T.der) {
+    const d = derivee();
+    if (d.length >= 2) {
+      const mx = Math.max(...d.map(q => q[1]));
+      const k = mx > 0 ? (YMAX * .92) / mx : 1;
+      g += `<polyline points="${d.map(q => X(q[0]).toFixed(1) + "," + Y(Math.max(0, q[1]) * k).toFixed(1)).join(" ")}" fill="none" stroke="#6B4FD8" stroke-width="2" clip-path="url(#clipPlot)"/>`;
+      const im = d.findIndex(q => q[1] === mx), e = d[im];
+      g += `<circle cx="${X(e[0])}" cy="${Y(e[1] * k)}" r="5" fill="none" stroke="#6B4FD8" stroke-width="2"/>`;
+      g += `<text x="${PX1 - 6}" y="${PY0 + 16}" text-anchor="end" fill="#6B4FD8" font-size="12">dpH/dV (échelle propre)</text>`;
+      $("derRes").innerHTML = `Extremum de la dérivée : ${vHTML()} ≈ ${fmt(e[0], 2)} mL (dpH/dV = ${fmt(mx, 2)} mL⁻¹). Le pas de vos ajouts fixe la précision : près du saut, versez par petits volumes.`;
+    } else $("derRes").textContent = "Faites au moins trois mesures pour calculer la dérivée.";
+  }
+  // méthode des tangentes
+  $("tangRes").textContent = "";
+  if (ph && T.tang) {
+    const r = calcTangentes();
+    g += `<line x1="${X(T.V1)}" y1="${PY0}" x2="${X(T.V1)}" y2="${PY1}" stroke="#2E9E5B" stroke-width="1" stroke-dasharray="2 3"/>`;
+    if (r.err) $("tangRes").textContent = r.err;
+    else {
+      g += droite(r.s, r.b1, "#2E9E5B") + droite(r.s, r.b2, "#2E9E5B") + droite(r.s, r.bm, "#E08A2E", "6 4");
+      g += `<circle cx="${X(r.V1)}" cy="${Y(r.y1)}" r="4" fill="#2E9E5B"/><circle cx="${X(r.V2)}" cy="${Y(r.y2)}" r="4" fill="#2E9E5B"/>`;
+      g += `<line x1="${X(r.VE)}" y1="${Y(r.pHE)}" x2="${X(r.VE)}" y2="${PY1}" stroke="#E08A2E" stroke-dasharray="3 3"/><circle cx="${X(r.VE)}" cy="${Y(r.pHE)}" r="6" fill="none" stroke="#E08A2E" stroke-width="2.5"/>`;
+      $("tangRes").innerHTML = `Tangentes parallèles en ${fmt(r.V1, 1)} mL et ${fmt(r.V2, 1)} mL ; la droite équidistante coupe la courbe en E : ${vHTML()} ≈ ${fmt(r.VE, 2)} mL, pH<sub>E</sub> ≈ ${fmt(r.pHE, 2)}.`;
+    }
+  }
+  // modélisation par deux droites (conductimétrie)
+  $("regRes").textContent = "";
+  if (!ph && T.reg) {
+    const n = id => parseFloat(String($(id).value).replace(",", "."));
+    const d1 = regression(n("r1a"), n("r1b")), d2 = regression(n("r2a"), n("r2b"));
+    const u = uY(), V = vHTML();
+    const eqn = d => `σ = ${sig3(d.a)} × ${V} ${d.b < 0 ? "−" : "+"} ${sig3(Math.abs(d.b))}`;
+    let t = [];
+    if (d1) { g += droite(d1.a, d1.b, "#2F6FB5"); t.push(`Droite 1 (${d1.n} points) : ${eqn(d1)}`); } else t.push("Droite 1 : il faut au moins deux points mesurés dans l'intervalle.");
+    if (d2) { g += droite(d2.a, d2.b, "#D64545"); t.push(`Droite 2 (${d2.n} points) : ${eqn(d2)}`); } else t.push("Droite 2 : il faut au moins deux points mesurés dans l'intervalle.");
+    if (d1 && d2 && Math.abs(d1.a - d2.a) > 1e-12) {
+      const ve = (d2.b - d1.b) / (d1.a - d2.a), ys = d1.a * ve + d1.b;
+      if (ve > 0 && ve < VMAX) {
+        g += `<line x1="${X(ve)}" y1="${Y(ys)}" x2="${X(ve)}" y2="${PY1}" stroke="#E08A2E" stroke-dasharray="3 3"/><circle cx="${X(ve)}" cy="${Y(ys)}" r="6" fill="none" stroke="#E08A2E" stroke-width="2.5"/>`;
+        t.push(`Intersection : ${V} ≈ ${fmt(ve, 2)} mL.`);
+      }
+    }
+    $("regRes").innerHTML = t.join("<br>") + ` <span class="hint">(σ en ${u}, ${V} en mL)</span>`;
+  }
+  if (S.pts.length) {
+    if (ph) g += `<polyline points="${S.pts.map(q => X(q[0]).toFixed(1) + "," + Y(q[1]).toFixed(1)).join(" ")}" fill="none" stroke="#2F6FB5" stroke-width="1.5" opacity=".6"/>`;
+    const n = S.pts.length;
+    S.pts.forEach((q, i) => { g += i === n - 1 ? `<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="5.5" fill="#E08A2E"/>` : `<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="3" fill="#2F6FB5"/>`; });
+  }
+  $("chart").innerHTML = g;
+}
+
+// ---------- réticule et clic sur la courbe ----------
+const sc = $("sc");
+function svgPt(e){ const p = sc.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(sc.getScreenCTM().inverse()); }
+const dansPlot = p => p.x >= PX0 && p.x <= PX1 && p.y >= PY0 - 10 && p.y <= PY1 + 10;
+function reticule(e){
+  const p = svgPt(e);
+  if (!dansPlot(p) || !S.pts.length) { $("cross").innerHTML = ""; return; }
+  const v = Vof(p.x); let best = S.pts[0];
+  for (const q of S.pts) if (Math.abs(q[0] - v) < Math.abs(best[0] - v)) best = q;
+  const x = X(best[0]), y = Y(best[1]);
+  const txt = `${vTXT()} = ${fmt(best[0], 2)} mL ; ${S.mode === "ph" ? "pH = " + fmt(best[1], 2) : "σ = " + fmtY(best[1]) + " " + uY()}`;
+  $("cross").innerHTML = `<line x1="${x}" y1="${PY0}" x2="${x}" y2="${PY1}" stroke="#1F3A5F" stroke-width="1"/><line x1="${PX0}" y1="${y}" x2="${PX1}" y2="${y}" stroke="#1F3A5F" stroke-width="1"/>` +
+    `<rect x="${PX0 + 6}" y="${PY0 + 4}" width="${txt.length * 6.6 + 12}" height="20" rx="4" fill="#1F3A5F" opacity=".9"/><text x="${PX0 + 12}" y="${PY0 + 18}" font-size="12" fill="#FFFFFF">${txt}</text>`;
+}
+sc.addEventListener("pointermove", reticule);
+sc.addEventListener("pointerleave", () => { $("cross").innerHTML = ""; });
+sc.addEventListener("click", e => {
+  if (!(S.mode === "ph" && T.tang)) return;
+  const p = svgPt(e); if (!dansPlot(p)) return;
+  T.V1 = Math.max(.5, Math.min(24.5, Math.round(Vof(p.x) * 10) / 10));
+  $("tangV").value = T.V1; $("tangVv").textContent = fmt(T.V1, 1); graphe();
+});
+
+// ---------- tableau ----------
+function tableau(){
+  const ph = S.mode === "ph";
+  $("tabV").innerHTML = vHTML() + " (mL)";
+  $("tabH").textContent = ph ? "pH" : "σ (" + uY() + ")";
+  $("tab").tBodies[0].innerHTML = S.pts.map(q => `<tr><td>${fmt(q[0], 2)}</td><td>${fmtY(q[1])}</td></tr>`).join("");
+}
+
+// ---------- description et protocole ----------
+const PROTO = {
+  tp9: {t:"Rappel du protocole — TP9 : quel est le degré d'acidité d'un vinaigre ?", c:`<ol>
+    <li>Dans le bécher de 250 mL : 10,0 mL de solution S′ (vinaigre dilué 10 fois), environ 100 mL d'eau distillée, le barreau aimanté et quelques gouttes de phénolphtaléine.</li>
+    <li>Burette : soude S<sub>B</sub> à C<sub>B</sub> = 0,10 mol·L⁻¹ (rincée, remplie, zéro ajusté).</li>
+    <li>Versez la soude mL par mL. À l'approche du virage, réduisez les ajouts à 0,2 mL.</li>
+    <li>Notez V<sub>virage</sub> : le volume pour lequel la teinte rose persiste.</li>
+    <li>Poursuivez jusqu'à environ 20 mL de soude versée.</li>
+    <li>Repérez l'équivalence par la méthode des tangentes, puis par la courbe dérivée. Le réticule affiche les coordonnées d'un point.</li>
+    <li>Complétez le tableau 2 et comparez les trois méthodes.</li></ol>
+    <p class="hint">Valeurs simulées : elles ressemblent à ce que vous mesurerez, mais ne remplacent pas vos mesures au laboratoire.</p>`},
+  tp10:{t:"Rappel du protocole — TP10 : quelle est la concentration d'un déboucheur ?", c:`<ol>
+    <li>Dans le bécher de 250 mL : V<sub>B</sub> = 10,0 mL de solution S<sub>B</sub> (déboucheur dilué 50 fois), environ 100 mL d'eau distillée et le barreau aimanté.</li>
+    <li>Burette : acide chlorhydrique S<sub>A</sub> à C<sub>A</sub> = 5,00×10⁻² mol·L⁻¹ (rincée, remplie, zéro ajusté).</li>
+    <li>Mesurez la conductivité initiale (V<sub>A</sub> = 0 mL), puis versez l'acide mL par mL en relevant σ après chaque ajout.</li>
+    <li>Arrêtez les ajouts à 20,0 mL et complétez le tableau 1.</li>
+    <li>« Copier les mesures », puis collez-les dans le tableur pour tracer σ = f(V<sub>A</sub>) ; ou modélisez ici les deux parties de la courbe par deux droites.</li>
+    <li>Le volume équivalent est l'abscisse du point d'intersection des deux droites. Écartez les points proches de l'équivalence : la courbe y est arrondie.</li></ol>
+    <p class="hint">Le conductimètre affiche σ en mS·cm⁻¹ (1 mS·cm⁻¹ = 0,1 S·m⁻¹). Valeurs simulées : elles ne remplacent pas vos mesures au laboratoire.</p>`}
+};
+function description(){
+  if (S.scen === "tp9") { $("desc").innerHTML = "Bécher : 10,0 mL de vinaigre dilué 10 fois (S′) + environ 100 mL d'eau distillée. Burette : soude à C<sub>B</sub> = 0,10 mol·L⁻¹."; return; }
+  if (S.scen === "tp10") { $("desc").innerHTML = "Bécher : V<sub>B</sub> = 10,0 mL de déboucheur dilué 50 fois (S<sub>B</sub>) + environ 100 mL d'eau distillée. Burette : acide chlorhydrique à C<sub>A</sub> = 5,00×10⁻² mol·L⁻¹."; return; }
+  const s = SYS[S.sys], m = MODES[S.mode];
+  const eau = S.mode === "cond" ? (S.eau ? ` additionnés de ${m.eau} mL d'eau distillée` : `, sans eau ajoutée`) : "";
+  $("desc").textContent = `Bécher : ${fmt(m.Va, 1)} mL d'${s.nom} à ${sci(m.ca)} mol·L⁻¹${eau}. Burette : ${s.titrant} à ${sci(m.cb)} mol·L⁻¹.`;
+}
+
+// ---------- gouttes ----------
+function goutte(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElementNS(NS, "circle");
+  c.setAttribute("cx", 300); c.setAttribute("cy", 444); c.setAttribute("r", 3.2); c.setAttribute("fill", "#E9A8A0");
+  $("drops").appendChild(c);
+  const yEnd = 540 - niveau().h, t0 = performance.now();
+  const step = t => { const k = Math.min(1, (t - t0) / 260); c.setAttribute("cy", 444 + (yEnd - 444) * k * k); if (k < 1) requestAnimationFrame(step); else c.remove(); };
+  requestAnimationFrame(step);
+}
+function poignee(ouvert){
+  const p = $("poignee");
+  if (ouvert) { p.setAttribute("x", 295.5); p.setAttribute("y", 374); p.setAttribute("width", 9); p.setAttribute("height", 44); }
+  else { p.setAttribute("x", 276); p.setAttribute("y", 392); p.setAttribute("width", 48); p.setAttribute("height", 9); }
+}
+
+// ---------- actions ----------
+function verser(dv, silencieux){
+  if (S.V >= VMAX - 1e-9) { $("msg").textContent = "La burette est vide : cliquez sur « Recommencer »."; return false; }
+  S.V = Math.min(VMAX, Math.round((S.V + dv) * 100) / 100);
+  S.pts.push([S.V, mesure(S.V)]);
+  goutte(); scene(); graphe(); tableau(); sync();
+  if (!silencieux) { poignee(true); setTimeout(() => poignee(false), 220); }
+  $("msg").textContent = "";
+  return true;
+}
+function tout(){ echelle(); description(); scene(); graphe(); tableau(); }
+function recommencer(){ S.V = 0; S.pts = [[0, mesure(0)]]; tout(); $("msg").textContent = ""; $("cross").innerHTML = ""; if (M.open) reconstruire(); }
+
+function seg(id, cb){
+  $(id).addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    for (const x of $(id).querySelectorAll("button")) x.setAttribute("aria-pressed", x === b);
+    cb(b.dataset.v);
+  });
+}
+function appareil(){
+  const ph = S.mode === "ph";
+  $("indGrp").hidden = !ph; $("eauGrp").hidden = ph || S.scen !== "libre";
+  $("exPH").hidden = !ph; $("exCond").hidden = ph;
+  $("sondePH").style.display = ph ? "" : "none"; $("sondeCond").style.display = ph ? "none" : "";
+  $("sondeTxt").textContent = ph ? "sonde pH-métrique" : "cellule conductimétrique";
+  $("appTxt").textContent = ph ? "pH-mètre" : "conductimètre";
+}
+seg("mode", v => { S.mode = v; appareil(); recommencer(); });
+seg("inc", v => { S.inc = parseFloat(v); });
+$("sys").addEventListener("change", e => { S.sys = e.target.value; recommencer(); });
+$("ind").addEventListener("change", e => { S.ind = e.target.value; scene(); });
+$("eau").addEventListener("change", e => { S.eau = e.target.checked; recommencer(); });
+$("theo").addEventListener("change", e => { S.theo = e.target.checked; graphe(); });
+$("tang").addEventListener("change", e => { T.tang = e.target.checked; $("tangGrp").hidden = !T.tang; graphe(); });
+$("tangV").addEventListener("input", e => { T.V1 = parseFloat(e.target.value); $("tangVv").textContent = fmt(T.V1, 1); graphe(); });
+$("der").addEventListener("change", e => { T.der = e.target.checked; graphe(); });
+$("reg").addEventListener("change", e => { T.reg = e.target.checked; $("regGrp").hidden = !T.reg; graphe(); });
+for (const id of ["r1a", "r1b", "r2a", "r2b"]) $(id).addEventListener("input", graphe);
+$("verser").addEventListener("click", () => verser(S.inc));
+$("reset").addEventListener("click", recommencer);
+$("copy").addEventListener("click", async () => {
+  const ph = S.mode === "ph";
+  // tabulation : le tableur répartit les colonnes au collage
+  const txt = vTXT() + " (mL)\t" + (ph ? "pH" : "sigma (" + (CM() ? "mS/cm" : "mS/m") + ")") + "\n" + S.pts.map(q => fmt(q[0], 2) + "\t" + fmtY(q[1])).join("\n");
+  try { await navigator.clipboard.writeText(txt); $("msg").textContent = "Mesures copiées : collez-les dans un tableur."; }
+  catch (err) { $("msg").textContent = "Copie impossible ici : ouvrez le tableau des mesures ci-dessous."; }
+});
+
+// ---------- scénarios (onglets) ----------
+const INCS = {
+  libre:[["1", "1 mL"], ["0.5", "0,5 mL"], ["0.1", "0,1 mL"], ["0.05", "1 goutte"]],
+  tp9:  [["1", "1 mL"], ["0.5", "0,5 mL"], ["0.2", "0,2 mL"], ["0.05", "1 goutte"]],
+  tp10: [["1", "1 mL"], ["0.5", "0,5 mL"], ["0.1", "0,1 mL"], ["0.05", "1 goutte"]]
+};
+const libreMem = {mode:"ph", sys:"hcl"};
+function scenario(sc, maj){
+  if (S.scen === "libre") { libreMem.mode = S.mode; libreMem.sys = S.sys; }
+  S.scen = sc;
+  for (const b of $("tabs").querySelectorAll("button")) b.setAttribute("aria-selected", b.dataset.v === sc);
+  const lib = sc === "libre";
+  if (lib) { S.mode = libreMem.mode; S.sys = libreMem.sys; }
+  else { S.mode = SCEN[sc].mode; S.sys = SCEN[sc].sys; }
+  $("modeGrp").hidden = !lib; $("sysGrp").hidden = !lib; $("theoGrp").hidden = !lib;
+  for (const b of $("mode").querySelectorAll("button")) b.setAttribute("aria-pressed", b.dataset.v === S.mode);
+  $("sys").value = S.sys;
+  // indicateurs
+  const L = INDS();
+  S.ind = sc === "tp9" ? "phph" : (L[S.ind] ? S.ind : "aucun");
+  $("ind").innerHTML = `<option value="aucun">Aucun</option>` + Object.entries(L).map(([k, d]) => `<option value="${k}">${d.nom} (${fmt(d.lo, 1)} – ${fmt(d.hi, 1)})</option>`).join("");
+  $("ind").value = S.ind;
+  // incréments
+  $("inc").innerHTML = INCS[sc].map(([v, t], i) => `<button data-v="${v}" aria-pressed="${i === 0}">${t}</button>`).join("");
+  S.inc = 1;
+  // textes
+  $("flacon").textContent = lib ? "titrant" : SCEN[sc].titrant;
+  $("intro").textContent = lib
+    ? "Versez la solution titrante en cliquant sur le robinet de la burette, et regardez la courbe se tracer sur l'écran. Les mesures sont calculées : ce sont des valeurs simulées."
+    : sc === "tp9"
+      ? "TP9 : titrage pH-métrique d'un vinaigre dilué par la soude. Repérez l'équivalence de trois façons : indicateur coloré, méthode des tangentes, courbe dérivée. Les mesures sont simulées."
+      : "TP10 : titrage conductimétrique d'un déboucheur dilué par l'acide chlorhydrique. Relevez σ mL par mL, puis modélisez les deux parties de la courbe par des droites. Les mesures sont simulées.";
+  $("proto").hidden = lib;
+  if (!lib) { $("protoT").textContent = PROTO[sc].t; $("protoC").innerHTML = PROTO[sc].c; }
+  if (sc === "tp10") { $("r1a").value = 0; $("r1b").value = 5; $("r2a").value = 15; $("r2b").value = 20; }
+  appareil(); recommencer();
+  if (maj) { try { const u = new URL(location.href); if (lib) u.searchParams.delete("tp"); else u.searchParams.set("tp", sc.slice(2)); history.replaceState(null, "", u); } catch (e) {} }
+}
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== S.scen) scenario(b.dataset.v, true); });
+
+// robinet : clic = un incrément ; appui long = écoulement continu
+let tHold = null, tFlow = null, coule = false;
+const rob = $("robinet");
+const stop = () => { clearTimeout(tHold); tHold = null; if (coule) { clearInterval(tFlow); coule = false; poignee(false); } };
+rob.addEventListener("pointerdown", e => {
+  e.preventDefault(); rob.setPointerCapture?.(e.pointerId);
+  tHold = setTimeout(() => { tHold = null; coule = true; poignee(true);
+    tFlow = setInterval(() => { if (!verser(.05, true)) stop(); }, 80); }, 380);
+});
+rob.addEventListener("pointerup", () => { if (tHold) { stop(); verser(S.inc); } else stop(); });
+rob.addEventListener("pointercancel", stop);
+rob.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); verser(S.inc); } });
+
+// ================= vue microscopique =================
+const MIC = {
+  hcl: {eq:"H₃O⁺ + HO⁻ → 2 H₂O", donneur:"tit", tit:["H₃O⁺","+",true], titr:["HO⁻","−",false], prod:null, spT:["Cl⁻","−"], spR:["Na⁺","+"]},
+  acoh:{eq:"CH₃COOH + HO⁻ → CH₃COO⁻ + H₂O", donneur:"tit", tit:["CH₃COOH","",true], titr:["HO⁻","−",false], prod:["CH₃COO⁻","−",false], spT:null, spR:["Na⁺","+"]},
+  nh3: {eq:"NH₃ + H₃O⁺ → NH₄⁺ + H₂O", donneur:"titr", tit:["NH₃","",false], titr:["H₃O⁺","+",true], prod:["NH₄⁺","+",true], spT:null, spR:["Cl⁻","−"]},
+  naoh:{eq:"H₃O⁺ + HO⁻ → 2 H₂O", donneur:"titr", tit:["HO⁻","−",false], titr:["H₃O⁺","+",true], prod:null, spT:["Na⁺","+"], spR:["Cl⁻","−"]}
+};
+const COL = {tit:"#2F6FB5", titr:"#D64545", prod:"#E08A2E", spec:"#9AA3AD", eau:"#F2B877"};
+const N0 = 20, CW = 440, CH = 280;
+const M = {open:false, parts:[], trans:[], flashes:[], added:0, queue:[], raf:0};
+const cv = $("cv"), cx = cv.getContext("2d");
+const rnd = (a, b) => a + Math.random() * (b - a);
+// une entité titrante dessinée pour V_E / 20 versé : l'équivalence tombe toujours à 20 entités
+const ajoutes = V => Math.floor(V * N0 / VEq() + 1e-6);
+function part(type, x, y){
+  const d = MIC[S.sys];
+  const def = type === "tit" ? d.tit : type === "titr" ? d.titr : type === "prod" ? d.prod : null;
+  return {type, x: x ?? rnd(20, CW - 20), y: y ?? rnd(40, CH - 20), vx: rnd(-.6, .6), vy: rnd(-.6, .6),
+    r: type === "spec" ? 7 : 11, ch: def ? def[1] : "", H: def ? def[2] : false, a: 1, target: null, claimed: false};
+}
+function spec(lbl, x, y){ const p = part("spec", x, y); p.ch = lbl[1]; p.lbl = lbl[0]; return p; }
+function reconstruire(){
+  const d = MIC[S.sys]; M.parts = []; M.trans = []; M.queue = []; M.flashes = [];
+  M.added = ajoutes(S.V); const r = Math.min(M.added, N0);
+  for (let i = 0; i < N0 - r; i++) M.parts.push(part("tit"));
+  if (d.prod) for (let i = 0; i < r; i++) M.parts.push(part("prod"));
+  for (let i = 0; i < M.added - r; i++) M.parts.push(part("titr"));
+  if (d.spT) for (let i = 0; i < N0; i++) M.parts.push(spec(d.spT));
+  for (let i = 0; i < M.added; i++) M.parts.push(spec(d.spR));
+  legende(); compteurs();
+}
+function sync(){
+  if (!M.open) return;
+  const n = ajoutes(S.V);
+  if (n < M.added) { reconstruire(); return; }
+  for (let i = M.added; i < n; i++) M.queue.push(performance.now() + (i - M.added) * 160);
+  M.added = n; compteurs();
+}
+function injecter(){
+  const d = MIC[S.sys];
+  const p = part("titr", CW / 2 + rnd(-6, 6), 6); p.vx = 0; p.vy = 2.4;
+  const libres = M.parts.filter(q => q.type === "tit" && !q.claimed);
+  if (libres.length) {
+    libres.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
+    p.target = libres[0]; libres[0].claimed = true;
+  }
+  M.parts.push(p, spec(d.spR, CW / 2 + rnd(-20, 20), 10));
+}
+function reagir(t, q){
+  const d = MIC[S.sys];
+  const don = d.donneur === "titr" ? t : q, acc = don === t ? q : t;
+  don.H = false; M.trans.push({a: don, b: acc, t0: performance.now()});
+  M.flashes.push({x: (t.x + q.x) / 2, y: (t.y + q.y) / 2, t0: performance.now()});
+  t.target = null;
+  if (d.prod) { q.type = "prod"; q.ch = d.prod[1]; } else { q.type = "eau"; q.ch = ""; q.r = 9; }
+  t.type = "eau"; t.ch = ""; t.r = 9;
+}
+function pas_sim(now){
+  while (M.queue.length && M.queue[0] <= now) { M.queue.shift(); injecter(); }
+  for (const p of M.parts) {
+    if (p.target) {
+      const dx = p.target.x - p.x, dy = p.target.y - p.y, dd = Math.hypot(dx, dy) || 1;
+      p.vx = dx / dd * 2.6; p.vy = dy / dd * 2.6;
+      if (dd < p.r + p.target.r) reagir(p, p.target);
+    } else {
+      p.vx = (p.vx + rnd(-.18, .18)) * .97; p.vy = (p.vy + rnd(-.18, .18)) * .97;
+      const v = Math.hypot(p.vx, p.vy); if (v > 1.4) { p.vx *= 1.4 / v; p.vy *= 1.4 / v; }
+    }
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < p.r) { p.x = p.r; p.vx = Math.abs(p.vx); } if (p.x > CW - p.r) { p.x = CW - p.r; p.vx = -Math.abs(p.vx); }
+    if (p.y < p.r) { p.y = p.r; p.vy = Math.abs(p.vy); } if (p.y > CH - p.r) { p.y = CH - p.r; p.vy = -Math.abs(p.vy); }
+    if (p.type === "eau") p.a -= .009;
+  }
+  M.parts = M.parts.filter(p => p.a > 0);
+}
+function bulle(p){
+  cx.globalAlpha = Math.max(0, p.a);
+  cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7);
+  cx.fillStyle = p.type === "spec" ? "#FFFFFF" : COL[p.type]; cx.fill();
+  cx.lineWidth = p.type === "spec" ? 2 : 1.5; cx.strokeStyle = p.type === "spec" ? COL.spec : "rgba(0,0,0,.25)";
+  if (p.type === "spec") cx.setLineDash([3, 2]); cx.stroke(); cx.setLineDash([]);
+  if (p.ch) { cx.fillStyle = p.type === "spec" ? "#5A6573" : "#FFFFFF"; cx.font = "bold 13px system-ui,sans-serif"; cx.textAlign = "center"; cx.textBaseline = "middle"; cx.fillText(p.ch === "−" ? "–" : p.ch, p.x, p.y + .5); }
+  if (p.H) hdot(p.x + p.r * .72, p.y - p.r * .72);
+  cx.globalAlpha = 1;
+}
+function hdot(x, y){ cx.beginPath(); cx.arc(x, y, 4.2, 0, 7); cx.fillStyle = "#FFFFFF"; cx.fill(); cx.lineWidth = 1.5; cx.strokeStyle = "#333"; cx.stroke(); }
+function dessin(now){
+  cx.clearRect(0, 0, CW, CH);
+  cx.fillStyle = "rgba(195,218,240,.35)"; cx.fillRect(0, 0, CW, CH);
+  const ordre = ["spec", "eau", "prod", "tit", "titr"];
+  for (const k of ordre) for (const p of M.parts) if (p.type === k) bulle(p);
+  M.trans = M.trans.filter(tr => {
+    const k = Math.min(1, (now - tr.t0) / 280), ax = tr.a.x + tr.a.r * .72, ay = tr.a.y - tr.a.r * .72, bx = tr.b.x + tr.b.r * .72, by = tr.b.y - tr.b.r * .72;
+    if (k < 1) { hdot(ax + (bx - ax) * k, ay + (by - ay) * k); return true; }
+    tr.b.H = true; return false;
+  });
+  M.flashes = M.flashes.filter(f => { const k = (now - f.t0) / 500; if (k > 1) return false;
+    cx.beginPath(); cx.arc(f.x, f.y, 10 + 22 * k, 0, 7); cx.strokeStyle = `rgba(224,138,46,${1 - k})`; cx.lineWidth = 3; cx.stroke(); return true; });
+  cx.fillStyle = "#5A6573"; cx.font = "12px system-ui,sans-serif"; cx.textAlign = "center"; cx.fillText("▼ burette", CW / 2, 14);
+}
+function boucle(now){ if (!M.open) return; pas_sim(now); dessin(now); compteurs(); M.raf = requestAnimationFrame(boucle); }
+function legende(){
+  const d = MIC[S.sys];
+  const it = [[COL.tit, d.tit[0] + " — espèce titrée"], [COL.titr, d.titr[0] + " — espèce titrante"]];
+  if (d.prod) it.push([COL.prod, d.prod[0] + " — produit"]);
+  it.push([COL.eau, "H₂O formée (rejoint le solvant)"]);
+  it.push(["#FFFFFF;border:2px dashed " + COL.spec, (d.spT ? d.spT[0] + ", " : "") + d.spR[0] + " — ions spectateurs"]);
+  $("microLeg").innerHTML = it.map(([c, t]) => `<li><i style="background:${c}"></i>${t}</li>`).join("");
+  $("microEq").textContent = d.eq;
+  $("microNote").textContent = `Modèle : 20 entités d'espèce titrée au départ ; une entité titrante dessinée pour ${fmt(VEq() / N0, 2)} mL versé. La réaction est considérée comme totale. Les molécules d'eau du solvant ne sont pas représentées ; le point blanc figure l'ion hydrogène H⁺ échangé. Fenêtre déplaçable par son bandeau.`;
+}
+let derPhase = "";
+function compteurs(){
+  if (!M.open) return;
+  const d = MIC[S.sys], c = t => M.parts.filter(p => p.type === t).length;
+  const sp = M.parts.filter(p => p.type === "spec").length;
+  const cases = [[d.tit[0] + " restant", c("tit")], [d.titr[0] + " libre", c("titr")]];
+  if (d.prod) cases.push([d.prod[0] + " formé", c("prod")]);
+  cases.push(["ions spectateurs", sp]);
+  const html = cases.map(([l, n]) => `<div><b>${n}</b>${l}</div>`).join("");
+  if ($("microCpt").innerHTML !== html) $("microCpt").innerHTML = html;
+  const n = ajoutes(S.V), Tt = d.tit[0], R = d.titr[0];
+  let ph, cl;
+  if (n < N0) { cl = "avant"; ph = `<b>Avant l'équivalence.</b> Chaque ${R} versé rencontre aussitôt une entité ${Tt} et réagit : ${R} est le <b>réactif limitant</b>, il n'en reste aucun dans le bécher. ${Tt} est encore présent.`; }
+  else if (n === N0) { cl = "eqv"; ph = `<b>Équivalence.</b> On a versé exactement autant de ${R} qu'il y avait de ${Tt} au départ : les réactifs ont été introduits dans les <b>proportions stœchiométriques</b>. Il ne reste ni ${Tt}, ni ${R}.`; }
+  else { cl = "apres"; ph = `<b>Après l'équivalence.</b> ${Tt} est épuisé : c'est désormais lui le <b>réactif limitant</b>. Les ${R} versés ne trouvent plus de partenaire et s'accumulent.`; }
+  const key = cl + n;
+  if (key !== derPhase) { derPhase = key; $("microPhase").className = "phase " + cl; $("microPhase").innerHTML = ph; }
+}
+function ouvrirMicro(o){
+  M.open = o; $("micro").hidden = !o; $("microBtn").setAttribute("aria-expanded", o);
+  $("microBtn").textContent = o ? "Fermer la vue microscopique" : "Ouvrir la vue microscopique";
+  cancelAnimationFrame(M.raf);
+  if (o) { derPhase = ""; reconstruire(); M.raf = requestAnimationFrame(boucle); }
+}
+$("microBtn").addEventListener("click", () => ouvrirMicro(!M.open));
+$("microX").addEventListener("click", () => ouvrirMicro(false));
+$("microVerser").addEventListener("click", () => verser(S.inc));
+document.addEventListener("keydown", e => { if (e.key === "Escape" && M.open) ouvrirMicro(false); });
+{ // déplacement de la fenêtre
+  const w = $("micro"), h = $("microHead"); let d0 = null;
+  h.addEventListener("pointerdown", e => { if (e.target.closest("button")) return; const r = w.getBoundingClientRect(); d0 = {x: e.clientX - r.left, y: e.clientY - r.top}; h.setPointerCapture(e.pointerId); });
+  h.addEventListener("pointermove", e => { if (!d0) return;
+    const x = Math.min(innerWidth - 60, Math.max(0, e.clientX - d0.x)), y = Math.min(innerHeight - 50, Math.max(0, e.clientY - d0.y));
+    Object.assign(w.style, {left: x + "px", top: y + "px", bottom: "auto"}); });
+  h.addEventListener("pointerup", () => d0 = null);
+}
+
+// démarrage : ?tp=9 ou ?tp=10 ouvre directement le TP ; ?mode=cond ouvre le labo libre en conductimétrie
+{
+  const q = new URLSearchParams(location.search), tp = q.get("tp");
+  if (q.get("mode") === "cond") S.mode = "cond";
+  scenario(tp === "9" ? "tp9" : tp === "10" ? "tp10" : "libre", false);
+}
+}
+</script>
+</body>
+</html>

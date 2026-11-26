@@ -38,6 +38,7 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 | `docs/plan-test-refonte.md` | Plan de test manuel de l'accueil à trois entrées, du parcours Python relié et des signalements |
 | `outils/python/` | Parcours Python de terminale (rubrique Outils) : `index.html` (les 5 niveaux), `niveau-1.html` à `niveau-5.html` (le 3 se génère depuis `sources/niveau-3/`), moteur `parcours.js` + `py-worker.js` + `py-prelude.py`, `parcours.css`, `polices/` auto-hébergées, `fiches/` (mémos PDF), `PARCOURS.md` (structure des niveaux), `A-VALIDER.md` (points de fond à trancher), `progression-resonance.js` (enregistre les réussites de l'élève connecté) |
 | `outils/radioactivite/` | Animation « Radioactivité » (terminale) : décroissance, expérience t½ et N₀, équations de transformation (tables du LNHB), radioprotection, missions. Page autonome, sans compte ni serveur ; `PASSATION.md` (historique, sources, règles), `tests/captures.py` (captures Playwright, sorties ignorées par Git) |
+| `outils/titrage/` | Labo de titrage (terminale) : paillasse, courbes pH = f(V) et σ = f(V), vue microscopique ; onglets Labo libre, TP9 (pH-métrie, vinaigre : tangentes, dérivée) et TP10 (conductimétrie, déboucheur : deux droites). Page autonome, sans compte ni serveur ; `PASSATION.md` (origine, règles, valeurs calées sur les corrigés), `docs/` (dossier de conception d'origine) |
 | `vendor/pyodide/`, `vendor/codemirror/`, `vendor/katex/` | Python dans le navigateur (Pyodide 314.0.7 : numpy, matplotlib, friendly-traceback), l'éditeur de code et le rendu des formules LaTeX (KaTeX 0.18.9, chargé seulement sur une page qui porte une formule), auto-hébergés ; voir leur `LISEZMOI.md` |
 | `.gitignore` | Bloque PDF, Excel, CSV et JSON : aucune donnée d'élève ne doit arriver sur le dépôt public. Exceptions, par leur propre `.gitignore` : `outils/python/fiches/*.pdf` et `vendor/pyodide/pyodide-lock.json` |
 | `ETAT_DU_PROJET.md` | Ce fichier |
@@ -134,6 +135,11 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
   - Le même dispositif existe sur le site du cours et dans Leitner (autre base, `ztyv…` : `Site-Web-Portfolio/bdd/schema/038-gestion-collegues.sql`). Les deux boîtes à messages restent séparées : celle de Résonance se relève dans son Tableau de bord, celle du cours et de Leitner dans l'onglet *Gestion* du tableau de bord du cours.
   - Vérifié sans toucher la base en ligne : migration rejouée deux fois sur un PostgreSQL local (droits collègue / élève / gestionnaire, refus d'effacer un compte enseignant, coupon effacé) ; Résonance dans Chromium avec une base simulée (26 contrôles : collègue, gestionnaire, migration absente).
 
+- **Labo de titrage** (26/11/2026), dans Outils → « Labo de titrage ». Prototype de M. Van Hoorde (dossier `labo-titrage-claude-code`) repris dans Résonance.
+  - Labo libre tel que conçu : HCl, acide éthanoïque, ammoniac ; suivi pH-métrique ou conductimétrique ; indicateurs ; vue microscopique.
+  - TP9 : vinaigre dilué 10 fois, soude 0,10 mol·L⁻¹, phénolphtaléine ; méthode des tangentes et courbe dérivée sur la courbe de l'élève (V_E ≈ 13,3 mL, pH_E ≈ 8,4, comme le corrigé).
+  - TP10 : déboucheur dilué 50 fois, HCl 5,00×10⁻² mol·L⁻¹, σ en mS·cm⁻¹ ; deux droites de régression et leur intersection (9,6 mL, comme le corrigé).
+
 - **Animation « Radioactivité »** (24/11/2026), dans Outils → « Radioactivité ». Prototype v0.3 de M. Van Hoorde, repris en v0.4 (détail dans `outils/radioactivite/PASSATION.md`).
   - Décroissance : t½ affichée seulement au bouton « Afficher t½ », avec la construction graphique depuis N₀/2 ; « Garder la courbe » et courbe N/N₀ pour montrer que t½ ne dépend pas de N₀.
   - Équation de transformation (α, β⁻, β⁺, γ, capture électronique) et bilan de conservation pour chaque nucléide et chaque source ; fluor 18 ajouté pour le β⁺.
@@ -204,11 +210,13 @@ Tutorat entre pairs en physique-chimie (première et terminale spécialité), ly
 - [ ] Mise à jour de Pyodide : changer aussi `VERSION_VENDOR` dans `sw.js`, sinon les appareils gardent l'ancienne version en cache.
 - [ ] RGPD : supabase-js et le lecteur Excel viennent encore d'un CDN (jsdelivr), qui voit l'adresse IP ; à auto-héberger dans `vendor/`.
 - [ ] Gestion entre collègues : coller la migration `008` (étape 11 de `supabase/MISE_EN_PLACE.md`), vérifier que votre compte est inscrit gestionnaire, publier Résonance, puis demander à la collègue de cocher ses comptes en double.
+- [ ] Labo de titrage : relire les choix faits sans vous (`outils/titrage/PASSATION.md`, « À valider »), dont C₀ = 2,45 mol·L⁻¹ au TP10 et les outils d'exploitation visibles pendant un TP noté.
 - [ ] Radioactivité : valider les données de `outils/radioactivite/PASSATION.md` (points ouverts du §7), dont le passage de toutes les demi-vies au LNHB.
 - [ ] Boîte à cartes : `supabase functions deploy pont-resonance --no-verify-jwt` depuis `Site-Web-Portfolio/` (pas d'ici : autre projet), publier Leitner puis Résonance, puis la section I de `docs/plan-test-refonte.md`.
 
 ## Journal
 
+- **26/11/2026** — Labo de titrage dans Outils (`outils/titrage/`) : labo libre, TP9 pH-métrie, TP10 conductimétrie.
 - **25/11/2026** — Radioactivité : z-score de l'Expérience retiré.
 - **24/11/2026** — Animation « Radioactivité » dans Outils (`outils/radioactivite/`) : bouton t½, courbes gardées, équations de transformation du LNHB.
 - **11/11/2026** — Gestion entre collègues : Mes élèves (masquer, demander une suppression), affichage personnalisable, « Écrire à M. Van Hoorde », section Gestion du site, fenêtre des nouveautés (migration `008`, `gestion.js`, `nouveautes.js`).
